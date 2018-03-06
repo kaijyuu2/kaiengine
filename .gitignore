@@ -1,0 +1,16 @@
+*.pyc
+*.rpyc
+*.sav
+*.save
+persistent
+tmp
+__pycache__
+bytecode.rpyb
+pyanalysis.rpyb
+screens.rpyb
+errors.txt
+log.txt
+traceback.txt
+options.config
+.spyderproject
+.spyderworkspace

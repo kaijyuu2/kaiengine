@@ -1,0 +1,87 @@
+
+
+#internal stuff
+from .standard import *
+
+#external stuff
+from OpenGL.GL import GL_TEXTURE_2D, GL_BLEND, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+from OpenGL.GL import GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, GL_PROJECTION, GL_RGBA
+from OpenGL.GL import GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST, GL_FLOAT
+from OpenGL.GL import GL_MODELVIEW, GL_VERTEX_ARRAY, GL_TEXTURE_COORD_ARRAY, GL_UNSIGNED_BYTE
+from OpenGL.GL import GL_COLOR_ARRAY, GL_TRIANGLES, GL_LINEAR, GL_UNPACK_ALIGNMENT
+from OpenGL.GL import GL_RGB, GL_FRAGMENT_SHADER, GL_VERTEX_SHADER, GL_FALSE, GL_STATIC_DRAW
+from OpenGL.GL import GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_COMPLETE
+from OpenGL.GL import GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_DRAW_FRAMEBUFFER, GL_READ_FRAMEBUFFER
+import ctypes
+
+#TODO: Remove need for this to be here
+PNG_EXTENSION = ".png"
+
+
+
+#some constants
+BASE_VBO_SIZE = 2048
+VBO_RESIZE_MULTIPLIER = 2
+TEX_COORD_AMOUNT = 2
+VERTEX_COORD_AMOUNT = 2
+COLOR_VALUE_AMOUNT = 4
+USER_DATA_AMOUNT = 16
+VERTEX_AMOUNT = 3 #triangles
+TRIANGLES_PER_QUAD = 2
+VERTEX_PER_TRIANGLE_PER_QUAD = TRIANGLES_PER_QUAD * VERTEX_AMOUNT
+VERTEX_TEX_LENGTH = VERTEX_COORD_AMOUNT + TEX_COORD_AMOUNT
+SPRITE_VBO_LENGTH = VERTEX_COORD_AMOUNT + TEX_COORD_AMOUNT + COLOR_VALUE_AMOUNT + USER_DATA_AMOUNT
+VALUE_TYPE = GL_FLOAT
+VALUE_SIZE = 4 #CHANGE THIS IF YOU CHANGE THE VALUE TYPE
+STRIDE = VALUE_SIZE * (TEX_COORD_AMOUNT + VERTEX_COORD_AMOUNT + COLOR_VALUE_AMOUNT + USER_DATA_AMOUNT)
+STRIDE_QUAD = STRIDE * VERTEX_AMOUNT * TRIANGLES_PER_QUAD
+TEX_COORD_STRIDE_OFFSET = None
+VERTEX_STRIDE_OFFSET = ctypes.c_void_p(VALUE_SIZE * TEX_COORD_AMOUNT)
+COLOR_STRIDE_OFFSET = ctypes.c_void_p(VALUE_SIZE * (TEX_COORD_AMOUNT + VERTEX_COORD_AMOUNT))
+USER_DATA_STRIDE_OFFSET = ctypes.c_void_p(VALUE_SIZE * (TEX_COORD_AMOUNT + VERTEX_COORD_AMOUNT + COLOR_VALUE_AMOUNT))
+
+BASE_VBO_DATA = [0.,0., -1.,-1., .5,.5,.5,.5, 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+                 1.,0., -1.,-1., .5,.5,.5,.5, 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+                 0.,1., -1.,-1., .5,.5,.5,.5, 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+                 1.,1., -1.,-1., .5,.5,.5,.5, 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+                 1.,0., -1.,-1., .5,.5,.5,.5, 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,
+                 0.,1., -1.,-1., .5,.5,.5,.5, 0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.] #enough for a single quad (two triangles)
+
+#x/y indexes
+Xi = 0
+Yi = 1
+
+#left/right indexes for texture offsets
+LEFT = 0
+RIGHT = 1
+BOTTOM = 0
+TOP = 1
+
+#color indexes
+RED = 0
+GREEN = 1
+BLUE = 2
+
+#base number of colors if not using 0.0-1.0 fractions
+COLOR_BASE = 255
+
+TEX_COORD_BASIC_ARRAY = (0.,1.)
+
+
+
+UNIQUE_NAME_BASE = "_UNIQUE_TEXTURE_NAME_"
+
+#keys for texture dict
+TEXTURES = "textures"
+COUNT = "count"
+DIM = "dimensions"
+IMAGE_DATA = "image_data"
+
+#list indexes for image sets
+IMAGE_TEXTURE = 0
+IMAGE_VBO = 1
+IMAGE_COUNT = 2
+IMAGE_IHANDLER = 3
+IMAGE_SPACE = 4
+
+IMAGE_SPACE_DEFAULT = 4
