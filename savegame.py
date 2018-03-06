@@ -35,7 +35,7 @@ def resetToDefaultSave():
     except JSONDecodeError as e:
         debugMessage(e)
     except ResourceUnavailableError:
-        debugMessage("Failed to load default save. Ignore this if you don't have one.")
+        debugMessage("Failed to load default save. Ignore this if the game isn't supposed to have one.")
     except:
         raise
 
