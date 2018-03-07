@@ -319,16 +319,10 @@ class Label_Graphic(Label_Base, GraphicObject):
             return self.pos[:]
         return getLeftSide(self.sprites[0])
 
-    def getRightSide(self, *args, **kwargs):
-        return self.getRightSide(*args, **kwargs)
-
     def getRightSide(self):
         if len(self.sprites) == 0:
             return self.pos[:]
         return getRightSide(self.sprites.last_item())
-
-    def getTopSide(self, *args, **kwargs):
-        return self.getTopSide(*args, **kwargs)
 
     def getTopSide(self):
         if len(self.sprites) == 0:
@@ -339,9 +333,6 @@ class Label_Graphic(Label_Base, GraphicObject):
         if not self.center[0]:
             x += effective_width/2
         return (x,pos[1])
-
-    def getBottomSide(self, *args, **kwargs):
-        return self.getBottomSide(*args, **kwargs)
 
     def getBottomSide(self):
         if len(self.sprites) == 0:

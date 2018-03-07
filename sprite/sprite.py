@@ -569,11 +569,15 @@ class Sprite(sGraphics.sSprite):
     def update_opacity(self):
         self.alpha = self.fade_opacity * self.ani_opacity
         
-    def getScreenPosition(self):
-        if self.follow_camera:
-            return self.getPos()
+    def getScreenPosition(self, centered = False):
+        if centered:
+            pos = self.getCenterPosition()
         else:
-            return list(map(operator.sub, self.getPos(), camera.getCameraXY()))
+            pos = self.getPos()
+        if self.follow_camera:
+            return pos
+        else:
+            return list(map(operator.sub, pos, camera.getCameraXY()))
 
     def getCenterPosition(self):
         effsize = self.get_effective_size()

@@ -324,12 +324,24 @@ class GraphicObject(BaseObject):
             debugMessage("effective width and/or height not defined for " + self.getFilename())
             return [0,0]
         
-    def getScreenPosition(self):
-        if self.follow_camera:
-            return self.getPos()
+    def getScreenPosition(self, centered = False):
+        if centered:
+            pos = self.getCenterPosition()
         else:
-            return list(map(operator.sub, self.getPos(), camera.getCameraXY()))
+            pos = self.getPos()
+        if self.follow_camera:
+            return pos
+        else:
+            return list(map(operator.sub, pos, camera.getCameraXY()))
 
+        
+    def getCenterPosition(self):
+        """returns the center of the sprite, no matter where that might be"""
+        if not self.sprites:
+            return self.pos[:]
+        else:
+            return (self.getTopSide()[0], self.getLeftSide()[1])
+        
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
         debugMessage("getLeftSide not defined for " + self.getFilename())

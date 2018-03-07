@@ -150,6 +150,31 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
         except AttributeError: #end of game error suppression
             return True
 
+    def getScreenPosition(self, centered = False):
+        if centered:
+            pos = self.getCenterPosition()
+        else:
+            pos = self.getPos()
+        if self.follow_camera:
+            return pos
+        else:
+            return list(map(operator.sub, pos, camera.getCameraXY()))
+
+    def getCenterPosition(self):
+        effsize = self.get_effective_size()
+        xoffset = 0
+        yoffset = 0
+        for key, offset in self.other_offsets.items():
+            if key != CAMERA_KEY:
+                xoffset += offset[Xi]
+                yoffset += offset[Yi]
+        if not self.center[Xi]:
+            xoffset += (self.width * effsize[Xi])/2
+        if not self.center[Yi]:
+            yoffset += (self.height * effsize[Yi])/2
+        return [self.pos[Xi] + self.offset[Xi] + xoffset,
+            self.pos[Yi] + self.offset[Yi] + yoffset]
+
 
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
