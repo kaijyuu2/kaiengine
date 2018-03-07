@@ -292,8 +292,8 @@ class GraphicInterface(PositionInterface):
                 temppath = [filename]
         return toStringPath(temppath)
     
-    def getSpriteScreenPosition(self):
-        return self.sprite.getScreenPosition()
+    def getSpriteScreenPosition(self, *args, **kwargs):
+        return self.sprite.getScreenPosition(*args, **kwargs)
 
     def getSpriteCenter(self):
         try: return self.sprite.center[:]
