@@ -6,7 +6,7 @@ from .resource import toStringPath, ResourceUnavailableError, allResourcesOnPath
 from .settings import getValue
 from .debug import debugMessage, checkDebugOn
 
-import os
+import os, copy
 
 localization_data = {}
 localization_text = {}
@@ -85,9 +85,9 @@ def getString(textkey, ID = None, fallbackID = None, locale = None, fallbackloca
         
 def _getString(textkey, ID, fallbackID, locale):
     try:
-        return localization_text[locale][ID][textkey]
+        return copy.deepcopy(localization_text[locale][ID][textkey])
     except KeyError:
-        return localization_text[locale][fallbackID][textkey]
+        return copy.deepcopy(localization_text[locale][fallbackID][textkey])
         
 
 
