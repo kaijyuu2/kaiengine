@@ -130,19 +130,22 @@ class InterfaceLayer(InterfaceWidget, EventInterface, SchedulerInterface):
     def _layerKeyPress(self, symbol, *args, **kwargs):
         if checkDebugOn():
             import kaiengine.keybinds
-            if self.isTopLayer() and kaiengine.keybinds.keyMatches(DEBUG_BUTTON, symbol):
-                import gc
-                debugMessage("---")
-                self._printStack()
-                """count = {}
-                for obj in gc.get_objects():
-                    key = type(obj).__name__
-                    try:count[key] += 1
-                    except KeyError: count[key] = 1
-                for i, tup in enumerate(sorted(count.items(), key = lambda x: x[1], reverse = True)):
-                    if i > 20:
-                        break
-                    debugMessage(tup[0] + str(tup[1]))"""
+            try:
+                if self.isTopLayer() and kaiengine.keybinds.keyMatches(DEBUG_BUTTON, symbol):
+                    import gc
+                    debugMessage("---")
+                    self._printStack()
+                    """count = {}
+                    for obj in gc.get_objects():
+                        key = type(obj).__name__
+                        try:count[key] += 1
+                        except KeyError: count[key] = 1
+                    for i, tup in enumerate(sorted(count.items(), key = lambda x: x[1], reverse = True)):
+                        if i > 20:
+                            break
+                        debugMessage(tup[0] + str(tup[1]))"""
+            except NotImplementedError:
+                pass
         self._layerKeyPress2(symbol, *args, **kwargs)
         if self.allow_key_held:
             self._key_held_timers[symbol] = FrameTimer()

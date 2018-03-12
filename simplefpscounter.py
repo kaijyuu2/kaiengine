@@ -35,7 +35,8 @@ def toggleFPS():
     
 def removeFPS():
     global fpssprite
-    fpssprite.destroy()
+    if fpssprite:
+        fpssprite.destroy()
     fpssprite = None
     unscheduleRealtime(simpleFPSUpdate)
     removeCustomListener(EVENT_TOGGLE_FPS, toggleFPS)

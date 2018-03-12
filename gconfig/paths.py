@@ -29,6 +29,8 @@ SETTINGS_FILE_NAME = "options"
 ARCHIVE_FILE_NAME = "resources.dat"
 TEXT_DIR = "text" #deprecated; used only in DoL
 WIDGET_PATH = "widgets"
+LOG_PATH = "logs"
+LOG_FILENAME_HEADER = "log"
 
 #full paths
 FULL_FONT_PATH = [RESOURCE_PATH, GRAPHICS_PATH, FONT_DIR]
