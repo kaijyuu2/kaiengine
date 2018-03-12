@@ -3,6 +3,9 @@ from kaiengine.debug import debugMessage
 import traceback
 
 class Event(object):
+
+    __slots__ = ['listener', 'priority', 'delete_me']
+
     def __init__(self, listener, priority = 0):
         self.listener = listener
         self.priority = priority
