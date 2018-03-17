@@ -26,7 +26,10 @@ def setupDrivers():
     audio.setSoundVolume(settings.getValue(DYNAMIC_SETTINGS_SOUND_VOLUME))
     audio.toggleMusic(settings.getValue(DYNAMIC_SETTINGS_MUSIC_ON))
     audio.toggleSound(settings.getValue(DYNAMIC_SETTINGS_SOUND_ON))
-    simplefpscounter.initializeSimpleFPSCounter()
+    try:
+        simplefpscounter.initializeSimpleFPSCounter()
+    except resource.ResourceUnavailableError:
+        pass
     event.initializeGlue()
 
 def closeDrivers():
