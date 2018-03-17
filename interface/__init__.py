@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from .interfaceManager import InterfaceManager
 from .interfaceLayer import InterfaceLayer
 from .interfaceWidget import InterfaceWidget, SpacerWidget
 from .interfaceConstants import INTERFACE_TIER_BOTTOM, INTERFACE_TIER_DEFAULT, INTERFACE_TIER_HIGH, INTERFACE_TIER_TOP
@@ -9,8 +8,6 @@ from .spriteHandler import destroyAllSprites, checkSpriteExists, clearPreloadedS
 from .spriteHandler import preloadSprite, processSprites, makeUISprite
 from kaiengine.event import addCustomListener, EVENT_REQUEST_LAYER_CREATION
 from kaiengine.safeminmax import dmax
-
-manager = InterfaceManager()
 
 _layers = defaultdict(list)
 

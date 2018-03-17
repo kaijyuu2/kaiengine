@@ -2,9 +2,10 @@ from kaiengine.gconfig import *
 from kaiengine.interface.spriteHandler import makeSprite, registerSprite, removeSprite
 from kaiengine.display import getWindowDimensionsScaled
 from kaiengine.event import addCustomListener, removeCustomListener
+from kaiengine.objectinterface import EventInterface
 from kaiengine.objectdestroyederror import ObjectDestroyedError
 
-class InterfaceWidget(object):
+class InterfaceWidget(EventInterface):
 
     """Base class for display of interface elements.
 

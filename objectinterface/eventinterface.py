@@ -83,7 +83,7 @@ class EventInterface(DestroyInterface):
         '''Register a function as a mouse move event listener.'''
         self._appendEventMethod(EVENT_MOUSE_MOVE, listener)
         addMouseMoveListener(listener, priority)
-        
+
     def removeMouseMoveListener(self,listener):
         '''Unregister a mouse move event listener. Does nothing if listener is not actually listening.'''
         self._removeEventMethod(EVENT_MOUSE_MOVE, listener)
@@ -103,7 +103,7 @@ class EventInterface(DestroyInterface):
         '''Register a function as a mouse exit window event listener.'''
         self._appendEventMethod(EVENT_MOUSE_EXIT, listener)
         addMouseExitListener(listener, priority)
-        
+
     def removeMouseExitListener(self,listener):
         '''Unregister a mouse enter window event listener. Does nothing if listener is not actually listening.'''
         self._removeEventMethod(EVENT_MOUSE_EXIT, listener)
@@ -116,7 +116,7 @@ class EventInterface(DestroyInterface):
     def removeJoybuttonPressListener(self,listener):
         self._removeEventMethod(EVENT_JOYPAD_PRESS, listener)
         removeJoybuttonPressListener(listener)
-        
+
     def addJoybuttonReleaseListener(self,listener, priority = 0):
         self._appendEventMethod(EVENT_JOYPAD_RELEASE, listener)
         addJoybuttonReleaseListener(listener, priority)
