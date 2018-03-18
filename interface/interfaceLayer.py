@@ -112,8 +112,8 @@ class FadeLayer(InterfaceLayer, SchedulerInterface):
 
     blocking = True
 
-    def __init__(self, speed=15, priority=90001, startFadedOut=False, **kwargs):
-        super(FadeLayer, self).__init__(priority=priority, **kwargs)
+    def __init__(self, speed=15, startFadedOut=False, **kwargs):
+        super(FadeLayer, self).__init__(**kwargs)
         self.speed = speed
         self.addWidget(FadeWidget(speed=speed, startFaded=startFadedOut))
         if startFadedOut:

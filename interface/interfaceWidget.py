@@ -49,7 +49,6 @@ class InterfaceWidget(EventInterface):
         self._baseLayer = baseLayer
         self.flipSprites = flipSprites
         self.being_destroyed = False
-        self._custom_listeners = {}
 
     @property
     def height(self):
@@ -328,10 +327,6 @@ class InterfaceWidget(EventInterface):
         sprite.flip = self.flipSprites[:]
         return sprite
 
-    def listen(self, key, listener, priority=0):
-        addCustomListener(key, listener, priority=priority)
-        self._custom_listeners[key] = listener
-
     def destroyWidget(self, widget):
         widget.destroy()
         self.widgets.remove(widget)
@@ -383,9 +378,7 @@ class InterfaceWidget(EventInterface):
         self.being_destroyed = True
         self._destroySpritesSelfOnly()
         self.destroyWidgets()
-        for key, listener in self._custom_listeners.items():
-            removeCustomListener(key, listener)
-        self._custom_listeners = {}
+        super().destroy()
 
     def setAlpha(self, alpha):
         """Set alpha value for all sprites in this widget and its subwidgets."""
