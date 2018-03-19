@@ -224,6 +224,11 @@ class GraphicInterface(PositionInterface):
         if self._follow_camera != val:
             self._follow_camera = val
             self._updateSprite()
+            
+    def checkSpriteOffscreen(self, *args, **kwargs):
+        if self.sprite:
+            return self.sprite.checkOffscreen(*args, **kwargs)
+        return True
 
     def setSpriteDimensions(self, x = None, y = None):
         if self._dimensions == None:
@@ -303,16 +308,22 @@ class GraphicInterface(PositionInterface):
         return self.sprite.getCenterPosition()
 
     def getSpriteLayer(self):
-        return self.sprite.layer
+        if self.sprite:
+            return self.sprite.layer
+        return 0
 
     def getSpriteFlip(self):
         return self._flip[:]
 
     def getSpriteWidth(self):
-        return self.sprite.width
+        if self.sprite:
+            return self.sprite.width
+        return 0
 
     def getSpriteHeight(self):
-        return self.sprite.height
+        if self.sprite:
+            return self.sprite.height
+        return 0
 
     def getSpriteShow(self):
         return self._show

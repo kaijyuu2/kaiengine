@@ -57,4 +57,5 @@ def gameFrame(dt):
 def resetLag():
     global lagtime
     lagtime = 0.0
-    frametimer.stopTimer() #prevents lag catch-up; all lag until after the next frame will be ignored
+    if frametimer:
+        frametimer.stopTimer() #prevents lag catch-up; all lag until after the next frame will be ignored

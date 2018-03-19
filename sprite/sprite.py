@@ -682,6 +682,13 @@ class Sprite(sGraphics.sSprite):
 
     def stopUpdatingWithCamera(self):
         self.remove_offset(CAMERA_KEY)
+        
+    def checkOffscreen(self, x_buffer = None, y_buffer = None):
+        from kaiengine.display import getWindowDimensionsScaled
+        if x_buffer is None: x_buffer = self.width
+        if y_buffer is None: y_buffer = self.height
+        x, y = self.getScreenPosition()
+        return x < -x_buffer or y < -y_buffer or x > getWindowDimensionsScaled()[0] + x_buffer or y > getWindowDimensionsScaled()[1] + y_buffer
 
     #overwritten stuff
 

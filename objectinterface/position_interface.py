@@ -15,9 +15,6 @@ class PositionInterface(DestroyInterface):
     def pos(self, val):
         self.setPos(*val)
 
-    def setPos(self, *args, **kwargs):
-        self.setPos(*args, **kwargs)
-
     def setPos(self, x = None, y = None):
         if x is None: x = self._pos[0]
         if y is None: y = self._pos[1]
