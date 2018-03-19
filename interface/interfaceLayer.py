@@ -12,7 +12,7 @@ from kaiengine.timer import Schedule
 from kaiengine.objectdestroyederror import ObjectDestroyedError
 from kaiengine.interface.spriteHandler import makeSprite, registerSprite, removeSprite
 from kaiengine.interface.interfaceWidget import FadeWidget
-from kaiengine.objectinterface import EventInterface
+from kaiengine.objectinterface import EventInterface, SchedulerInterface
 from kaiengine.keybinds import keyMatches, keyMatchesAny
 from kaiengine.uidgen import generateUniqueID
 from kaiengine import settings
@@ -83,14 +83,13 @@ class InterfaceLayer(EventInterface, metaclass=ListenerRegistryMeta):
 
     def destroy(self):
         """Destroy the layer and all associated objects, and create next layer if appropriate."""
+        customEvent(EVENT_REMOVE_INPUT_LOCKS, self._ID)
         super().destroy()
         self.destroyWidget()
         self._delete = True
-        customEvent(EVENT_REMOVE_INPUT_LOCKS, self._ID)
 
     def fade(self, **kwargs):
         """Convenience function for a full-screen fade effect."""
-        #TODO: event for fade in
         return self.createLayer(FadeLayer, tier=INTERFACE_TIER_HIGH, **kwargs)
 
     def fadeIn(self):
@@ -107,70 +106,18 @@ class InterfaceLayer(EventInterface, metaclass=ListenerRegistryMeta):
                 return func(self, *args, **kwargs)
         self.addCustomListener(event_key, instantiated, priority)
 
-class FadeLayer(InterfaceLayer):
+class FadeLayer(InterfaceLayer, SchedulerInterface):
 
-    """Layer for a full-screen fade effect. Make sure to call fadeIn when desired.
-
-        style: can be simple or sweep (default simple)
-        color: color to tint fade (default black)
-        blocking: whether fade blocks input (default True)
-        duration: length of fade in seconds (default 1.0)"""
+    """Layer for a full-screen fade effect."""
 
     blocking = True
 
-    def __init__(self, style="simple", color=COLOR_BLACK, duration=1.0, priority=90001, startFadedOut=False, multiFade=False, realTime=True, **kwargs):
-        super(FadeLayer, self).__init__(priority=priority, **kwargs)
-        self.realTime = realTime
-        if realTime:
-            self.modifier = 1.0 / duration
-        else:
-            self.duration = duration * 60 #TODO: better to reference some constant instead of a magic number?
-        self.addWidget(FadeWidget(style, color, startFaded=startFadedOut))
+    def __init__(self, speed=15, startFadedOut=False, **kwargs):
+        super(FadeLayer, self).__init__(**kwargs)
+        self.speed = speed
+        self.addWidget(FadeWidget(speed=speed, startFaded=startFadedOut))
         if startFadedOut:
-            self.timer = 0
+            fadeInDelay = 0
         else:
-            if realTime:
-                self.timer = 1.0
-            else:
-                self.timer = self.duration
-        self.fadingIn = False
-        self.multiFade = multiFade
-        Schedule(self.advanceTick, 1, True)
-        self.addCustomListener(EVENT_FADE_IN, self.fadeIn)
-
-    def advanceTick(self):
-        if self.timer > 0:
-            self.timer = self.timer - 1
-            try:
-                self._widget.update((self.timer/float(self.duration)), self.fadingIn)
-            except ZeroDivisionError:
-                self._widget.update(0, self.fadingIn)
-        elif not self.multiFade and self.fadingIn:
-            self.destroy()
-
-    @property
-    def doneFadingOut(self):
-        """Return True if fully faded out, or fadeIn has begun."""
-        return self.fadingIn or self.timer <= 0
-
-    @property
-    def doneFading(self):
-        """Return True if fully faded in."""
-        return self.fadingIn and self.timer <= 0
-
-    def fadeIn(self):
-        """Begin fade-in."""
-        if self.realTime:
-            self.timer = 1.0
-        else:
-            self.timer = self.duration
-        self.fadingIn = True
-
-    def fadeOut(self):
-        """Begin fade-out (generally only needed for multiple fades)."""
-        if self.realTime:
-            self.timer = 1.0
-        else:
-            self.timer = self.duration
-        self.fadingIn = False
-
+            fadeInDelay = self.speed * 5
+        self.Schedule(self.destroy, fadeInDelay + self.speed*4)

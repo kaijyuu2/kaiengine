@@ -2,9 +2,10 @@ from kaiengine.gconfig import *
 from kaiengine.interface.spriteHandler import makeSprite, registerSprite, removeSprite
 from kaiengine.display import getWindowDimensionsScaled
 from kaiengine.event import addCustomListener, removeCustomListener
+from kaiengine.objectinterface import EventInterface, SchedulerInterface
 from kaiengine.objectdestroyederror import ObjectDestroyedError
 
-class InterfaceWidget(object):
+class InterfaceWidget(EventInterface):
 
     """Base class for display of interface elements.
 
@@ -48,7 +49,6 @@ class InterfaceWidget(object):
         self._baseLayer = baseLayer
         self.flipSprites = flipSprites
         self.being_destroyed = False
-        self._custom_listeners = {}
 
     @property
     def height(self):
@@ -327,10 +327,6 @@ class InterfaceWidget(object):
         sprite.flip = self.flipSprites[:]
         return sprite
 
-    def listen(self, key, listener, priority=0):
-        addCustomListener(key, listener, priority=priority)
-        self._custom_listeners[key] = listener
-
     def destroyWidget(self, widget):
         widget.destroy()
         self.widgets.remove(widget)
@@ -382,9 +378,7 @@ class InterfaceWidget(object):
         self.being_destroyed = True
         self._destroySpritesSelfOnly()
         self.destroyWidgets()
-        for key, listener in self._custom_listeners.items():
-            removeCustomListener(key, listener)
-        self._custom_listeners = {}
+        super().destroy()
 
     def setAlpha(self, alpha):
         """Set alpha value for all sprites in this widget and its subwidgets."""
@@ -410,95 +404,28 @@ class SpacerWidget(InterfaceWidget):
     def width(self):
         return self._width
 
-class FadeWidget(InterfaceWidget):
+class FadeWidget(InterfaceWidget, SchedulerInterface):
 
-    def __init__(self, style="simple", color=COLOR_BLACK, startFaded=False, *args, **kwargs):
-        super(FadeWidget, self).__init__(followCamera=True, *args, **kwargs)
-        self.style = style
+    def __init__(self, speed=15, startFaded=False, *args, **kwargs):
+        super().__init__(followCamera=True, *args, **kwargs)
         self.faders = []
-        if style == "simple":
-            self.fader = self.addSprite(makeSprite((WIDGET_PATH, "darkener.png")))
-            self.fader.set_dimensions(*getWindowDimensionsScaled())
+        for i in range(4):
+            fader = self.addSprite(makeSprite((WIDGET_PATH, "dissolve_fade_%s.png" % str(i+1))))
+            fader.size = [getWindowDimensionsScaled()[0]/4+1, getWindowDimensionsScaled()[1]/4+1]
+            fader.tile_texture()
+            fader.layer = FADE_LAYER
             if not startFaded:
-                self.fader.alpha = 0
-        elif style == "sweep":
-            self.fader = self.addSprite(makeSprite((WIDGET_PATH, "fade_sweep.png")))
-            self.fader.set_dimensions(getWindowDimensionsScaled()[0]*3, getWindowDimensionsScaled()[1])
-            if not startFaded:
-                self.fader.setPos(-2*getWindowDimensionsScaled()[0], 0)
-            else:
-                #TODO: check if this is actually the right position to start
-                self.fader.setPos(-1*getWindowDimensionsScaled()[0], 0)
-        elif style == "diamond":
-            self.fader = self.addSprite(makeSprite((WIDGET_PATH, "fade_diamond.png")))
-            self.fader.set_dimensions(1, 1)
-            self.fader.setPos(getWindowDimensionsScaled()[0]/2, getWindowDimensionsScaled()[1]/2)
-            self.fader.setCenter(True, True)
-        elif style == "dissolve":
-            for i in range(4):
-                fader = self.addSprite(makeSprite((WIDGET_PATH, "dissolve_fade_%s.png" % str(i+1))))
-                fader.size = [getWindowDimensionsScaled()[0]/4+1, getWindowDimensionsScaled()[1]/4+1]
-                fader.tile_texture()
-                fader.layer = FADE_LAYER
-                if not startFaded:
-                    fader.show = False
-                self.faders.append(fader)
-        if style != "dissolve":
-            self.fader.layer = FADE_LAYER
-        if style == "simple" or style == "sweep":
-            self.fader.setColor(*color)
+                fader.show = False
+            self.faders.append(fader)
         self.faderFlag = False
-
-    def update(self, time=1.0, fadingIn=False, *args, **kwargs):
-        if not fadingIn:
-            if self.style == "simple":
-                self.fader.alpha = 1.0 - time
-            elif self.style == "sweep":
-                self.fader.setPos((-3*(time)*getWindowDimensionsScaled()[0])-getWindowDimensionsScaled()[0], 0)
-            elif self.style == "diamond":
-                if not self.faderFlag:
-                    if time > 0.04:
-                        self.fader.set_dimensions(int(getWindowDimensionsScaled()[0]*2.25*(1.0-time)),
-                                                    int(getWindowDimensionsScaled()[1]*2.25*(1.0-time)))
-                    else:
-                        self.faderFlag = True
-                        removeSprite(self.fader)
-                        self.faders = [makeSprite((WIDGET_PATH, "fade_diamond_"+spath+".png")) for spath in ("ul", "ur", "bl", "br")]
-                        for fader in self.faders:
-                            fader.layer = FADE_LAYER
-            elif self.style == "dissolve":
-                if time < 0.25:
-                    self.faders[3].show = True
-                if time < 0.5:
-                    self.faders[2].show = True
-                if time < 0.75:
-                    self.faders[1].show = True
-                if time < 0.99:
-                    self.faders[0].show = True
+        if startFaded:
+            for i in range(4):
+                self.Schedule(self._setFadeState, speed*i, state=3-i)
         else:
-            if self.style == "simple":
-                self.fader.alpha = time
-            elif self.style == "sweep":
-                self.fader.setPos((3*(1.0 - time)*getWindowDimensionsScaled()[0])-getWindowDimensionsScaled()[0], 0)
-            elif self.style == "diamond":
-                if len(self.faders) == 0:
-                    self.faderFlag = True
-                    removeSprite(self.fader)
-                    self.faders = [makeSprite((WIDGET_PATH, "fade_diamond_"+spath+".png")) for spath in ("ul", "ur", "bl", "br")]
-                    for fader in self.faders:
-                        fader.layer = FADE_LAYER
-                widthDistance = getWindowDimensionsScaled()[0]/2
-                heightDistance = getWindowDimensionsScaled()[1]/2
-                self.faders[0].setPos(-1*widthDistance*(1.0-time), heightDistance*(1.0-time))
-                self.faders[1].setPos(widthDistance*(1.0-time), heightDistance*(1.0-time))
-                self.faders[2].setPos(-1*widthDistance*(1.0-time), -1*heightDistance*(1.0-time))
-                self.faders[3].setPos(widthDistance*(1.0-time), -1*heightDistance*(1.0-time))
-            elif self.style == "dissolve":
-                if time < 0.01:
-                    self.faders[3].show = False
-                if time < 0.25:
-                    self.faders[2].show = False
-                if time < 0.5:
-                    self.faders[1].show = False
-                if time < 0.75:
-                    self.faders[0].show = False
+            for i in range(4):
+                self.Schedule(self._setFadeState, speed*i, state=i)
+                self.Schedule(self._setFadeState, speed*i + speed*5, state=3-i)
+
+    def _setFadeState(self, state=0):
+        for i, fader in enumerate(self.faders):
+            fader.show = state >= i
