@@ -5,12 +5,12 @@ from kaiengine.keybinds import keyName
 def _relayInputEventKey(symbol, modifiers):
     bind = keyName(symbol)
     if bind:
-        _callEvent(EVENT_INPUT_PREFIX + bind)
+        _callEvent(EVENT_INPUT_PREFIX + str(bind))
 
 def _relayInputEventMouse(x, y, button, modifiers):
     bind = keyName(button)
     if bind:
-        _callEvent(EVENT_INPUT_PREFIX + bind)
+        _callEvent(EVENT_INPUT_PREFIX + str(bind))
 
 def initializeGlue():
     _addListener(EVENT_KEY_PRESS, _relayInputEventKey, 0)
