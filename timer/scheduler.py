@@ -93,6 +93,9 @@ class RealtimeEvent(object):
         self._destroyed = True
         if self.handle:
             self.handle.cancel()
+            
+    def __del__(self):
+        self.destroy()
 
 realtimeEvents = {}
 
@@ -114,6 +117,7 @@ def _realtimeEventRun(event, *args, **kwargs):
     if not event._destroyed and event.repeating:
         _scheduleRealtime(event.listener, event.time, event.repeating, *args, **kwargs)
         
+        
 def _unscheduleRealtime(listener):
     try:
         _cleanupRealtimeScheduledEvent(listener, min(realtimeEvents[listener].keys()))
@@ -124,7 +128,7 @@ def _cleanupRealtimeScheduledEvent(listener, key):
     try:
         if realtimeEvents[listener][key].handle:
             realtimeEvents[listener][key].handle.cancel()
-        del realtimeEvents[listener][key]
+        del realtimeEvents[listener][key] #deliberately do not call destroy method so that repeating ones work. I know this is hacky; I'm sorry
         if not realtimeEvents[listener]:
             del realtimeEvents[listener]
     except KeyError:
