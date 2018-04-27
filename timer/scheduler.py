@@ -1,12 +1,13 @@
 
+#functions/etc for scheduling logic
 
 from .timer import Timer
+from .maingamescheduler import getGameScheduler
 
 from kaiengine.sDict import sDict
-from kaiengine.debug import debugMessage
 
-from pyglet import clock
 
+import functools
 import traceback, math
 
 class TimedEvent(object):
@@ -31,6 +32,7 @@ class TimedEvent(object):
         try:
             self.listener(*self.args, **self.kwargs)
         except Exception as e:
+            from kaiengine.debug import debugMessage
             debugMessage(traceback.format_exc())
             debugMessage("something broke with a scheduled listener; deleting it")
             debugMessage(e)
@@ -54,61 +56,79 @@ class TimedEvent(object):
 
 
 class RealtimeEvent(object):
-    def __init__(self, listener, time, repeating, args, kwargs):
+    def __init__(self, listener, time, repeating, scheduler_time, args, kwargs):
         self.listener = listener
         self.time = time
         self.repeating = repeating
         self.key = None
+        self.handle = None
         self.args = args
         self.kwargs = kwargs
         self.paused = False
         self.time_active = Timer()
+        self.pause_timer = Timer()
         self.time_active.Start()
-        self.pause_time = 0.0
+        self.scheduler_time = scheduler_time
         self._destroyed = False
         self._repeat_started = False
 
     def pauseEvent(self):
-        self.paused = True
-        self.pause_time = self.time - (self.time_active.checkTime() % self.time)
-        self.time_active.pauseTimer()
-        if self._repeat_started:
-            self._repeat_started = False
-            clock.unschedule(self.repeatRestart)
-
-    def unpauseEvent(self):
         if not self.paused:
             self.paused = True
-            self.time_active.unpauseTimer()
-            if self.repeating:
-                clock.schedule_once(self.repeatRestart, self.pause_time)
-            else:
-                clock.schedule_once(self.listener, self.pause_time, *self.args, **self.kwargs)
+            if self.handle:
+                self.handle.cancel()
+            self.time_active.pauseTimer()
+            self.pause_timer.Start()
 
-    def repeatRestart(self):
-        clock.schedule_interval(self.listener, self.time, *self.args, **self.kwargs)
-        self._repeat_started = True
+    def unpauseEvent(self):
+        returnval = 0.0
+        if self.paused:
+            self.paused = False
+            self.time_active.unpauseTimer()
+            returnval = self.pause_timer.checkTime()
+            self.pause_timer.stopTimer()
+        return returnval
 
     def destroy(self):
         self._destroyed = True
-        if self._repeat_started:
-            self._repeat_started = False
-            clock.unschedule(self.repeatRestart) #very slow call; do sparingly
+        if self.handle:
+            self.handle.cancel()
 
 realtimeEvents = {}
 
-def _ScheduleRealtime(listener, time, repeat = False, *args, **kwargs):
-    newevent = RealtimeEvent(listener, time, repeat, args, kwargs)
+def _scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
+    scheduler = getGameScheduler()
+    newevent = RealtimeEvent(listener, time, repeat, scheduler.time(), args, kwargs)
+    handle = scheduler.call_later(time, functools.partial(_realtimeEventRun, newevent, *args, **kwargs))
     try:
         key = realtimeEvents[listener].append(newevent)
     except KeyError:
         realtimeEvents[listener] = sDict()
         key = realtimeEvents[listener].append(newevent)
     realtimeEvents[listener][key].key = key
-    if repeat:
-        clock.schedule_interval(listener, time, *args, **kwargs)
-    else:
-        clock.schedule_once(_realtimeRunOnce, time, newevent, *args, **kwargs)
+    realtimeEvents[listener][key].handle = handle
+
+def _realtimeEventRun(event, *args, **kwargs):
+    event.listener(getGameScheduler().time() - event.time, *args, **kwargs)
+    _cleanupRealtimeScheduledEvent(event.listener, event.key)
+    if not event._destroyed and event.repeating:
+        _scheduleRealtime(event.listener, event.time, event.repeating, *args, **kwargs)
+        
+def _unscheduleRealtime(listener):
+    try:
+        _cleanupRealtimeScheduledEvent(listener, min(realtimeEvents[listener].keys()))
+    except (KeyError, ValueError):
+        pass
+    
+def _cleanupRealtimeScheduledEvent(listener, key):
+    try:
+        if realtimeEvents[listener][key].handle:
+            realtimeEvents[listener][key].handle.cancel()
+        del realtimeEvents[listener][key]
+        if not realtimeEvents[listener]:
+            del realtimeEvents[listener]
+    except KeyError:
+        pass
 
 def _realtimeRunOnce(time, event, *args, **kwargs): #this is used so we can catch the call and delete the event
     try:
@@ -119,52 +139,21 @@ def _realtimeRunOnce(time, event, *args, **kwargs): #this is used so we can catc
     if run: #only run if not unscheduled
         event.listener(time, *args, **kwargs)
 
-def _PauseRealtimeListener(listener):
-    clock.unschedule(listener)
-    try:
-        for event in realtimeEvents[listener].values():
-            if not event.paused and (event.repeating or event.time >= event.time_active.checkTime()):
-                event.pauseEvent()
-                break
-    except KeyError: pass
+def _pauseRealtimeListener(listener):
+    for key in sorted(realtimeEvents.keys()):
+        if not realtimeEvent[key].paused:
+            realtimeEvent[key].pauseEvent()
+            break
 
-def _UnpauseRealtimeListener(listener):
-    try:
-        for event in realtimeEvents[listener].values():
-            if event.paused and (event.repeating or event.time >= event.time_active.checkTime()):
-                event.unpauseEvent()
-                break
-    except KeyError: pass
+def _unpauseRealtimeListener(listener):
+    for key in sorted(realtimeEvents.keys()):
+        if realtimeEvent[key].paused:
+            event = realtimeEvent[key]
+            pause_time = event.unpauseEvent()
+            event.scheduler_time += pause_time
+            getGameScheduler().call_later(event.time - event.time_active.getTime(), functools.partial(_realtimeEventRun, event, *event.args, **event.kwargs))
+            break
 
-def _UnscheduleRealtime(listener):
-    last_repeating = False
-    try:
-        deletekeys = []
-        for key, event in realtimeEvents[listener].items(): #clears out junk too
-            deletekeys.append(key)
-            event.destroy()
-            last_repeating = event.repeating
-            if event.repeating or event.time >= event.time_active.checkTime():
-                break
-        for key in deletekeys:
-            del realtimeEvents[listener][key]
-        if not realtimeEvents[listener]:
-            del realtimeEvents[listener]
-    except KeyError: pass
-    if last_repeating: #only call unschedule for repeating functions, since unschedule so slow
-        clock.unschedule(listener)
-
-def _cleanupRealtimeEvent(event):
-    event.destroy()
-    try:
-        del realtimeEvents[event.listener][event.key]
-    except KeyError:
-        pass
-    try:
-        if not realtimeEvents[event.listener]:
-            del realtimeEvents[event.listener]
-    except KeyError:
-        pass
 
 scheduledEvents = {}
 scheduledEventTimes = {}

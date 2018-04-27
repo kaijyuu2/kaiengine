@@ -1,5 +1,4 @@
 
-from pyglet.app import exit as _pexit #for game exit event
 
 from . import eventdriver
 from .eventkeys import *
@@ -211,6 +210,3 @@ def customEvent(key, *args, **kwargs):
 
 def callQuery(key, *args, **kwargs):
     return eventdriver._callQuery(key, *args, **kwargs)
-
-#call the game close when game close is called
-addGameCloseListener(_pexit, -9999999999999999999999999999999999999) #can be cancelled by any game close listener returning True, as normal
