@@ -417,8 +417,9 @@ class GraphicInterface(PositionInterface, SleepInterface):
         
     def wakeUp(self, *args, **kwargs):
         super().wakeUp(*args, **kwargs)
-        self.unpauseSpriteAnimations(GI_SLEEP_KEY)
-        self._updateSpriteShow()
+        if not self.sleeping:
+            self.unpauseSpriteAnimations(GI_SLEEP_KEY)
+            self._updateSpriteShow()
 
     def destroy(self):
         super().destroy()

@@ -1,83 +1,102 @@
 
+from .sleep_interface import SleepInterface
 
-from kaiengine.destroyinterface import DestroyInterface
+from kaiengine.timer import schedule, unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, pauseScheduledListenerWithID, unpauseScheduledListener, unpauseScheduledListenerWithID, pauseRealtimeListener, unpauseRealtimeListener
 
-from kaiengine.timer import schedule, unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, unpauseScheduledListener, pauseRealtimeListener, unpauseRealtimeListener
+from collections import defaultdict
 
+SI_SLEEP_KEY = "_SCHEDULER_INTERFACE_SLEEP_KEY"
 
-class SchedulerInterface(DestroyInterface):
+class SchedulerInterface(SleepInterface):
     def __init__(self, *args, **kwargs):
         super(SchedulerInterface, self).__init__(*args, **kwargs)
-        self._scheduled_methods = {}
-        self._scheduled_realtime_methods = {}
+        self._scheduled_methods = defaultdict(int)
+        self._scheduled_method_keys = defaultdict(set)
+        self._scheduled_realtime_methods = defaultdict(int)
+        self._scheduled_realtime_method_keys = defaultdict(set)
 
     def schedule(self, method, *args, **kwargs):
         if not self.destroyed:
-            schedule(method, *args, **kwargs)
-            try: self._scheduled_methods[method] += 1
-            except KeyError: self._scheduled_methods[method] = 1
+            self._scheduled_method_keys[method].add(schedule(method, *args, **kwargs))
+            self._scheduled_methods[method] += 1
 
     def scheduleUnique(self, method, *args, **kwargs): #won't schedule the same method twice
         if method not in self._scheduled_methods:
             self.schedule(method, *args, **kwargs)
 
     def unschedule(self, method):
-        unschedule(method)
+        key = unschedule(method)
+        if key is not None: #figured the conditional would be faster overall than searching the list each time a needless unschedule was called
+            self._scheduled_method_keys[method].discard(key)
+            if not self._scheduled_method_keys[method]:
+                del self._scheduled_method_keys[method]
         try:
             self._scheduled_methods[method] -= 1
             if self._scheduled_methods[method] <= 0:
                 del self._scheduled_methods[method]
         except (AttributeError, KeyError): pass
 
-    def pauseScheduledListener(self, listener):
-        pauseScheduledListener(listener)
+    def pauseScheduledListener(self, *args, **kwargs):
+        pauseScheduledListener(*args, **kwargs)
+        
+    def pauseScheduledListenerWithID(self, *args, **kwargs):
+        pauseScheduledListenerWithID(*args, **kwargs)
 
-    def pauseAllScheduledListeners(self):
-        for method, number in list(self._scheduled_methods.items()):
-            for i in range(number):
-                self.pauseScheduledListener(method)
+    def pauseAllScheduledListeners(self, *args, **kwargs):
+        for method, keyset in self._scheduled_method_keys.items():
+            for key in keyset:
+                self.pauseScheduledListenerWithID(method, key, *args, **kwargs)
 
-    def unpauseScheduledListener(self, listener):
-        unpauseScheduledListener(listener)
+    def unpauseScheduledListener(self, listener, *args, **kwargs):
+        unpauseScheduledListener(listener, *args, **kwargs)
+        
+    def unpauseScheduledListenerWithID(self, *args, **kwargs):
+        unpauseScheduledListenerWithID(*args, **kwargs)
 
-    def unpauseAllScheduledListeners(self):
-        for method, number in list(self._scheduled_methods.items()):
-            for i in range(number):
-                self.unpauseScheduledListener(method)
+    def unpauseAllScheduledListeners(self, *args, **kwargs):
+        for method, keyset in self._scheduled_methods_keys.items():
+            for key in keyset:
+                self.unpauseScheduledListenerWithID(method, key, *args, **kwargs)
 
     def scheduleRealtime(self, method, *args, **kwargs):
         if not self.destroyed:
-            scheduleRealtime(method, *args, **kwargs)
-            try: self._scheduled_realtime_methods[method] += 1
-            except KeyError: self._scheduled_realtime_methods[method] = 1
+            self._scheduled_realtime_method_keys[method].add(scheduleRealtime(method, *args, **kwargs))
+            self._scheduled_realtime_methods[method] += 1
 
     def scheduleRealtimeUnique(self, method, *args, **kwargs):
         if method not in self._scheduled_realtime_methods:
             self.scheduleRealtime(method, *args, **kwargs)
 
     def unscheduleRealtime(self, method):
-        unscheduleRealtime(method)
+        key = unscheduleRealtime(method)
+        if key is not None:
+            self._scheduled_realtime_method_keys[method].discard(key)
+            if not self._scheduled_realtime_method_keys[method]:
+                del self._scheduled_realtime_method_keys[method]
         try:
             self._scheduled_realtime_methods[method] -= 1
             if self._scheduled_realtime_methods[method] <= 0:
                 del self._scheduled_realtime_methods[method]
         except (AttributeError, KeyError): pass
 
-    def pauseRealtimeListener(self, method):
-        pauseRealtimeListener(method)
+    def pauseRealtimeListener(self, *args, **kwargs):
+        pauseRealtimeListener(*args, **kwargs)
+        
+    def pauseRealtimeListenerWithID(self, *args, **kwargs):
+        pauseRealtimeListenerWithID(*args, **kwargs)
 
-    def pauseAllRealtimeListeners(self):
-        for method, number in list(self._scheduled_realtime_methods.items()):
-            for i in range(number):
-                self.pauseRealtimeListener(method)
+    def pauseAllRealtimeListeners(self, *args, **kwargs):
+        for method, keyset in self._scheduled_realtime_method_keys.items():
+            for key in keyset:
+                self.pauseRealtimeListenerWithID(method, key, *args, **kwargs)
 
-    def unpauseRealtimeListener(self, method):
-        unpauseRealtimeListener(method)
+    def unpauseRealtimeListener(self, *args, **kwargs):
+        unpauseRealtimeListener(*args, **kwargs)
 
-    def unpauseAllRealtimeListeners(self):
-        for method, number in list(self._scheduled_realtime_methods.items()):
-            for i in range(number):
-                self.unpauseRealtimeListener(method)
+    def unpauseAllRealtimeListeners(self, *args, **kwargs):
+        for method, keyset in self._scheduled_realtime_method_keys.items():
+            for key in keyset:
+                self.unpauseRealtimeListenerWithID(method, key, *args, **kwargs)
 
     def unscheduleAllListeners(self):
         if unschedule is not None and unscheduleRealtime is not None:
@@ -88,7 +107,24 @@ class SchedulerInterface(DestroyInterface):
                 for i in range(val):
                     unscheduleRealtime(method)
         self._scheduled_methods.clear()
+        self._scheduled_method_keys.clear()
         self._scheduled_realtime_methods.clear()
+        self._scheduled_realtime_method_keys.clear()
+        
+        
+    #overwritten stuff
+    
+    def sleep(self, *args, **kwargs):
+        super().sleep(*args, **kwargs)
+        self.pauseAllScheduledListeners(SI_SLEEP_KEY)
+        self.pauseAllRealtimeListeners(SI_SLEEP_KEY)
+        
+    def wakeUp(self, *args, **kwargs):
+        super().wakeUp(*args, **kwargs)
+        if not self.sleeping:
+            self.unpauseAllScheduledListeners(SI_SLEEP_KEY)
+            self.unpauseAllRealtimeListeners(SI_SLEEP_KEY)
+    
 
     def destroy(self, *args, **kwargs):
         super().destroy(*args, **kwargs)

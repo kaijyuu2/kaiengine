@@ -2,7 +2,6 @@
 
 from .position_interface import PositionInterface
 from .schedulerinterface import SchedulerInterface
-from .sleep_interface import SleepInterface
 
 from kaiengine.timer import getRealtimeSinceLastFrame
 from kaiengine.gconfig import *
@@ -12,7 +11,7 @@ import math
 
 MI_PAUSE_KEY = "_DEFAULT_MOVEMENT_INTERFACE_PAUSE_KEY"
 
-class MovementInterfaceBase(PositionInterface, SchedulerInterface, SleepInterface):
+class MovementInterfaceBase(PositionInterface, SchedulerInterface):
     def __init__(self, *args, **kwargs):
         super(MovementInterfaceBase, self).__init__(*args, **kwargs)
         self.velocity = (0.0,0.0)

@@ -2,6 +2,7 @@
 
 #the object for the main scheduler
 
+
 import asyncio
 
 scheduler = None
@@ -23,6 +24,9 @@ def initializeGame(init, close):
     
     try:
         scheduler.run_forever()
+    except:
+        import traceback
+        traceback.print_stack()
     finally:
         try:
             close()

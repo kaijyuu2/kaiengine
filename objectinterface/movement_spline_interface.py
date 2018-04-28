@@ -2,7 +2,6 @@
 
 from .position_interface import PositionInterface
 from .schedulerinterface import SchedulerInterface
-from .sleep_interface import SleepInterface
 
 from kaiengine.timer import Timer, FrameTimer
 from kaiengine.gconfig import *
@@ -25,7 +24,7 @@ def getSplinePos(perc_time, start_pos, start_mag, end_pos, end_mag):
             (perc_time_pow_2*3 - perc_time_pow_3*2) * end_pos +
             (perc_time_pow_3 - perc_time_pow_2) * end_mag)
 
-class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface, SleepInterface):
+class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface):
     def __init__(self, *args, **kwargs):
         super(_MovementSplineInterfaceBase, self).__init__(*args, **kwargs)
         self._spline_start_pos = None
@@ -141,7 +140,8 @@ class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface, SleepI
         
     def wakeUp(self, *args, **kwargs):
         super().wakeUp(*args, **kwargs)
-        self.unpauseSpline(MIS_SLEEP_PAUSE_KEY)
+        if not self.sleeping:
+            self.unpauseSpline(MIS_SLEEP_PAUSE_KEY)
 
 class MovementSplineInterfaceFrames(_MovementSplineInterfaceBase):
 

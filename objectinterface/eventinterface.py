@@ -7,11 +7,11 @@ from .sleep_interface import SleepInterface
 from kaiengine.event import *
 
 
-class EventInterface(DestroyInterface, SleepInterface):
+class EventInterface(SleepInterface):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._event_methods = defaultdict(list)
-        self._query_methods = defaultdict(list)
+        self._query_methods = {}
 
     def addQueryListener(self, key, method):
         self.removeQueryListener(self, key)
@@ -38,6 +38,8 @@ class EventInterface(DestroyInterface, SleepInterface):
                     break
             if index >= 0:
                 del self._event_methods[key][i]
+            if not self._event_methods[key]:
+                del self._event_methods[key]
         except (IndexError, KeyError):
             pass
 
@@ -49,73 +51,73 @@ class EventInterface(DestroyInterface, SleepInterface):
         '''Unregister a key press event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_KEY_PRESS, *args, **kwargs)
 
-    def addKeyReleaseListener(self,listener, priority = 0):
+    def addKeyReleaseListener(self,*args, **kwargs):
         '''Register a function as a key release event listener.'''
-        self.addCustomListener(EVENT_KEY_RELEASES, *args, **kwargs)
+        self.addCustomListener(EVENT_KEY_RELEASE, *args, **kwargs)
 
-    def removeKeyReleaseListener(self,listener):
+    def removeKeyReleaseListener(self,*args, **kwargs):
         '''Unregister a key release event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_KEY_RELEASE, *args, **kwargs)
 
-    def addMousePressListener(self,listener, priority = 0):
+    def addMousePressListener(self,*args, **kwargs):
         '''Register a function as a mouse press event listener.'''
         self.addCustomListener(EVENT_MOUSE_PRESS, *args, **kwargs)
 
-    def removeMousePressListener(self,listener):
+    def removeMousePressListener(self,*args, **kwargs):
         '''Unregister a mouse press event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_PRESS, *args, **kwargs)
 
-    def addMouseReleaseListener(self,listener, priority = 0):
+    def addMouseReleaseListener(self,*args, **kwargs):
         '''Register a function as a mouse release event listener.'''
         self.addCustomListener(EVENT_MOUSE_RELEASE, *args, **kwargs)
 
-    def removeMouseReleaseListener(self,listener):
+    def removeMouseReleaseListener(self,*args, **kwargs):
         '''Unregister a mouse release event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_RELEASE, *args, **kwargs)
 
-    def addMouseDragListener(self,listener, priority = 0):
+    def addMouseDragListener(self,*args, **kwargs):
         '''Register a function as a mouse drag event listener.'''
         self.addCustomListener(EVENT_MOUSE_DRAG, *args, **kwargs)
 
-    def removeMouseDragListener(self,listener):
+    def removeMouseDragListener(self,*args, **kwargs):
         '''Unregister a mouse drag event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_DRAG, *args, **kwargs)
 
-    def addMouseMoveListener(self,listener, priority = 0):
+    def addMouseMoveListener(self,*args, **kwargs):
         '''Register a function as a mouse move event listener.'''
         self.addCustomListener(EVENT_MOUSE_MOVE, *args, **kwargs)
 
-    def removeMouseMoveListener(self,listener):
+    def removeMouseMoveListener(self,*args, **kwargs):
         '''Unregister a mouse move event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_MOVE, *args, **kwargs)
 
-    def addMouseEnterListener(self,listener, priority=0):
+    def addMouseEnterListener(self,*args, **kwargs):
         '''Register a function as a mouse enter window event listener.'''
         self.addCustomListener(EVENT_MOUSE_ENTER, *args, **kwargs)
 
-    def removeMouseEnterListener(self,listener):
+    def removeMouseEnterListener(self,*args, **kwargs):
         '''Unregister a mouse enter window event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_ENTER, *args, **kwargs)
 
-    def addMouseExitListener(self,listener, priority=0):
+    def addMouseExitListener(self,*args, **kwargs):
         '''Register a function as a mouse exit window event listener.'''
         self.addCustomListener(EVENT_MOUSE_EXIT, *args, **kwargs)
 
-    def removeMouseExitListener(self,listener):
+    def removeMouseExitListener(self,*args, **kwargs):
         '''Unregister a mouse enter window event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_EXIT, *args, **kwargs)
 
-    def addJoybuttonPressListener(self,listener, priority = 0):
+    def addJoybuttonPressListener(self,*args, **kwargs):
         self.addCustomListener(EVENT_JOYPAD_PRESS, *args, **kwargs)
 
-    def removeJoybuttonPressListener(self,listener):
+    def removeJoybuttonPressListener(self,*args, **kwargs):
         self.removeCustomListener(EVENT_JOYPAD_PRESS, *args, **kwargs)
 
-    def addJoybuttonReleaseListener(self,listener, priority = 0):
-        self.addCustomListener(EVENT_JOYPAD_RELEAS, *args, **kwargs)
+    def addJoybuttonReleaseListener(self,*args, **kwargs):
+        self.addCustomListener(EVENT_JOYPAD_RELEASE, *args, **kwargs)
 
-    def removeJoybuttonReleaseListener(self,listener):
-        self.removeCustomListener(EVENT_JOYPAD_RELEAS, *args, **kwargs)
+    def removeJoybuttonReleaseListener(self,*args, **kwargs):
+        self.removeCustomListener(EVENT_JOYPAD_RELEASE, *args, **kwargs)
         
     def removeAllListeners(self):
         self._removeAllListeners()
@@ -136,11 +138,12 @@ class EventInterface(DestroyInterface, SleepInterface):
     
     def wakeUp(self, *args, **kwargs):
         super().wakeUp(*args, **kwargs)
-        for key, methoddata in self._event_methods.items():
-            for method, priority in methoddata:
-                addCustomListener(key, method, priority)
-        for key, query in self._query_methods.items():
-            addQueryListener(key, query)
+        if not self.sleeping:
+            for key, methoddata in self._event_methods.items():
+                for method, priority in methoddata:
+                    addCustomListener(key, method, priority)
+            for key, query in self._query_methods.items():
+                addQueryListener(key, query)
         
 
     def destroy(self, *args, **kwargs):

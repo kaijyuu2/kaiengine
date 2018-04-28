@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
+from kaiengine.destroyinterface import DestroyInterface
 
-class SleepInterface():
+SLEEP_KEY = "_DEFAULT_SLEEP_KEY"
+
+class SleepInterface(DestroyInterface):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.sleeping = False
+        self.sleeping = set()
     
     
-    def sleep(self):
-        self.sleeping = True
+    def sleep(self, key = SLEEP_KEY):
+        self.sleeping.add(key)
         
-    def wakeUp(self):
-        self.sleeping = False
+    def wakeUp(self, key = SLEEP_KEY):
+        self.sleeping.discard(key)

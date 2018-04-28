@@ -50,22 +50,41 @@ def scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
     return scheduler._scheduleRealtime(listener, time, repeat, *args, **kwargs)
 
 def unschedule(listener):
-    scheduler._unschedule(listener)
+    return scheduler._unschedule(listener)
 
-def unscheduleRealtime(listener):
-    scheduler._unscheduleRealtime(listener)
+def unscheduleWithID(*args, **kwargs):
+    return scheduler._unscheduleWithID(*args, **kwargs)
 
-def pauseScheduledListener(listener):
-    scheduler._pauseScheduledListener(listener)
+def unscheduleRealtime(*args, **kwargs):
+    return scheduler._unscheduleRealtime(*args, **kwargs)
 
-def unpauseScheduledListener(listener):
-    scheduler._unpauseScheduledListener(listener)
+def unscheduleRealtimeWithID(*args, **kwargs):
+    return scheduler._unscheduleRealtimeWithID(*args, **kwargs)
 
-def pauseRealtimeListener(listener):
-    scheduler._pauseRealtimeListener(listener)
+def pauseScheduledListener(*args, **kwargs):
+    scheduler._pauseScheduledListener(*args, **kwargs)
+    
+def pauseScheduledListenerWithID(*args, **kwargs):
+    scheduler._pauseScheduledListenerWithID(*args, **kwargs)
 
-def unpauseRealtimeListener(listener):
-    scheduler._unpauseRealtimeListener(listener)
+def unpauseScheduledListener(*args, **kwargs):
+    scheduler._unpauseScheduledListener(*args, **kwargs)
+
+def unpauseScheduledListenerWithID(*args, **kwargs):
+    scheduler._unpauseScheduledListenerWithID(*args, **kwargs)
+
+def pauseRealtimeListener(*args, **kwargs):
+    scheduler._pauseRealtimeListener(*args, **kwargs)
+    
+def pauseRealtimeListenerWithID(*args, **kwargs):
+    scheduler._pauseRealtimeListenerWithID(*args, **kwargs)
+
+def unpauseRealtimeListener(*args, **kwargs):
+    scheduler._unpauseRealtimeListener(*args, **kwargs)
+    
+def unpauseRealtimeListenerWithID(*args, **kwargs):
+    scheduler._unpauseRealtimeListenerWithID(*args, **kwargs)
+    
 
 def clearSchedule():
     """clears entire frame based schedule (not realtime)
