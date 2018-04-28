@@ -1,12 +1,15 @@
 
 
 from .position_interface import PositionInterface
+from .sleep_interface import SleepInterface
 
 from kaiengine.gconfig import *
 from kaiengine.resource import toStringPath
 from kaiengine.display import createGraphic, createGlowSprite
 
-class GraphicInterface(PositionInterface):
+GI_SLEEP_KEY = "_GRAPHIC_INTERFACE_SLEEP_KEY"
+
+class GraphicInterface(PositionInterface, SleepInterface):
 
     vars()[GPATH] = None
     vars()[GRAPHIC_INTERFACE_GLOWABLE] = False
@@ -127,15 +130,15 @@ class GraphicInterface(PositionInterface):
         except AttributeError:
             return True
 
-    def pauseSpriteAnimations(self):
+    def pauseSpriteAnimations(self, *args, **kwargs):
         try:
-            self.sprite.pauseAnimations()
+            self.sprite.pauseAnimations(*args, **kwargs)
         except AttributeError:
             pass
 
-    def unpauseSpriteAnimations(self):
+    def unpauseSpriteAnimations(self, *args, **kwargs):
         try:
-            self.sprite.unpauseAnimations()
+            self.sprite.unpauseAnimations(*args, **kwargs)
         except AttributeError:
             pass
 
@@ -401,8 +404,21 @@ class GraphicInterface(PositionInterface):
             pass
 
     def _updateSpriteShow(self):
-        try: self.sprite.show = self._show
+        try: self.sprite.show = False if self.sleeping else self._show
         except AttributeError: pass
+    
+    
+    #overwritten stuff
+    
+    def sleep(self, *args, **kwargs):
+        super().sleep(*args, **kwargs)
+        self.pauseSpriteAnimations(GI_SLEEP_KEY)
+        self._updateSpriteShow()
+        
+    def wakeUp(self, *args, **kwargs):
+        super().wakeUp(*args, **kwargs)
+        self.unpauseSpriteAnimations(GI_SLEEP_KEY)
+        self._updateSpriteShow()
 
     def destroy(self):
         super().destroy()

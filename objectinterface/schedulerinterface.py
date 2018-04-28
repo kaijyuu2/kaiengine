@@ -2,7 +2,7 @@
 
 from kaiengine.destroyinterface import DestroyInterface
 
-from kaiengine.timer import Schedule, Unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, unpauseScheduledListener, pauseRealtimeListener, unpauseRealtimeListener
+from kaiengine.timer import schedule, unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, unpauseScheduledListener, pauseRealtimeListener, unpauseRealtimeListener
 
 
 class SchedulerInterface(DestroyInterface):
@@ -11,18 +11,18 @@ class SchedulerInterface(DestroyInterface):
         self._scheduled_methods = {}
         self._scheduled_realtime_methods = {}
 
-    def Schedule(self, method, *args, **kwargs):
+    def schedule(self, method, *args, **kwargs):
         if not self.destroyed:
-            Schedule(method, *args, **kwargs)
+            schedule(method, *args, **kwargs)
             try: self._scheduled_methods[method] += 1
             except KeyError: self._scheduled_methods[method] = 1
 
     def scheduleUnique(self, method, *args, **kwargs): #won't schedule the same method twice
         if method not in self._scheduled_methods:
-            self.Schedule(method, *args, **kwargs)
+            self.schedule(method, *args, **kwargs)
 
-    def Unschedule(self, method):
-        Unschedule(method)
+    def unschedule(self, method):
+        unschedule(method)
         try:
             self._scheduled_methods[method] -= 1
             if self._scheduled_methods[method] <= 0:
@@ -80,10 +80,10 @@ class SchedulerInterface(DestroyInterface):
                 self.unpauseRealtimeListener(method)
 
     def unscheduleAllListeners(self):
-        if Unschedule is not None and unscheduleRealtime is not None:
+        if unschedule is not None and unscheduleRealtime is not None:
             for method, val in list(self._scheduled_methods.items()):
                 for i in range(val):
-                    Unschedule(method)
+                    unschedule(method)
             for method, val in list(self._scheduled_realtime_methods.items()):
                 for i in range(val):
                     unscheduleRealtime(method)
@@ -91,5 +91,5 @@ class SchedulerInterface(DestroyInterface):
         self._scheduled_realtime_methods.clear()
 
     def destroy(self, *args, **kwargs):
-        super(SchedulerInterface, self).destroy(*args, **kwargs)
+        super().destroy(*args, **kwargs)
         self.unscheduleAllListeners()

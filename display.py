@@ -6,7 +6,6 @@ from .mainwindow import main_window
 import os
 from sys import platform
 
-from .timer import Schedule, Unschedule
 from . import sGraphics
 from . import objects
 from . import load

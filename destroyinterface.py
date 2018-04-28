@@ -7,7 +7,7 @@ from kaiengine.debug import debugMessage
 class DestroyInterface(object):
     def __init__(self, *args, **kwargs):
         self._destroyed = False
-        try: super(DestroyInterface, self).__init__(*args, **kwargs)
+        try: super().__init__(*args, **kwargs)
         except TypeError: pass #if too many parameters passed, just skip error
 
 
@@ -21,9 +21,9 @@ class DestroyInterface(object):
 
     def destroy(self):
         self._destroyed = True
-        try: super(DestroyInterface, self).destroy
+        try: super().destroy
         except (AttributeError, TypeError): pass
-        else: super(DestroyInterface, self).destroy()
+        else: super().destroy()
 
 
     def __del__(self):

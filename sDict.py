@@ -3,7 +3,7 @@
 
 class sDict(dict):
     def __init__(self, oldDict = None):
-        super(sDict, self).__init__()
+        super().__init__()
         self.counter = 0
         self.sorted_keys = []
         if oldDict:
@@ -27,21 +27,16 @@ class sDict(dict):
         return self.counter
 
     def last_key(self):
-        keys = list(self.keys())
-        keys.sort()
-        return keys[-1]
+        return sorted(self.keys())[-1]
 
     def last_item(self):
         return self[self.last_key()]
 
     def clear(self):
-        try: #error suppression on game close
-            super(sDict, self).clear()
-        except TypeError:
-            pass
+        super().clear()
         self.counter = 0
 
-    def update(self, newdict):
+    def update(self, *args, **kwargs):
         #make update return a reference to itself. Fixes one thing I didn't like about the base dict object
-        super(sDict, self).update(newdict)
+        super().update(*args, **kwargs)
         return self

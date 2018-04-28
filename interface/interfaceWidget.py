@@ -420,11 +420,11 @@ class FadeWidget(InterfaceWidget, SchedulerInterface):
         self.faderFlag = False
         if startFaded:
             for i in range(4):
-                self.Schedule(self._setFadeState, speed*i, state=3-i)
+                self.schedule(self._setFadeState, speed*i, state=3-i)
         else:
             for i in range(4):
-                self.Schedule(self._setFadeState, speed*i, state=i)
-                self.Schedule(self._setFadeState, speed*i + speed*5, state=3-i)
+                self.schedule(self._setFadeState, speed*i, state=i)
+                self.schedule(self._setFadeState, speed*i + speed*5, state=3-i)
 
     def _setFadeState(self, state=0):
         for i, fader in enumerate(self.faders):

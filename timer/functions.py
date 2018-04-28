@@ -41,27 +41,25 @@ def updateTimeSinceLastFrame(dt):
 
 #scheduling
 
-def Schedule(listener, time, repeat = False, *args, **kwargs):
+def schedule(listener, time, repeat = False, *args, **kwargs):
     '''register a timed event that will happen in time frames.'''
-    scheduler._Schedule(listener, time, repeat, *args, **kwargs)
-    return listener
+    return scheduler._schedule(listener, time, repeat, *args, **kwargs)
 
 def scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
     '''register a timed event that will happen in time seconds.'''
-    scheduler._scheduleRealtime(listener, time, repeat, *args, **kwargs)
-    return listener
+    return scheduler._scheduleRealtime(listener, time, repeat, *args, **kwargs)
 
-def Unschedule(listener):
-    scheduler._Unschedule(listener)
+def unschedule(listener):
+    scheduler._unschedule(listener)
 
 def unscheduleRealtime(listener):
     scheduler._unscheduleRealtime(listener)
 
 def pauseScheduledListener(listener):
-    scheduler._PauseScheduledListener(listener)
+    scheduler._pauseScheduledListener(listener)
 
 def unpauseScheduledListener(listener):
-    scheduler._UnpauseScheduledListener(listener)
+    scheduler._unpauseScheduledListener(listener)
 
 def pauseRealtimeListener(listener):
     scheduler._pauseRealtimeListener(listener)
@@ -72,4 +70,4 @@ def unpauseRealtimeListener(listener):
 def clearSchedule():
     """clears entire frame based schedule (not realtime)
     warning: do not use for most cases"""
-    scheduler._ClearSchedule()
+    scheduler._clearSchedule()

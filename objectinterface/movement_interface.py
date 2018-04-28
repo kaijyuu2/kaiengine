@@ -2,6 +2,7 @@
 
 from .position_interface import PositionInterface
 from .schedulerinterface import SchedulerInterface
+from .sleep_interface import SleepInterface
 
 from kaiengine.timer import getRealtimeSinceLastFrame
 from kaiengine.gconfig import *
@@ -9,19 +10,21 @@ from kaiengine import settings
 
 import math
 
-class MovementInterfaceBase(PositionInterface, SchedulerInterface):
+MI_PAUSE_KEY = "_DEFAULT_MOVEMENT_INTERFACE_PAUSE_KEY"
+
+class MovementInterfaceBase(PositionInterface, SchedulerInterface, SleepInterface):
     def __init__(self, *args, **kwargs):
         super(MovementInterfaceBase, self).__init__(*args, **kwargs)
         self.velocity = (0.0,0.0)
         self.acceleration = (0.0,0.0)
         self._move_to_point_end = None
-        self._pause_movement = False
+        self._pause_movement = set()
 
 
     def moveOverTime(self, time, xvel = 0, yvel = 0, xaccel = 0, yaccel = 0):
         self.setVelocity(xvel, yvel)
         self.setAcceleration(xaccel, yaccel)
-        self.ScheduleMovementEvent(self.finishMovement, self._MovementGetWaitTime(time))
+        self.scheduleMovementEvent(self.finishMovement, self._MovementGetWaitTime(time))
 
     def moveToPoint(self, time, x, y, maxspeed = 10000000000, minspeed = 0):
         if time <= 0:
@@ -55,7 +58,7 @@ class MovementInterfaceBase(PositionInterface, SchedulerInterface):
             self._move_to_point_end = None
 
     def runMovement(self):
-        if not self._pause_movement:
+        if not self.checkMovementPaused():
             time_passed = self._MovementGetTimePassed()
             newx = self.getPos()[0] + self.velocity[0]*time_passed + .5*self.acceleration[0]*time_passed
             newy = self.getPos()[1] + self.velocity[1]*time_passed + .5*self.acceleration[1]*time_passed
@@ -66,18 +69,18 @@ class MovementInterfaceBase(PositionInterface, SchedulerInterface):
         self._setVelocity(0,0)
         self._setAcceleration(0,0)
 
-    def pauseMovement(self):
-        self._pause_movement = True
+    def pauseMovement(self, key = MI_PAUSE_KEY):
+        self._pause_movement.add(key)
 
-    def unpauseMovement(self):
-        self._pause_movement = False
+    def unpauseMovement(self, key = MI_PAUSE_KEY):
+        self._pause_movement.discard(key)
 
     def checkMovementPaused(self):
-        return self._pause_movement
+        return bool(self._pause_movement) or self.sleeping
 
     def setVelocity(self, *args, **kwargs):
         self._unscheduleEvents()
-        self.Schedule(self.runMovement, 0, repeat = True)
+        self.schedule(self.runMovement, 0, repeat = True)
         self._setVelocity(*args, **kwargs)
 
     def _setVelocity(self, x = None, y = None):
@@ -88,7 +91,7 @@ class MovementInterfaceBase(PositionInterface, SchedulerInterface):
 
     def setAcceleration(self, *args, **kwargs):
         self._unscheduleEvents()
-        self.Schedule(self.runMovement, 0, repeat = True)
+        self.schedule(self.runMovement, 0, repeat = True)
         self._setAcceleration(*args, **kwargs)
 
     def _setAcceleration(self, x = None, y = None):
@@ -108,24 +111,23 @@ class MovementInterfaceBase(PositionInterface, SchedulerInterface):
 
     def _updateMoving(self):
         if not self.checkMoving():
-            self.Unschedule(self.runMovement)
+            self.unschedule(self.runMovement)
 
     def _unscheduleEvents(self):
-        self.Unschedule(self.runMovement)
-        self.UnscheduleMovementEvent(self.finishMovement)
+        self.unschedule(self.runMovement)
+        self.unscheduleMovementEvent(self.finishMovement)
 
 
     def destroy(self, *args, **kwargs):
-        if MovementInterfaceBase:
-            super(MovementInterfaceBase, self).destroy(*args, **kwargs)
+        super().destroy(*args, **kwargs)
         self._unscheduleEvents()
 
 class MovementInterfaceFrames(MovementInterfaceBase):
 
     def __init__(self, *args, **kwargs):
         super(MovementInterfaceFrames, self).__init__(*args, **kwargs)
-        self.ScheduleMovementEvent = self.Schedule
-        self.UnscheduleMovementEvent = self.Unschedule
+        self.scheduleMovementEvent = self.schedule
+        self.unscheduleMovementEvent = self.unschedule
 
     def _MovementGetTimePassed(self):
         return 1.0/settings.getValue(DYNAMIC_SETTINGS_FRAMES_PER_SECOND)
@@ -140,8 +142,8 @@ class MovementInterfaceFrames(MovementInterfaceBase):
 class MovementInterfaceRealtime(MovementInterfaceBase):
     def __init__(self, *args, **kwargs):
         super(MovementInterfaceRealtime, self),__init__(*args, **kwargs)
-        self.ScheduleMovementEvent = self.scheduleRealtime
-        self.UnscheduleMovementEvent = self.unscheduleRealtime
+        self.scheduleMovementEvent = self.scheduleRealtime
+        self.unscheduleMovementEvent = self.unscheduleRealtime
 
     def _MovementGetTimePassed(self):
         return getRealtimeSinceLastFrame()

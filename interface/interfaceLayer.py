@@ -8,7 +8,7 @@ from kaiengine.event import EVENT_JOYPAD_PRESS, EVENT_GAME_CLOSE
 from kaiengine.event import EVENT_MOUSE_ENTER, EVENT_MOUSE_EXIT
 from kaiengine.event import EVENT_REQUEST_LAYER_CREATION, EVENT_FADE_IN
 from kaiengine.event import EVENT_REMOVE_INPUT_LOCKS, EVENT_LOCK_INPUT
-from kaiengine.timer import Schedule
+from kaiengine.timer import schedule
 from kaiengine.objectdestroyederror import ObjectDestroyedError
 from kaiengine.interface.spriteHandler import makeSprite, registerSprite, removeSprite
 from kaiengine.interface.interfaceWidget import FadeWidget
@@ -120,4 +120,4 @@ class FadeLayer(InterfaceLayer, SchedulerInterface):
             fadeInDelay = 0
         else:
             fadeInDelay = self.speed * 5
-        self.Schedule(self.destroy, fadeInDelay + self.speed*4)
+        self.schedule(self.destroy, fadeInDelay + self.speed*4)

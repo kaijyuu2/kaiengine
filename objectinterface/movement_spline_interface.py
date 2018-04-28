@@ -2,12 +2,16 @@
 
 from .position_interface import PositionInterface
 from .schedulerinterface import SchedulerInterface
+from .sleep_interface import SleepInterface
 
 from kaiengine.timer import Timer, FrameTimer
 from kaiengine.gconfig import *
 from kaiengine import settings
 
 import math
+
+MI_SPLINE_PAUSE_KEY = "_DEFAULT_MOVEMENT_INTERFACE_SPLINE_PAUSE_KEY"
+MIS_SLEEP_PAUSE_KEY = "_MOVEMENT_INTERFACE_SPLINE_SLEEP_PAUSE_KEY" 
 
 def getSplinePos(perc_time, start_pos, start_mag, end_pos, end_mag):
     start_pos = float(start_pos)
@@ -21,13 +25,13 @@ def getSplinePos(perc_time, start_pos, start_mag, end_pos, end_mag):
             (perc_time_pow_2*3 - perc_time_pow_3*2) * end_pos +
             (perc_time_pow_3 - perc_time_pow_2) * end_mag)
 
-class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface):
+class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface, SleepInterface):
     def __init__(self, *args, **kwargs):
         super(_MovementSplineInterfaceBase, self).__init__(*args, **kwargs)
         self._spline_start_pos = None
         self._spline_end_pos = None
         self._spline_mag = None
-        self._pause_movement = False
+        self._pause_movement = set()
 
         self._spline_countdown_timer = None
 
@@ -101,14 +105,18 @@ class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface):
         except TypeError:
             pass
 
-    def pauseSpline(self):
-        self._spline_countdown_timer.pauseTimer()
+    def pauseSpline(self, key = MI_SPLINE_PAUSE_KEY):
+        self._pause_movement.add(key)
+        if self.checkSplinePaused():
+            self._spline_countdown_timer.pauseTimer()
 
-    def unpauseSpline(self):
-        self._spline_countdown_timer.unpauseTimer()
+    def unpauseSpline(self, key = MI_SPLINE_PAUSE_KEY):
+        self._pause_movement.discard(key)
+        if not self.checkSplinePaused():
+            self._spline_countdown_timer.unpauseTimer()
 
     def checkSplinePaused(self):
-        return self._spline_countdown_timer.checkPaused()
+        return bool(self._pause_movement)
 
     def checkSplineActive(self):
         return not self._spline_end_pos is None
@@ -125,13 +133,22 @@ class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface):
     def _startSplineTimer(self, time):
         pass
 
+    #this this overwrites
+    
+    def sleep(self, *args, **kwargs):
+        super().sleep(*args, **kwargs)
+        self.pauseSpline(MIS_SLEEP_PAUSE_KEY)
+        
+    def wakeUp(self, *args, **kwargs):
+        super().wakeUp(*args, **kwargs)
+        self.unpauseSpline(MIS_SLEEP_PAUSE_KEY)
 
 class MovementSplineInterfaceFrames(_MovementSplineInterfaceBase):
 
     def __init__(self, *args, **kwargs):
         super(MovementSplineInterfaceFrames, self).__init__(*args, **kwargs)
-        self.scheduleSplineEvent = self.Schedule
-        self.unscheduleSplineEvent = self.Unschedule
+        self.scheduleSplineEvent = self.schedule
+        self.unscheduleSplineEvent = self.unschedule
         self._spline_countdown_timer = FrameTimer()
 
     def getSplineTimeRemaining(self):

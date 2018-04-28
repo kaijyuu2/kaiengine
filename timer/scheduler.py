@@ -5,18 +5,25 @@ from .timer import Timer
 from .maingamescheduler import getGameScheduler
 
 from kaiengine.sDict import sDict
-
+from kaiengine.uidgen import generateUniqueID
 
 import functools
 import traceback, math
 
+FRAME_PAUSE_KEY = "_DEFAULT_FRAME_EVENT_PAUSE_KEY"
+
 class TimedEvent(object):
     def __init__(self, listener, time, repeating, args, kwargs):
+        try:
+            callablename = listener.__name__
+        except AttributeError:
+            callablename = "GENERIC_UNNAMED_FUNCTION"
+        self.eventid = generateUniqueID(callablename + "_FRAME_BASED_EVENT_)
         self.listener = listener
         self.time = max(1, int(math.ceil(time))) #just in case a float was passed
         self.repeating = repeating
         self.lookupindex = None
-        self.paused = False
+        self.paused = set()
         self.pause_time = self.time
         self.args = args
         self.kwargs = kwargs
@@ -41,13 +48,12 @@ class TimedEvent(object):
             self.delete_me = True
 
 
-    def pauseEvent(self, time):
-        self.paused = True
-        self.pause_time = max(0, time)
+    def pauseEvent(self, time, key = FRAME_PAUSE_KEY):
+        self.paused.add(key)
+        self.pause_time = max(self.pause_time, time)
 
-    def unpauseEvent(self):
-        self.paused = False
-
+    def unpauseEvent(self, key = FRAME_PAUSE_KEY):
+        self.paused.discard(key)
 
     def unschedule(self):
         self.listener = None
@@ -57,6 +63,11 @@ class TimedEvent(object):
 
 class RealtimeEvent(object):
     def __init__(self, listener, time, repeating, scheduler_time, args, kwargs):
+        try:
+            callablename = listener.__name__
+        except AttributeError:
+            callablename = "GENERIC_UNNAMED_FUNCTION"
+        self.eventid = generateUniqueID(callablename + "_REALTIME_EVENT_)
         self.listener = listener
         self.time = time
         self.repeating = repeating
@@ -110,6 +121,7 @@ def _scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
         key = realtimeEvents[listener].append(newevent)
     realtimeEvents[listener][key].key = key
     realtimeEvents[listener][key].handle = handle
+    return newevent.eventid
 
 def _realtimeEventRun(event, *args, **kwargs):
     event.listener(getGameScheduler().time() - event.time, *args, **kwargs)
@@ -158,87 +170,112 @@ def _unpauseRealtimeListener(listener):
             getGameScheduler().call_later(event.time - event.time_active.getTime(), functools.partial(_realtimeEventRun, event, *event.args, **event.kwargs))
             break
 
+scheduled_events = {}
+scheduled_event_times = {}
 
-scheduledEvents = {}
-scheduledEventTimes = {}
+def _schedule(listener, time, repeat = False, *args, **kwargs):
+    event = TimedEvent(listener, time, repeat, args, kwargs)
+    _scheduleAppendEvent(event)
+    return event.eventid
 
-def _Schedule(listener, time, repeat = False, *args, **kwargs):
-    _ScheduleAppendEvent(TimedEvent(listener, time, repeat, args, kwargs))
-
-def _ScheduleAppendEvent(event):
+def _scheduleAppendEvent(event):
     from .functions import checkCurrentFrame #avoiding circular import
     newtime = checkCurrentFrame() + event.time
-    key = _ScheduleAddToQueue(event, newtime)
-    try: scheduledEventTimes[event.listener].append([newtime, key, event])
-    except KeyError: scheduledEventTimes[event.listener] = [[newtime, key, event]]
+    key = _scheduleAddToQueue(event, newtime)
+    try: scheduled_event_times[event.listener].append([newtime, key, event])
+    except KeyError: scheduled_event_times[event.listener] = [[newtime, key, event]]
 
-def _ScheduleAddToQueue(event, newtime):
-    try: key = scheduledEvents[newtime].append(event)
+def _scheduleAddToQueue(event, newtime):
+    try: key = scheduled_events[newtime].append(event)
     except KeyError:
-        scheduledEvents[newtime] = sDict()
-        key = scheduledEvents[newtime].append(event)
+        scheduled_events[newtime] = sDict()
+        key = scheduled_events[newtime].append(event)
     return key
 
-def _PauseScheduledListener(listener):
+def _pauseScheduledListener(listener, *args, **kwargs):
     try:
-        for time, key, event in scheduledEventTimes[listener]:
+        for time, key, event in scheduled_event_times[listener]:
             if not event.paused and not event._unscheduled and not event.delete_me:
                 from .functions import checkCurrentFrame
-                event.pauseEvent(time - checkCurrentFrame())
-                del scheduledEvents[time][key]
+                event.pauseEvent(time - checkCurrentFrame(), *args, **kwargs)
+                del scheduled_events[time][key]
+                break
+    except KeyError:
+        pass
+    
+def _pauseListenerWithID(listender, eventid, *args, **kwargs):
+    try:
+        for time, key, event in scheduled_event_times[listener]:
+            if event.eventid == eventid:
+                from .functions import checkCurrentFrame
+                event.pauseEvent(time - checkCurrentFrame(), *args, **kwargs)
+                del scheduled_events[time][key]
                 break
     except KeyError:
         pass
 
-def _UnpauseScheduledListener(listener):
+def _unpauseScheduledListener(listener, *args, **kwargs):
     try:
         time = None
         key = None
         unpausedevent = None
         counter = 0
-        for oldtime, oldkey, event in scheduledEventTimes[listener]:
+        for oldtime, oldkey, event in scheduled_event_times[listener]:
             if event.paused:
-                event.unpauseEvent()
-                from .functions import checkCurrentFrame
-                time = event.pause_time + checkCurrentFrame()
-                key = _ScheduleAddToQueue(event, time)
-                unpausedevent = event
+                event.unpauseEvent(*args, **kwargs)
+                if not event.paused:
+                    from .functions import checkCurrentFrame
+                    time = event.pause_time + checkCurrentFrame()
+                    key = _scheduleAddToQueue(event, time)
+                    unpausedevent = event
+                    event.pause_time = 0
                 break
             counter += 1
         if time is not None:
-            scheduledEventTimes[listener][counter] = (time, key, unpausedevent)
+            scheduled_event_times[listener][counter] = (time, key, unpausedevent)
     except KeyError:
         pass
 
-def _Unschedule(listener):
+def _unschedule(listener):
     try:
-        time, key, event = scheduledEventTimes[listener].pop(0)
+        time, key, event = scheduled_event_times[listener].pop(0)
         event.unschedule()
-        del scheduledEvents[time][key]
-        if len(scheduledEventTimes[listener]) == 0: raise IndexError #silly hack to avoid repeated code
+        del scheduled_events[time][key]
+        if len(scheduled_event_times[listener]) == 0: raise IndexError #silly hack to avoid repeated code
     except KeyError: pass
-    except IndexError: del scheduledEventTimes[listener]
+    except IndexError: del scheduled_event_times[listener]
+    
+def _unscheduleWithID(listener, eventid):
+    try:
+        for time, key, event in scheduled_event_times[listener]:
+            if event.eventid == eventid:
+                event.unschedule()
+                del scheduled_events[time][key]
+                if len(scheduled_event_times[listener]) == 0:
+                    del scheduled_event_times[listener]
+                break
+    except KeyError:
+        pass
 
 def _checkSchedule(currentFrame):
     try:
-        for event in list(scheduledEvents[currentFrame].values()):
+        for event in list(scheduled_events[currentFrame].values()):
             try:
                 event.call_listener()
                 try:
-                    del scheduledEventTimes[event.listener][0]
-                    if len(scheduledEventTimes[event.listener]) == 0: raise IndexError #silly hack to avoid repeated code
-                except IndexError: del scheduledEventTimes[event.listener]
+                    del scheduled_event_times[event.listener][0]
+                    if len(scheduled_event_times[event.listener]) == 0: raise IndexError #silly hack to avoid repeated code
+                except IndexError: del scheduled_event_times[event.listener]
                 except KeyError: pass
                 if not event.delete_me:
-                    _ScheduleAppendEvent(event)
+                    _scheduleAppendEvent(event)
             except:
                 import traceback
                 traceback.print_exc()
-        del scheduledEvents[currentFrame]
+        del scheduled_events[currentFrame]
     except KeyError:
         pass
 
-def _ClearSchedule():
-    global scheduledEventTimes
-    scheduledEvents.clear()
-    scheduledEventTimes.clear()
+def _clearSchedule():
+    scheduled_events.clear()
+    scheduled_event_times.clear()

@@ -10,7 +10,7 @@ from kaiengine import sDict
 from kaiengine import sGraphics
 from kaiengine import camera
 from kaiengine import settings
-from kaiengine.timer import FrameTimer, checkCurrentFrame, scheduleRealtime, unscheduleRealtime, Schedule, Unschedule
+from kaiengine.timer import FrameTimer, checkCurrentFrame, scheduleRealtime, unscheduleRealtime, schedule, unschedule
 from kaiengine.propertygetter import PropertyGetter
 from kaiengine.uidgen import GenerateUniqueID
 from kaiengine.debug import debugHasKeyMessage, debugMessage
@@ -418,14 +418,14 @@ class Sprite(sGraphics.sSprite):
                     unscheduleRealtime(self.runAnimations)
                     scheduleRealtime(self.runAnimations, -anitime / self.animation_speed)
                 else:
-                    Unschedule(self.runAnimations)
-                    Schedule(self.runAnimations, -anitime / self.animation_speed)
+                    unschedule(self.runAnimations)
+                    schedule(self.runAnimations, -anitime / self.animation_speed)
             except ZeroDivisionError:
                 pass
 
     def stopAnimations(self):
         self.current_ani = None
-        Unschedule(self.runAnimations)
+        unschedule(self.runAnimations)
         unscheduleRealtime(self.runAnimations)
 
     def animationFinished(self):
@@ -436,7 +436,7 @@ class Sprite(sGraphics.sSprite):
         self.fade_opacity = self.hard_fade_timer.getCountdownPercent()
         if self.hard_fade_timer.checkCountdown():
             self.hard_fade_flag = False
-            Unschedule(self.runHardFade)
+            unschedule(self.runHardFade)
 
 
     def set_ani_image(self, num, number_of_frames_cycled = 0):
@@ -563,8 +563,8 @@ class Sprite(sGraphics.sSprite):
     def hard_fade(self, time):
         self.hard_fade_flag = True
         self.hard_fade_timer.countdownStart(time)
-        Unschedule(self.runHardFade)
-        Schedule(self.runHardFade, 0, repeat = True)
+        unschedule(self.runHardFade)
+        schedule(self.runHardFade, 0, repeat = True)
 
     def update_opacity(self):
         self.alpha = self.fade_opacity * self.ani_opacity
@@ -713,8 +713,8 @@ class Sprite(sGraphics.sSprite):
         self.removeAllListeners()
         try:
             unscheduleRealtime(self.runAnimations)
-            Unschedule(self.runAnimations)
-            Unschedule(self.runHardFade)
+            unschedule(self.runAnimations)
+            unschedule(self.runHardFade)
         except:
             pass
             #if self.ani_thread_timer is not None:

@@ -90,7 +90,7 @@ class InterfaceLayer(InterfaceWidget, EventInterface, SchedulerInterface):
 
     def removeKeyHeldTimers(self):
         self._key_held_timers.clear()
-        self.Unschedule(self._checkKeyHeld)
+        self.unschedule(self._checkKeyHeld)
 
     def _checkKeyHeld(self):
         if self._top_layer:
@@ -162,7 +162,7 @@ class InterfaceLayer(InterfaceWidget, EventInterface, SchedulerInterface):
         except KeyError:
             pass
         if len(self._key_held_timers) <= 0:
-            self.Unschedule(self._checkKeyHeld)
+            self.unschedule(self._checkKeyHeld)
         return returnval
 
     def _layerMousePress(self, *args, **kwargs):

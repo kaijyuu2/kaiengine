@@ -44,7 +44,7 @@ def dispatchInputEvents():
     getWindow().dispatch_events()
 
 def gameFrame(dt):
-    #UnscheduleRealtime(GameFrame) #stopgap to prevent leak; ideally whole scheduling system should handle better
+    #unscheduleRealtime(GameFrame) #stopgap to prevent leak; ideally whole scheduling system should handle better
     updateTimeSinceLastFrame(dt)
     dispatchInputEvents()
     runCamera()

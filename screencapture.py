@@ -1,7 +1,7 @@
 
 
 from . import sGraphics
-from .timer import Schedule, Unschedule
+from .timer import schedule, unschedule
 from kaiengine.debug import debugMessage
 
 import os
@@ -43,7 +43,7 @@ def startAnimationCapture(hardDiskCache=False):
     #hardDiskCache NYI due to various concerns
     if not hardDiskCache:
         finishAnimationCapture() #stop any current capture
-        Schedule(_captureAnimation, 1, True)
+        schedule(_captureAnimation, 1, True)
         _captureAnimation() #do it this frame too
 
 def _captureAnimation():
@@ -56,7 +56,7 @@ def captureInProgress():
 def finishAnimationCapture(savePath=None):
     """Complete animation capture and save frames to disk."""
     global screenshot_data
-    Unschedule(_captureAnimation) #unschedule if needed
+    unschedule(_captureAnimation) #unschedule if needed
     if not screenshot_data: #check if we don't have any available capture data
         return
 

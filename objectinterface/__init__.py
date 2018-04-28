@@ -6,3 +6,4 @@ from .movement_spline_interface import MovementSplineInterfaceFrames, MovementSp
 from .position_interface import PositionInterface
 from .schedulerinterface import SchedulerInterface
 from .eventinterface import EventInterface
+from .sleep_interface import SleepInterface
