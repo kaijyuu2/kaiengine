@@ -38,6 +38,21 @@ MULTI_SPRITE_SPRITES = "multi_sprites"
 MULTI_SPRITE_SPRITE_PATH = "path"
 MULTI_SPRITE_SPRITE_LAYER = "layer"
 
+#scenes
+
+SCENE_BG_FILENAME = "bg" 
+SCENE_MUSIC_FILENAME = "music"
+SCENE_ACTOR_LIST = "actors"
+
+
+#tilemap scenes
+
+TILEMAP_SCENE_TILE_LIST = "tile_list"
+TILEMAP_SCENE_WIDTH = "width"
+TILEMAP_SCENE_HEIGHT = "height"
+TILEMAP_SCENE_TILE_HEIGHT = "tile_height"
+TILEMAP_SCENE_TILE_WIDTH = "tile_width"
+
 
 #strings keys
 #languages

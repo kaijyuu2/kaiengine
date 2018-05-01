@@ -12,7 +12,7 @@ fpscount = 0
 
 def initializeSimpleFPSCounter():
     global fpssprite, fpstimer
-    fpssprite = registerSprite(display.createLabel("FPS: 0", font_size = settings.getValue(DYNAMIC_SETTINGS_FPS_SIZE), color = COLOR_WHITE, layer = 20000000000))
+    fpssprite = registerSprite(display.createLabel("FPS: 0", font_size = settings.getValue(DYNAMIC_SETTINGS_FPS_SIZE), color = COLOR_WHITE, layer = DEFAULT_FPS_LAYER))
     fpssprite.follow_camera = True
     scheduleRealtime(simpleFPSUpdate, 1.0, True)
     if settings.getValue(DYNAMIC_SETTINGS_FPS_ON):

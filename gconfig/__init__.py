@@ -12,6 +12,7 @@ from .eventkeys import *
 from .interfacekaiconfig import *
 from .defaultresources import *
 from .default_keybinds import *
+from .layers import *
 
 #offset keys
 CAMERA_KEY = "CAMERA"

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from kaiengine.destroyinterface import DestroyInterface
+from kaiengine.objectinterface import EventInterface
 
 
 manager = None
 
-class SceneManager(DestroyInterface):
+class SceneManager(EventInterface):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -21,18 +21,23 @@ class SceneManager(DestroyInterface):
         if self.scene_stack:
             self.getCurrentScene().destroy()
             self.scene_stack = self.scene_stack[:-1]
-            self.getCurrentScene().wakeUpScene()
+            if self.scene_stack:
+                self.getCurrentScene().wakeUpScene()
             
     def clearSceneStack(self):
         for scene in self.scene_stack:
             scene.destroy()
-        self.scene_stack = []
+        self.scene_stack.clear()
 
     def getCurrentScene(self):
         try:
             return self.scene_stack[-1]
         except IndexError:
             return None
+        
+    def destroy(self):
+        super().destroy()
+        self.clearSceneStack()
         
         
 def initializeSceneManager():
@@ -44,3 +49,18 @@ def closeSceneManager():
     if manager:
         manager.destroy()
     manager = None
+    
+def getSceneManager():
+    return manager
+
+def pushScene(*args, **kwargs):
+    manager.pushScene(*args, **kwargs)
+    
+def popScene(*args, **kwargs):
+    manager.popScene(*args, **kwargs)
+    
+def clearSceneStack():
+    manager.clearSceneStack()
+    
+def getCurrentScene():
+    return manager.getCurrentScene()
