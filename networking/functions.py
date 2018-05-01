@@ -2,7 +2,8 @@
 
 import asyncio
 
-def runCoroutine(coroutine, callback):
+def runCoroutine(coroutine, callback = None):
     future = asyncio.Future()
     asyncio.ensure_future(coroutine(future))
-    future.add_done_callback(callback)
+    if callback is not None:
+        future.add_done_callback(callback)
