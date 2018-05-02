@@ -4,7 +4,11 @@ from .scene import Scene
 
 from kaiengine.sprite import SpriteMulti
 from kaiengine.weakrefhelper import weakRef, unWeakRef
-from kaiengine.objectinterface import GraphicalInterface
+from kaiengine.objectinterface import GraphicInterface
+
+from kaiengine.gconfig import *
+
+import copy
 
 MAPTILE_SPRITE = "sprite"
 MAPTILE_SPRITE_PRIORITY = "priority"

@@ -8,6 +8,7 @@ from kaiengine.audio import playMusic, stopMusic
 from kaiengine.objects import createActor
 from kaiengine.debug import debugMessage
 
+from kaiengine.gconfig import *
 
 ACTOR_TYPE = "type"
 ACTOR_POS = "pos"
@@ -17,7 +18,7 @@ FADE_TIME = 60 #one second
 
 class Scene(BaseObject, GraphicInterface, EventInterface):
     
-    default_prop = {SCENE_BG_FILENAME: None
+    default_prop = {SCENE_BG_FILENAME: None,
                     SCENE_MUSIC_FILENAME: None,
                     SCENE_ACTOR_LIST: []}
     

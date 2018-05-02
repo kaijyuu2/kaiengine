@@ -3,7 +3,7 @@
 #quick setup functions
 
 
-from . import display, fonts, camera, settings, resource, keybinds, simplefpscounter, audio, savegame, localization, event, joysticks
+from . import display, fonts, camera, settings, resource, keybinds, simplefpscounter, audio, savegame, localization, event, joysticks, scene
 
 from .gconfig import *
 
@@ -30,6 +30,7 @@ def setupDrivers():
         simplefpscounter.initializeSimpleFPSCounter()
     except resource.ResourceUnavailableError:
         pass
+    scene.initializeSceneManager()
     event.initializeGlue()
 
 def closeDrivers():
