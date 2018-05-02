@@ -5,6 +5,8 @@ from kaiengine.baseobject import BaseObject
 from kaiengine.objectinterface import GraphicInterface, EventInterface
 from kaiengine.darkener import Darkener
 from kaiengine.audio import playMusic, stopMusic
+from kaiengine.objects import createActor
+from kaiengine.debug import debugMessage
 
 
 ACTOR_TYPE = "type"
@@ -21,8 +23,11 @@ class Scene(BaseObject, GraphicInterface, EventInterface):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.actor_factory = createActor
         
         self.actors = sDict()
+        
+        self.schedule(self.updateActorPriority, 1, True)
         
     def secondaryInit(self):
         '''secondary initialization after scene has been registered'''
@@ -31,10 +36,19 @@ class Scene(BaseObject, GraphicInterface, EventInterface):
         self.playSceneMusic()
         self.loadActors()
         
+    def updateActorPriority(self):
+        '''sort actors by y position and give priority to ones that are lower on the screen'''
+        actors = sorted(list(self.actors.values()), key=lambda x: x.getPos()[1], reverse=True) #sort by y pos
+        for i, actor in enumerate(actors):
+            actor.setSpriteLayer(actor.getBaseLayer() + ACTOR_LAYER_INCREMENT * i)
+
+    def setActorFactory(self, factory):
+        self.actor_factory = factory
+        
     def loadActors(self):
         for actordict in self.actor_list:
             try:
-                newactor = CreateActor(actordict.pop(ACTOR_TYPE, None), self)
+                newactor = self.actor_factory(actordict.pop(ACTOR_TYPE, None), self)
                 pos = actordict.pop(ACTOR_POS)
                 self.addActor(newactor)
                 newactor.setPos(*pos)

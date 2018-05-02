@@ -17,7 +17,7 @@ class Darkener(GraphicInterface, SchedulerInterface):
         self.done_fading = True
 
         self.setSprite(WHITE_PIXEL_FILENAME)
-        self.setSpriteLayer(DARKENER_LAYER)
+        self.setSpriteLayer(DEFAULT_DARKENER_LAYER)
         self.setSpriteDimensions(*getWindowDimensionsScaled())
         self.setSpriteColor(*color)
         self.setSpriteAlpha(0.0)

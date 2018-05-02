@@ -53,6 +53,10 @@ TILEMAP_SCENE_HEIGHT = "height"
 TILEMAP_SCENE_TILE_HEIGHT = "tile_height"
 TILEMAP_SCENE_TILE_WIDTH = "tile_width"
 
+#actors
+ACTOR_STARTING_SPRITE = "starting_sprite"
+
+
 
 #strings keys
 #languages

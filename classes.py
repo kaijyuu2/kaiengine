@@ -65,3 +65,13 @@ def getCustGraphicObjects():
     from . import graphicobject
     directory = GRAPHIC_OBJECTS_DIR
     return findClasses(getClassDict(directory), directory, graphicobject.GraphicObject)
+
+def getCustTilemapScenes():
+    from .scene import TilemapScene
+    directory = TILEMAP_SCENE_DIR
+    return findClasses(getClassDict(directory), directory, TilemapScene)
+
+def getCustActors():
+    from .actor import Actor
+    directory = ACTOR_DIR
+    return findClasses(getClassDict(directory), directory, Actor)

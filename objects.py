@@ -40,3 +40,9 @@ def createObject(filepath, full_path, extension, cust_method, *args, **kwargs):
 
 def createGraphicObject(class_type = None, prop = None, *args, **kwargs):
     return createObjectFin(classes.getCustGraphicObjects(), class_type, prop, *args, **kwargs)
+
+def createActor(class_type = None, prop = None, *args, **kwargs):
+    return createObjectFin(classes.getCustActors(), class_type, prop, *args, **kwargs)
+
+def createTilemapScene(class_type = None, prop = None, *args, **kwargs):
+    return createObjectFin(classes.getCustTilemapScenes(), class_type, prop, *args, **kwargs)
