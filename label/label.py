@@ -39,7 +39,7 @@ class Label(Container, BaseObject):
 
 
     def setText(self, text, font_size = None, font = None, color = None, layer = None):
-        self._sublabel.set_text(text, font_size, font, color)
+        self._sublabel.setText(text, font_size, font, color)
         if layer is not None:
             self._sublabel.layer = layer
 

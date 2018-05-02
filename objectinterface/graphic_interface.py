@@ -287,10 +287,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def _getGraphicPath(self, path, filename):
         '''for those who want to set a custom directory path'''
-        try:
-            tempbool = isinstance(filename, str) #test if full filepath or just the filename
-        except TypeError:
-            tempbool = isinstance(filename, str) #python 3
+        tempbool = isinstance(filename, str)
         if not tempbool:
             temppath = filename
         else:

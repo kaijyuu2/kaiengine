@@ -27,7 +27,7 @@ def incrementFPSCount():
 
 def simpleFPSUpdate(dt):
     global fpscount
-    fpssprite.set_text( "FPS: " + str(int(float(fpscount) / dt)))
+    fpssprite.setText( "FPS: " + str(int(float(fpscount) / dt)))
     fpscount = 0
 
 def toggleFPS():

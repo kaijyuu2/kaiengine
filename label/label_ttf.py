@@ -22,7 +22,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
         super(Label_TTF, self).__init__(text, font_size, font, color, layer, bordered)
         self.show = show
         if self.text is not None:
-            self.set_text(text)
+            self.setText(text)
 
 
     @property
@@ -32,7 +32,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
     def bordered(self, val):
         if self._bordered != val:
             self._bordered = val
-            self._set_text() #regenerate texture
+            self._setText() #regenerate texture
 
     @property
     def follow_camera(self):
@@ -88,7 +88,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
             self.stopUpdatingWithCamera()
         self._follow_camera = val
 
-    def set_text(self, text, font_size = None, font = None, color = None):
+    def setText(self, text, font_size = None, font = None, color = None):
         self.text = text
         if font_size is None:
             if self.font_size is None:
@@ -105,9 +105,9 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
                 self.color = DEFAULT_TEXT_COLOR
         else:
             self.color = NormalizeColorFormat(color)
-        self._set_text()
+        self._setText()
 
-    def _set_text(self):
+    def _setText(self):
         if self.text is not None:
             self.set_image_from_buffer(None,*fonts.textToImageBuffer(self.text, self.font_size, self.font, self.bordered))
             if self.follow_camera:
@@ -126,7 +126,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
 
     def setFontSize(self, newsize):
         self.font_size = newsize
-        self._set_text()
+        self._setText()
 
     def set_font_size(self, *args, **kwargs):
         """deprected form of setFontSize"""
@@ -137,7 +137,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
 
     def setFont(self, new_font):
         self.font = new_font
-        self._set_text()
+        self._setText()
 
     def set_font(self, *args, **kwargs):
         """deprecated form of setFont"""

@@ -61,17 +61,14 @@ class directory_dict(dict):
 
 
 #included custom classes
-def getCustGraphicObjects():
+def getCustGraphicObjects(directory = GRAPHIC_OBJECTS_DIR):
     from . import graphicobject
-    directory = GRAPHIC_OBJECTS_DIR
     return findClasses(getClassDict(directory), directory, graphicobject.GraphicObject)
 
-def getCustTilemapScenes():
+def getCustTilemapScenes(directory = TILEMAP_SCENE_DIR):
     from .scene import TilemapScene
-    directory = TILEMAP_SCENE_DIR
     return findClasses(getClassDict(directory), directory, TilemapScene)
 
-def getCustActors():
+def getCustActors(directory = ACTOR_DIR):
     from .actor import Actor
-    directory = ACTOR_DIR
     return findClasses(getClassDict(directory), directory, Actor)

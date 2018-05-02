@@ -10,10 +10,14 @@ from kaiengine.gconfig import *
 
 import copy
 
-MAPTILE_SPRITE = "sprite"
+MAPTILE_SPRITE = "graphic"
 MAPTILE_SPRITE_PRIORITY = "priority"
 MAPTILE_SPRITE_XFLIP = "xflip"
 MAPTILE_SPRITE_YFLIP = "yflip"
+
+MAPTILE_DATA_LOWER = "lower"
+MAPTILE_DATA_UPPER = "upper"
+SPRITE_DATA_SET = {(MAPTILE_DATA_LOWER, 0), (MAPTILE_DATA_UPPER, 1)}
 
 class TilemapScene(Scene):
     
@@ -31,9 +35,9 @@ class TilemapScene(Scene):
         self.loadTilemap()
         
     def secondaryInit(self):
-        pass
+        super().secondaryInit()
     
-    def getMapTileType(self):
+    def getMapTileType(self, tiledata = None):
         return MapTile
     
     def getMapTileWidth(self):
@@ -48,7 +52,7 @@ class TilemapScene(Scene):
         xcounter = 0
         ycounter = self.height - 1
         for tile in self.tile_list:
-            self.tilemap[(xcounter, ycounter)] = self.getMapTileType()(self)
+            self.tilemap[(xcounter, ycounter)] = self.getMapTileType(tile)(self)
             sprites = [None, None]
             priorities = [False, False]
             xflips = [False, False]
@@ -59,8 +63,9 @@ class TilemapScene(Scene):
                     priorities[index] = tile[key].get(MAPTILE_SPRITE_PRIORITY, False)
                     xflips[index] = tile[key].get(MAPTILE_SPRITE_XFLIP, False)
                     yflips[index] = tile[key].get(MAPTILE_SPRITE_YFLIP, False)
-            self.tilemap[(xcounter, ycounter)].SetMaptileGraphics(sprites[0], sprites[1], priorities[0], priorities[1], xflips[0], xflips[1], yflips[0], yflips[1])
-            self.tilemap[(xcounter, ycounter)].SetMaptilePos(xcounter, ycounter)
+            self.tilemap[(xcounter, ycounter)].setMaptileGraphics(sprites[0], sprites[1], priorities[0], priorities[1], xflips[0], xflips[1], yflips[0], yflips[1])
+            self.tilemap[(xcounter, ycounter)].setMaptilePos(xcounter, ycounter)
+            
             xcounter += 1
             if xcounter >= self.width:
                 xcounter = 0
@@ -69,7 +74,7 @@ class TilemapScene(Scene):
                     break #probable error
         
     def clearMapTiles(self):
-        for tile in self.tilemap.values:
+        for tile in self.tilemap.values():
             tile.destroy()
         self.tilemap.clear()
         
@@ -78,6 +83,9 @@ class TilemapScene(Scene):
         self.clearMapTiles()
         
 class MapTile(GraphicInterface):
+    
+    vars()[GPATH] = copy.copy(MAP_TILE_GRAPHICS_FULL_PATH)
+    
     def __init__(self, mappe, *args, **kwargs):
         super().__init__(mappe, *args, **kwargs)
         self.owner = mappe
@@ -130,7 +138,7 @@ class MapTile(GraphicInterface):
     def _setMaptileSprite(self, layer):
         self.sprite.setMultiLayer(layer, self.getPriorityLayer()  if self._priorities[layer] else self.getNormalLayer())
         self.sprite.setMultiFlip(layer, [self._xflips[layer], self._yflips[layer]])
-        self.SetMaptilePos()
+        self.setMaptilePos()
 
     def setMaptilePos(self, x = None, y = None):
         if x is None: x = self.maptile_pos[0]

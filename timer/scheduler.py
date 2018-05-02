@@ -125,7 +125,14 @@ def _scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
     return newevent.eventid
 
 def _realtimeEventRun(event, *args, **kwargs):
-    event.listener(getGameScheduler().time() - event.time, *args, **kwargs)
+    try:
+        event.listener(getGameScheduler().time() - event.scheduler_time, *args, **kwargs)
+    except:
+        from kaiengine.debug import debugMessage
+        import traceback
+        debugMessage("Something broke with a scheduled realtime listener; deleting it.")
+        traceback.print_exc()
+        event.repeating = False #stop it from repeating
     _cleanupRealtimeScheduledEvent(event.listener, event.key)
     if not event._destroyed and event.repeating:
         _scheduleRealtime(event.listener, event.time, event.repeating, *args, **kwargs)

@@ -14,7 +14,11 @@ class SceneManager(EventInterface):
     def pushScene(self, newscenetype, *args, **kwargs):
         if self.getCurrentScene():
             self.getCurrentScene().sleepScene()
-        self.scene_stack.append(newscenetype(*args, **kwargs))
+        try:
+            newscene = newscenetype(*args, **kwargs)
+        except TypeError: #must of passed an already created scene
+            newscene = newscenetype
+        self.scene_stack.append(newscene)
         self.getCurrentScene().secondaryInit()
 
     def popScene(self):

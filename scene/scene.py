@@ -2,7 +2,7 @@
 
 from kaiengine.sDict import sDict
 from kaiengine.baseobject import BaseObject
-from kaiengine.objectinterface import GraphicInterface, EventInterface
+from kaiengine.objectinterface import GraphicInterface, EventInterface, SchedulerInterface
 from kaiengine.darkener import Darkener
 from kaiengine.audio import playMusic, stopMusic
 from kaiengine.objects import createActor
@@ -16,7 +16,7 @@ ACTOR_SPRITE = "sprite"
 
 FADE_TIME = 60 #one second
 
-class Scene(BaseObject, GraphicInterface, EventInterface):
+class Scene(BaseObject, GraphicInterface, EventInterface, SchedulerInterface):
     
     default_prop = {SCENE_BG_FILENAME: None,
                     SCENE_MUSIC_FILENAME: None,
@@ -24,6 +24,8 @@ class Scene(BaseObject, GraphicInterface, EventInterface):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.darkener = None
+        
         self.actor_factory = createActor
         
         self.actors = sDict()
@@ -46,10 +48,13 @@ class Scene(BaseObject, GraphicInterface, EventInterface):
     def setActorFactory(self, factory):
         self.actor_factory = factory
         
+    def getActorFactory(self, actordata = None): #data passed in case this is overwritten
+        return self.actor_factory
+        
     def loadActors(self):
         for actordict in self.actor_list:
             try:
-                newactor = self.actor_factory(actordict.pop(ACTOR_TYPE, None), self)
+                newactor = self.getActorFactory(actordict)(actordict.pop(ACTOR_TYPE, None), self)
                 pos = actordict.pop(ACTOR_POS)
                 self.addActor(newactor)
                 newactor.setPos(*pos)
@@ -119,13 +124,13 @@ class Scene(BaseObject, GraphicInterface, EventInterface):
             playMusic(self.music)
             
     def sceneFadeOut(self, time = FADE_TIME, *args, **kwargs):
-        if not self.scene_hidden:
+        if not self.sleeping:
             self.darkener.fadeOut(time)
             if len(args) + len(kwargs) > 0:
                 self.waitForFade(*args, **kwargs)
 
     def sceneFadeIn(self, time = FADE_TIME, *args, **kwargs):
-        if not self.scene_hidden:
+        if not self.sleeping:
             self.darkener.fadeIn(time)
             if len(args) + len(kwargs) > 0:
                 self.waitForFade(*args, **kwargs)
@@ -134,12 +139,12 @@ class Scene(BaseObject, GraphicInterface, EventInterface):
         return self.darkener.checkDoneFading()
 
     def waitForFade(self, method, *args, **kwargs):
-        if not self.scene_hidden:
+        if not self.sleeping:
             self.schedule(self._waitForFade, 1, True, method, *args, **kwargs)
             self._waitForFade(method, *args, **kwargs)
 
     def _waitForFade(self, method, *args, **kwargs):
-        if not self.scene_hidden:
+        if not self.sleeping:
             if self.checkDoneFading():
                 self.unschedule(self._waitForFade)
                 method(*args, **kwargs)

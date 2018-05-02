@@ -41,8 +41,8 @@ def createObject(filepath, full_path, extension, cust_method, *args, **kwargs):
 def createGraphicObject(class_type = None, prop = None, *args, **kwargs):
     return createObjectFin(classes.getCustGraphicObjects(), class_type, prop, *args, **kwargs)
 
-def createActor(class_type = None, prop = None, *args, **kwargs):
-    return createObjectFin(classes.getCustActors(), class_type, prop, *args, **kwargs)
+def createActor(filepath, *args, **kwargs):
+    return createObject(filepath, FULL_ACTOR_PATH, ACTOR_EXTENSION, classes.getCustActors, *args, **kwargs)
 
-def createTilemapScene(class_type = None, prop = None, *args, **kwargs):
-    return createObjectFin(classes.getCustTilemapScenes(), class_type, prop, *args, **kwargs)
+def createTilemapScene(filepath, *args, **kwargs):
+    return createObject(filepath, TILEMAP_SCENE_FULL_PATH, TILEMAP_SCENE_EXTENSION, classes.getCustTilemapScenes, *args, **kwargs)
