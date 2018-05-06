@@ -7,21 +7,21 @@ MESSAGE_QUEUE = []
 
 async def _connectToServer(address, port):
     reader, writer = await asyncio.open_connection(address, port)
-    await asyncio.gather(listenToServer(reader),
-                         messageServer(writer))
+    await asyncio.gather(_listenToServer(reader),
+                         _messageServer(writer))
     reader.close()
     writer.close()
 
 def connectToServer(server_address=DEFAULT_HOST, port=DEFAULT_PORT):
     asyncio.ensure_future(_connectToServer(address, port))
 
-async def listenToServer(reader):
+async def _listenToServer(reader):
     while True:
         dat = await reader.read(MAX_READ_SIZE)
         key, json_object = _decodeMessage(dat)
         _relayEventFromServer(key, json_object)
 
-async def messageServer(writer):
+async def _messageServer(writer):
     while True:
         if MESSAGE_QUEUE:
             next_message = MESSAGE_QUEUE.pop(0)
