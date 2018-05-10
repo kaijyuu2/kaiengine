@@ -31,6 +31,7 @@ TEXT_DIR = "text" #deprecated; used only in DoL
 WIDGET_PATH = "widgets"
 LOG_PATH = "logs"
 LOG_FILENAME_HEADER = "log"
+SERVER_LOG_FILENAME_HEADER = "serverlog"
 
 #full paths
 FULL_FONT_PATH = [RESOURCE_PATH, GRAPHICS_PATH, FONT_DIR]

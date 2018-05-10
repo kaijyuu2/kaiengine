@@ -26,7 +26,7 @@ def initializeGame(init, close):
         scheduler.run_forever()
     except:
         import traceback
-        traceback.print_stack()
+        traceback.print_exc()
     finally:
         try:
             close()

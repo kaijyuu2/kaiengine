@@ -41,7 +41,9 @@ def scheduleGameFrame():
     scheduleRealtime(gameFrame, 2*frametime - delay)
 
 def dispatchInputEvents():
-    getWindow().dispatch_events()
+    window = getWindow()
+    if window:
+        window.dispatch_events()
 
 def gameFrame(dt):
     #unscheduleRealtime(GameFrame) #stopgap to prevent leak; ideally whole scheduling system should handle better

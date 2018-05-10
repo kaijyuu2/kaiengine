@@ -32,6 +32,12 @@ def setupDrivers():
         pass
     scene.initializeSceneManager()
     event.initializeGlue()
+    
+def setupDriversMinimal():
+    '''Sets only the minimal amount of drivers up (no audiovisual ones)'''
+    resource.setupArchive()
+    localization.initLocalizationData()
+    event.initializeGlue()
 
 def closeDrivers():
     simplefpscounter.removeFPS()

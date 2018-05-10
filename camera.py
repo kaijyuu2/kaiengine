@@ -12,95 +12,129 @@ from kaiengine.gconfig import *
 
 #camera class & driver
 
-CameraObj = None
+cameraObj = None
 
 def initCamera():
-    global CameraObj
-    CameraObj = camera()
+    global cameraObj
+    cameraObj = camera()
 
 def getCameraMoving():
-    return CameraObj.get_moving()
+    try:
+        return cameraObj.get_moving()
+    except AttributeError:
+        return 0
 
 def getCameraX():
-    return CameraObj.getX()
+    try:
+        return cameraObj.getX()
+    except AttributeError:
+        return 0
 
 def getCameraY():
-    return CameraObj.getY()
+    try:
+        return cameraObj.getY()
+    except AttributeError:
+        return 0
 
 def getCameraXY():
     return [getCameraX(), getCameraY()]
 
 def setCameraCenterXY(x, y):
-    CameraObj.center(x, y)
+    if cameraObj:
+        cameraObj.center(x, y)
 
 def setCameraXY(x, y):
-    CameraObj.set_x(x)
-    CameraObj.set_y(y)
+    if cameraObj:
+        cameraObj.set_x(x)
+        cameraObj.set_y(y)
 
 def moveCameraOverTime(pos, time, **kwargs):
-    CameraObj.move_over_time(pos, time, **kwargs)
+    if cameraObj:
+        cameraObj.move_over_time(pos, time, **kwargs)
 
 def setXBoundaries(x, x2):
-    CameraObj.set_x_boundary(x, x2)
+    if cameraObj:
+        cameraObj.set_x_boundary(x, x2)
 
 def setYBoundaries(y, y2):
-    CameraObj.set_y_boundary(y, y2)
+    if cameraObj:
+        cameraObj.set_y_boundary(y, y2)
 
 def setBoundaries(x, x2, y, y2):
     setXBoundaries(x, x2)
     setYBoundaries(y, y2)
 
 def setCameraOffset(*args, **kwargs):
-    CameraObj.setOffset(*args, **kwargs)
+    if cameraObj:
+        cameraObj.setOffset(*args, **kwargs)
 
 def getCameraOffset(*args, **kwargs):
-    return CameraObj.getOffset(*args, **kwargs)
+    try:
+        return cameraObj.getOffset(*args, **kwargs)
+    except AttributeError:
+        return (0,0)
 
 def clearCameraOffset(*args, **kwargs):
-    CameraObj.clearOffset(*args, **kwargs)
+    if cameraObj:
+        cameraObj.clearOffset(*args, **kwargs)
 
 def setScrollBuffer(val):
-    CameraObj.set_scroll_buffer(val)
+    if cameraObj:
+        cameraObj.set_scroll_buffer(val)
 
 def setUseScrollBuffer(val):
-    CameraObj.set_use_scroll_buffer(val)
+    if cameraObj:
+        cameraObj.set_use_scroll_buffer(val)
 
 def setUseCameraBoundary(val):
-    CameraObj.set_use_camera_boundary(val)
+    if cameraObj:
+        cameraObj.set_use_camera_boundary(val)
 
 def setAllowMovement(val, reset = None):
-    CameraObj.set_allow_movement(val, reset)
+    if cameraObj:
+        cameraObj.set_allow_movement(val, reset)
 
 def getAllowMovement():
-    return CameraObj.get_allow_movement()
+    try:
+        return cameraObj.get_allow_movement()
+    except AttributeError:
+        return False
 
 def lockToScreen():
-    CameraObj.lock_to_screen_dim()
+    if cameraObj:
+        cameraObj.lock_to_screen_dim()
 
 def moveX(dx):
-    CameraObj.move_x(dx)
+    if cameraObj:
+        cameraObj.move_x(dx)
 
 def moveY(dy):
-    CameraObj.move_y(dy)
+    if cameraObj:
+        cameraObj.move_y(dy)
 
 def moveXY(dx, dy):
     moveX(dx)
     moveY(dy)
 
 def addCameraSprite(sprite):
-    return CameraObj.addCameraSprite(sprite)
+    if cameraObj:
+        return cameraObj.addCameraSprite(sprite)
 
 def removeCameraSprite(index):
-    CameraObj.removeCameraSprite(index)
+    if cameraObj:
+        cameraObj.removeCameraSprite(index)
 
 def runCamera():
-    CameraObj.run()
+    if cameraObj:
+        cameraObj.run()
 
 def updateCameraSprites():
-    CameraObj.updateCameraSprites()
+    if cameraObj:
+        cameraObj.updateCameraSprites()
 
 def updateInternalCamera():
-    CameraObj.update_internal_camera()
+    if cameraObj:
+        cameraObj.update_internal_camera()
 
 DEFAULT_CAMERA_OFFSET_KEY = "_DEFAULT_CAMERA_OFFSET_KEY"
 
