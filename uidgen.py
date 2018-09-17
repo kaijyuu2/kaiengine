@@ -20,4 +20,12 @@ def generateUniqueID(identifier = DEFAULT_ID):
         id_counters[identifier] = 0
     return BASE_UNIQUE_STRING + identifier + UNDERSCORE_CHAR + str(id_counters[identifier])
 
+class IdentifiedObject(object):
+
+    '''Provide child objects with unique IDs.'''
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.id = generateUniqueID(self.__class__.__name__)
+
 GenerateUniqueID = generateUniqueID #deprecated function name

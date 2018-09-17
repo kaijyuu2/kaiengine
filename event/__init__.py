@@ -2,7 +2,6 @@
 
 from . import eventdriver
 from .eventkeys import *
-from .inputInterpretation import initializeGlue
 
 class ListenerRegistryMeta(type):
     """Allow subclasses to independently define listeners to initialize.
@@ -19,36 +18,33 @@ class ListenerRegistryMeta(type):
 
     def __init__(cls, *args, **kwargs):
         cls._listener_init = []
-        for attr in cls.__dict__.values():
+        cls._child_listener_init = []
+        for key, attr in cls.__dict__.items():
             try:
                 attr._listener_init_data
             except AttributeError:
                 pass
             else:
                 cls._listener_init.append((attr, *attr._listener_init_data))
+            try:
+                attr._child_listener_init_data
+            except AttributeError:
+                pass
+            else:
+                cls._child_listener_init.append((attr, key, *attr._child_listener_init_data))
         return super().__init__(*args, **kwargs)
 
     def __call__(cls, *args, **kwargs):
         obj = super().__call__(*args, **kwargs)
+        try:
+            p = kwargs["priority"]
+        except:
+            p = 0
         for func, event_key, priority, lock in cls._listener_init:
-            try:
-                p = kwargs["priority"]
-            except:
-                p = 0
             obj._initListener(event_key, func, priority or p, lock)
+        for func, child_key, event_key, priority, lock in cls._child_listener_init:
+            obj._initChildListener(child_key, event_key, func, priority or p, lock)
         return obj
-
-def _event_response(event_key, priority=None, lock=False):
-    def decorator(func):
-        func._listener_init_data = (event_key, priority, lock)
-        return func
-    return decorator
-
-def on_event(event_key, priority=None, lock=False):
-    return _event_response(event_key, priority, lock)
-
-def on_input(bind, priority=None):
-    return on_event(EVENT_INPUT_PREFIX + bind, priority=priority, lock=True)
 
 #custom events
 
