@@ -15,14 +15,13 @@ class ListenerInitializerInterface(EventInterface):
 
     def _initChildListener(self, child_key, event_key, func, priority, lock):
         child = getattr(self, child_key)
-        event_key = child.ID + event_key
+        event_key = child.id + event_key
         self._initListener(event_key, func, priority, lock)
 
 class EventIDInterface(IdentifiedObject, ListenerInitializerInterface):
 
     def event(self, event_key, *args, **kwargs):
-        customEvent(self.ID + event_key, *args, **kwargs)
-
+        customEvent(self.id + event_key, *args, **kwargs)
 
 
 def _event_response(event_key, priority=None, lock=False):
