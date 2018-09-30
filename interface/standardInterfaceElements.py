@@ -9,11 +9,11 @@ class HorizontalContainer(InterfaceElement):
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
-        offset = sum([child.width + self.spacing for child in self._children[:index]])
+        offset = sum([child.width + self.spacing for child in list(self._children.values())[:index]])
         return self._position + (offset, 0)
 
     def _calculateWidth(self):
-        return sum([child.width + self.spacing for child in self._children])
+        return sum([child.width + self.spacing for child in self._children.values()])
 
 class VerticalContainer(InterfaceElement):
 
@@ -21,11 +21,11 @@ class VerticalContainer(InterfaceElement):
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
-        offset = sum([child.height + self.spacing for child in self._children[:index]])
+        offset = sum([child.height + self.spacing for child in list(self._children.values())[:index]])
         return self._position + (0, offset)
 
     def _calculateHeight(self):
-        return sum([child.height + self.spacing for child in self._children])
+        return sum([child.height + self.spacing for child in self._children.values()])
 
 class GridContainer(InterfaceElement):
 
@@ -54,6 +54,7 @@ class GridContainer(InterfaceElement):
 class SpriteElement(InterfaceElement):
 
     def __init__(self, sprite_path=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._sprite_path = sprite_path
         self._sprite = createGraphic(sprite_path) #TODO: automatically setting layer, etc
 

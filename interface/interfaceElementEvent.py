@@ -55,4 +55,4 @@ def _child_event_response(event_append, event_key, *args, **kwargs):
     return func
 
 def on_activate(*args, **kwargs):
-    return _child_event_response(_ACTIVATE_APPEND, _EVENT_INTERFACE_ACTIVATED, *args, **kwargs)
+    return _child_event_response(ACTIVATE_APPEND, EVENT_INTERFACE_ACTIVATED, *args, **kwargs)

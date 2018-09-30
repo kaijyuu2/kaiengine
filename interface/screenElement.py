@@ -8,8 +8,12 @@ class ScreenCoordinates(list):
     def __add__(self, other):
         return ScreenCoordinates([a+b for a, b in zip_longest(self, other, fillvalue=0)])
 
+    __radd__ = __add__
+
     def __sub__(self, other):
         return ScreenCoordinates([a-b for a, b in zip_longest(self, other, fillvalue=0)])
+
+    __rsub__ = __sub__
 
 class ScreenElement(object):
 
@@ -17,7 +21,7 @@ class ScreenElement(object):
     _display_offset = ScreenCoordinates((0, 0))
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self._children = {}
 
     @property
