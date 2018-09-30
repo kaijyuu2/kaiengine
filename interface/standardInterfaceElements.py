@@ -56,8 +56,14 @@ class SpriteElement(InterfaceElement):
     def __init__(self, sprite_path=None, *args, **kwargs):
         self._sprite_path = sprite_path
         self._sprite = createGraphic(sprite_path) #TODO: automatically setting layer, etc
-        self.height = self._sprite.height
-        self.width = self._sprite.width
+
+    @property
+    def height(self):
+        return self._sprite.height
+
+    @property
+    def width(self):
+        return self._sprite.width
 
     def _applyPosition(self):
         self._sprite.pos = self._position

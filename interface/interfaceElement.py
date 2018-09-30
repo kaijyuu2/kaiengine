@@ -12,7 +12,6 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
 
     def _init(self, *args, **kwargs):
         pass
-        #possibly make unhandled args into children?
 
     def activate(self):
         self.event(_EVENT_INTERFACE_ACTIVATED)

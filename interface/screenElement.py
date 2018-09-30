@@ -69,3 +69,7 @@ class ScreenElement(object):
 
     def _applyPosition(self):
         pass
+
+    def addChild(self, child_element, *args, **kwargs):
+        self._children[child_element.id] = child_element
+        return child_element
