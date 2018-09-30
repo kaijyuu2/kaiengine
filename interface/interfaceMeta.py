@@ -23,7 +23,7 @@ class _EventDefHandler(type):
 
     @classmethod
     def __prepare__(metacls, name, bases, **kwds):
-        return _EventHandlerDict()
+        return _EventDefHandler._EventHandlerDict()
 
 class _InterfaceElementMeta(_EventDefHandler, ListenerRegistryMeta):
 

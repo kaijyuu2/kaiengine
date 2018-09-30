@@ -13,8 +13,8 @@ class ScreenCoordinates(list):
 
 class ScreenElement(object):
 
-    _position = ScreenCoordinates(0, 0)
-    _display_offset = ScreenCoordinates(0, 0)
+    _position = ScreenCoordinates((0, 0))
+    _display_offset = ScreenCoordinates((0, 0))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
