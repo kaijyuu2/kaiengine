@@ -20,8 +20,8 @@ class ListenerInitializerInterface(EventInterface):
 
 class EventIDInterface(IdentifiedObject, ListenerInitializerInterface):
 
-    def event(self, event_key, *args, **kwargs):
-        customEvent(self.id + event_key, *args, **kwargs)
+    def event(self, event_key, *, **kwargs):
+        customEvent(self.id + event_key, origin_id=self.id, **kwargs)
 
 
 def _event_response(event_key, priority=None, lock=False):
