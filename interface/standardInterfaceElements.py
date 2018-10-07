@@ -51,11 +51,11 @@ class GridContainer(InterfaceElement):
         return self._position + (x, y)
 
     def _calculateHeight(self):
-        index = dmax([child.location[1] for child in self.children])
+        index = dmax([location[1] for location in self._child_locations.values()])
         return self.grid_size[1] + (index * (self.grid_size[1] + self.spacing[1]))
 
     def _calculateWidth(self):
-        index = dmax([child.location[0] for child in self.children])
+        index = dmax([location[0] for location in self._child_locations.values()])
         return self.grid_size[0] + (index * (self.grid_size[0] + self.spacing[0]))
 
 class SpriteElement(InterfaceElement):

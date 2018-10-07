@@ -2,7 +2,7 @@ from kaiengine.event import addCustomListener
 
 from .interfaceElement import InterfaceElement
 from .interfaceElementKeys import *
-from .standardInterfaceElements import HorizontalContainer, VerticalContainer, SpriteElement#, GridContainer
+from .standardInterfaceElements import HorizontalContainer, VerticalContainer, SpriteElement, GridContainer
 
 _elements = {}
 
