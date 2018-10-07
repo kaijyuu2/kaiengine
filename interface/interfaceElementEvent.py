@@ -7,6 +7,10 @@ from .interfaceElementKeys import *
 
 class ListenerInitializerInterface(EventInterface):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._input_locks = set()
+
     def _initListener(self, event_key, func, priority, lock):
         def instantiated(*args, **kwargs):
             if (not lock) or (not self._input_locks):
