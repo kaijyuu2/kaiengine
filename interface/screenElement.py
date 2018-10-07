@@ -23,6 +23,7 @@ class ScreenElement(object):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._children = {}
+        self._child_locations = {}
 
     @property
     def position(self):
@@ -74,6 +75,7 @@ class ScreenElement(object):
     def _applyPosition(self):
         pass
 
-    def addChild(self, child_element, *args, **kwargs):
+    def addChild(self, child_element, location=None, *args, **kwargs):
         self._children[child_element.id] = child_element
+        self._child_locations[child_element.id] = location
         return child_element

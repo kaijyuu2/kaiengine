@@ -14,6 +14,7 @@ def setupWindowBasic(*logos):
     display.setGlobalScaling(settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING))
 
 def setupDrivers():
+    #TODO: modularize this so setup steps can be requested/queued from elsewhere
     resource.setupArchive()
     fonts.initializeFontDriver()
     localization.initLocalizationData()
