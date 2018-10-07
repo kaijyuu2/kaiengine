@@ -31,7 +31,7 @@ class ListenerRegistryMeta(type):
             except AttributeError:
                 pass
             else:
-                cls._child_listener_init.append((attr, key, *attr._child_listener_init_data))
+                cls._child_listener_init.append((attr, attr._base_key, *attr._child_listener_init_data))
         return super().__init__(*args, **kwargs)
 
     def __call__(cls, *args, **kwargs):

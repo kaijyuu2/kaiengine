@@ -18,6 +18,7 @@ class _EventDefHandler(type):
             except AttributeError:
                 pass
             else:
+                value._base_key = key
                 key = key + value._special_key_append
             dict.__setitem__(self, key, value)
 
