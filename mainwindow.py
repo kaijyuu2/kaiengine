@@ -47,23 +47,23 @@ class main_window(sWindow):
         super().set_icon(*icons)
 
     def on_key_press(self, symbol, modifiers):
-        event.keyPressEvent(symbol, modifiers)
+        event.keyPressEvent(symbol)
 
     def on_key_release(self, symbol, modifiers):
-        event.keyReleaseEvent(symbol, modifiers)
+        event.keyReleaseEvent(symbol)
 
     def on_mouse_press(self, x, y, button, modifiers):
-        event.mousePressEvent(x, y, button, modifiers)
+        event.mousePressEvent(x, y, button)
 
     def on_mouse_release(self, x, y, button, modifiers):
-        event.mouseReleaseEvent(x, y, button, modifiers)
+        event.mouseReleaseEvent(x, y, button)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        event.mouseDragEvent(x, y, dx, dy, buttons, modifiers)
+        event.mouseDragEvent(x, y, dx, dy, buttons)
 
     def on_mouse_motion(self, x, y, dx, dy):
         event.mouseMoveEvent(x, y, dx, dy)
-        
+
     def on_mouse_enter(self, x, y):
         event.mouseEnterEvent(x, y)
 

@@ -2,6 +2,7 @@
 
 from . import eventdriver
 from .eventkeys import *
+from kaiengine.input import standardizedKey
 
 class ListenerRegistryMeta(type):
     """Allow subclasses to independently define listeners to initialize.
@@ -156,25 +157,27 @@ def removeGameCloseListener(listener):
 
 # event callers
 
-def keyPressEvent(symbol, modifiers):
+def keyPressEvent(symbol):
     '''Process a key press event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_KEY_PRESS, symbol, modifiers)
+    symbol = standardizedKey(symbol)
+    eventdriver._callEvent(EVENT_KEY_PRESS, symbol)
 
-def keyReleaseEvent(symbol, modifiers):
+def keyReleaseEvent(symbol):
     '''Process a key release event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_KEY_RELEASE, symbol, modifiers)
+    symbol = standardizedKey(symbol)
+    eventdriver._callEvent(EVENT_KEY_RELEASE, symbol)
 
-def mousePressEvent(x, y, button, modifiers):
+def mousePressEvent(x, y, button):
     '''Process a mouse press event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_MOUSE_PRESS, x, y, button, modifiers)
+    eventdriver._callEvent(EVENT_MOUSE_PRESS, x, y, button)
 
-def mouseReleaseEvent(x, y, button, modifiers):
+def mouseReleaseEvent(x, y, button):
     '''Process a mouse release event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_MOUSE_RELEASE, x, y, button, modifiers)
+    eventdriver._callEvent(EVENT_MOUSE_RELEASE, x, y, button)
 
-def mouseDragEvent(x, y, dx, dy, button, modifiers):
+def mouseDragEvent(x, y, dx, dy, button):
     '''Process a mouse drag event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_MOUSE_DRAG, x, y, dx, dy, button, modifiers)
+    eventdriver._callEvent(EVENT_MOUSE_DRAG, x, y, dx, dy, button)
 
 def mouseMoveEvent(x, y, dx, dy):
     '''Process a mouse motion event. If any listener returns True, halt processing.'''
