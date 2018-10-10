@@ -169,11 +169,13 @@ def keyReleaseEvent(symbol):
 
 def mousePressEvent(x, y, button):
     '''Process a mouse press event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_MOUSE_PRESS, x, y, button)
+    eventdriver._callEvent(EVENT_MOUSE_MOVE, x, y, 0, 0)
+    eventdriver._callEvent(EVENT_MOUSE_PRESS, button)
 
 def mouseReleaseEvent(x, y, button):
     '''Process a mouse release event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_MOUSE_RELEASE, x, y, button)
+    eventdriver._callEvent(EVENT_MOUSE_MOVE, x, y, 0, 0)
+    eventdriver._callEvent(EVENT_MOUSE_RELEASE, button)
 
 def mouseDragEvent(x, y, dx, dy, button):
     '''Process a mouse drag event. If any listener returns True, halt processing.'''

@@ -1,93 +1,55 @@
+from kaiengine.settings import settings
 
-from pyglet.window.key import symbol_string
+#TODO: move constants/defaults to another file
 
-import copy
+INPUT_EVENT_TYPE_PRESS = "INPUT_EVENT_TYPE_PRESS"
+INPUT_EVENT_TYPE_RELEASE = "INPUT_EVENT_TYPE_RELEASE"
 
-bound_keys = {}
+INPUT_EVENT_CONFIRM = "INPUT_EVENT_CONFIRM"
+INPUT_EVENT_CANCEL = "INPUT_EVENT_CANCEL"
+INPUT_EVENT_MOVE_UP = "INPUT_EVENT_MOVE_UP"
+INPUT_EVENT_MOVE_DOWN = "INPUT_EVENT_MOVE_DOWN"
+INPUT_EVENT_MOVE_LEFT = "INPUT_EVENT_MOVE_LEFT"
+INPUT_EVENT_MOVE_RIGHT = "INPUT_EVENT_MOVE_RIGHT"
 
-def keyMatches(bindName, key):
-    try:
-        return key in bound_keys[bindName]
-    except KeyError:
-        raise NotImplementedError("Keybind %s does not exist in keybind lookup table." % bindName)
-    return False
+BINDS = {
+         (KAI_KEY_Z, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
+         (KAI_KEY_ENTER, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
+         (KAI_KEY_RETURN, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
 
-def keyMatchesAny(bindNames, key):
-    for bind in bindNames:
-        if keyMatches(bind, key):
-            return True
-    return False
+         (KAI_KEY_X, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
+         (KAI_KEY_BACKSPACE, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
+         (KAI_KEY_SPACE, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
 
-def keyNameBound(bindName):
-    return bindName in bound_keys
+         (KAI_KEY_W, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_UP,
+         (KAI_KEY_UP, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_UP,
+         (KAI_KEY_S, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_DOWN,
+         (KAI_KEY_DOWN, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_DOWN,
+         (KAI_KEY_A, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_LEFT,
+         (KAI_KEY_LEFT, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_LEFT,
+         (KAI_KEY_D, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_RIGHT,
+         (KAI_KEY_RIGHT, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_RIGHT
+         }
 
-def keyBound(key):
-    for bind in list(bound_keys.keys()):
-        if keyMatches(bind, key):
-            return True
-    return False
-
-def keyName(key):
-    #TODO: reverse dict to facilitate efficiency of this (rest should be used less now)
-    for bind in bound_keys.keys():
-        if keyMatches(bind, key):
-            return bind
-    return None #key not bound
-
-def getBindNameString(bindName):
-    try:
-        return getKeyNameString(bound_keys[bindName][0])
-    except (KeyError, IndexError):
-        return "INVALID KEY"
-    
-def getKeyNameString(key):
-    try: return symbol_string(key)
-    except TypeError: return str(key)
-
-def addBoundKey(bindName, key, index = None):
-    if bindName in bound_keys:
-        if index is None:
-            if key not in bound_keys[bindName]:
-                bound_keys[bindName].append(key)
-        else:
-            bound_keys[bindName].extend([None]*(index - len(bound_keys[bindName]) + 1)) #pad list if necessary
-            bound_keys[bindName][index] = key
-    else:
-        bound_keys[bindName] = [key]
-
-def addBoundKeyDict(bindDict):
-    for key, val in list(bindDict.items()):
-        for keybind in val:
-            addBoundKey(key, keybind)
-
-def clearBoundKeys():
-    bound_keys.clear()
-
-def removeBoundKey(bindName, key):
-    if bindName in bound_keys:
+def bindingResponse(event_type): #TODO: think of a better name
+    def relayBinding(kai_key): #TODO: think of a better name
         try:
-            bound_keys[bindName].pop(bound_keys[bindName].index(key))
-            if len(bound_keys[bindName]) < 1:
-                del bound_keys[bindName]
-        except ValueError:
+            bind = BINDS[(kai_key, event_type)] #TODO: correctly access binds via settings or whatever
+        except KeyError:
             pass
+        else:
+            inputEvent(bind) #TODO: create inputEvent method (maybe?)
+    return relayBinding
 
-def getBoundKeys():
-    return copy.deepcopy(bound_keys)
+relayPress = bindingResponse(INPUT_EVENT_TYPE_PRESS)
+relayRelease = bindingResponse(INPUT_EVENT_TYPE_RELEASE)
 
-def checkKeyBound(keyname, remove=False):
-    for key, keylist in list(bound_keys.items()):
-        index = -1
-        for i, boundkeyname in enumerate(keylist):
-            if boundkeyname == keyname:
-                index = i
-                break
-        if index >= 0:
-            if remove:
-                bound_keys[key][index] = None
-            return key, index
-    return False
+addKeyPressListener(relayPress)
+addKeyReleaseListener(relayRelease)
 
-def changeBoundKey(bindName, key):
-    removeBoundKey(bindName, key)
-    addBoundKey(bindName, key)
+addMousePressListener(relayPress)
+addMouseReleaseListener(relayRelease)
+
+#addJoybuttonPressListener(relayPress) #TODO: handle the 'joystick' argument issue
+#addJoybuttonReleaseListener(relayRelease)
+
