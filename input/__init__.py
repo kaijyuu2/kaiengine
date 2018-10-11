@@ -1,4 +1,4 @@
-import .pygletkeys
+from . import pygletkeys
 
 KEYS = pygletkeys.KEYS
 
