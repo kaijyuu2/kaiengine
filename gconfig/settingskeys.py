@@ -2,6 +2,7 @@
 
 from .paths import *
 from .datakeys import *
+from .default_keybinds import DEFAULT_BINDS
 
 DYNAMIC_SETTINGS_FPS_ON = "FPS_VISIBLE"
 DYNAMIC_SETTINGS_FPS_SIZE = "FPS_SIZE"
@@ -55,7 +56,7 @@ DEFAULT_DYNAMIC_SETTINGS = {DYNAMIC_SETTINGS_FPS_ON: True,
                 DYNAMIC_SETTINGS_FULLSCREEN: False,
                 DYNAMIC_SETTINGS_GAME_CAPTION: "Needs a caption",
                 DYNAMIC_SETTINGS_VSYNC: False,
-                DYNAMIC_SETTINGS_KEY_BINDS: {},
+                DYNAMIC_SETTINGS_KEY_BINDS: DEFAULT_BINDS,
                 DYNAMIC_SETTINGS_DEFAULT_SAVE_PATH: [RESOURCE_PATH,MISC_DIR], #for the default save that the game starts with
                 DYNAMIC_SETTINGS_SAVE_PATH: [SAVES_PATH], #for player saves
                 DYNAMIC_SETTINGS_DEFAULT_SAVE_FILENAME: "default",

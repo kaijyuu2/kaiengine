@@ -4,7 +4,7 @@ import os
 
 from kaiengine import savegame
 from kaiengine.baseobject import BaseObject
-from kaiengine.jsonfuncs import jsondump
+from kaiengine.jsonfuncs import jsondump, jsondumps
 from kaiengine.resource import ResourceUnavailableError, checkResourceExists, toStringPath
 
 from kaiengine.gconfig import *
@@ -49,10 +49,19 @@ class Settings(BaseObject):
 
     def saveToFile(self):
         try:
-            jsondump(self.serialize(), toStringPath(self.getFullFilepath()))
+            serialized = self.serialize()
+            jsondumps(serialized)
         except Exception as e:
             from kaiengine.debug import debugMessage
+            debugMessage("Settings serialization error:")
             debugMessage(e)
+        else:
+            try:
+                jsondump(serialized, toStringPath(self.getFullFilepath()))
+            except Exception as e:
+                from kaiengine.debug import debugMessage
+                debugMessage("Settings file save error:")
+                debugMessage(e)
 
     def getValue(self, key, default_val = _DEFAULT_VALUE_):
         try: #preferentially try to get it from the save; use globals if it doesn't exist
