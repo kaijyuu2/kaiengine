@@ -24,6 +24,12 @@ def _removeListener(listeners_key, listener):
             del listeners_dict[listeners_key][key]
             break
 
+def _clearListeners(listeners_key):
+    try:
+        del listeners_dict[listeners_key]
+    except KeyError:
+        pass
+
 def _callEvent(listeners_key, *args, **kwargs):
     try: sorted_listeners = sorted(list(listeners_dict[listeners_key].items()), key = lambda pair: pair[1].get_priority(), reverse = True)
     except KeyError: return

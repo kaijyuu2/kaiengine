@@ -57,6 +57,10 @@ def removeCustomListener(key, listener):
     '''Unregister a function as a custom event listener'''
     eventdriver._removeListener(key, listener)
 
+def clearCustomListeners(key):
+    '''Unregister all functions as listeners for an event.'''
+    eventdriver._clearListeners(key)
+
 def addQueryListener(key, listener):
     eventdriver._addQueryListener(key, listener)
 

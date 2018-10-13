@@ -1,4 +1,5 @@
 from kaiengine.event import customEvent
+from kaiengine.keybinds import INPUT_EVENT_CONFIRM, INPUT_EVENT_CANCEL
 from .interfaceElementEvent import EventIDInterface
 from .interfaceElementKeys import *
 from .interfaceMeta import _InterfaceElementMeta
@@ -17,13 +18,22 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def _init(self, *args, **kwargs):
         pass
 
+    def gainFocus(self):
+        #clearCustomListeners(INPUT_EVENT_CONFIRM) #maybe..?
+        #clearCustomListeners(INPUT_EVENT_CANCEL)
+        self.addCustomListener(INPUT_EVENT_CONFIRM, self.activate)
+        self.addCustomListener(INPUT_EVENT_CANCEL, self.cancel)
+
+    def loseFocus(self):
+        self.removeCustomListener(INPUT_EVENT_CONFIRM, self.activate)
+        self.removeCustomListener(INPUT_EVENT_CANCEL, self.cancel)
+
     def activate(self):
         self.event(EVENT_INTERFACE_ACTIVATED)
+
+    def cancel(self):
+        pass
 
     def destroy(self):
         self.event(EVENT_INTERFACE_DESTROYED)
         super().destroy()
-
-    #if SELF.INTERACTABLE: connect to confirm, etc.?
-    #only the "focus" one should get confrim/cancel/etc
-    #move (mouse incl) should be handled by changing focus
