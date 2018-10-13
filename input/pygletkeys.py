@@ -1,7 +1,10 @@
 from pyglet.window import key
+from pyglet.window import mouse
 from .keys import *
 
 KEYS = {
+    mouse.LEFT: KAI_KEY_MOUSE_LEFT,
+    mouse.RIGHT: KAI_KEY_MOUSE_RIGHT,
     key.A: KAI_KEY_A,
     key.AMPERSAND: KAI_KEY_AMPERSAND,
     key.APOSTROPHE: KAI_KEY_APOSTROPHE,

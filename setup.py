@@ -20,7 +20,7 @@ def setupDrivers():
     localization.initLocalizationData()
     camera.initCamera()
     savegame.Initialize()
-    keybinds.addBoundKeyDict(settings.getValue(DYNAMIC_SETTINGS_KEY_BINDS))
+    #keybinds.addBoundKeyDict(settings.getValue(DYNAMIC_SETTINGS_KEY_BINDS))
     joysticks.initJoysticks()
     audio.initAudio()
     audio.setMusicVolume(settings.getValue(DYNAMIC_SETTINGS_MUSIC_VOLUME))

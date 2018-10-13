@@ -1,4 +1,7 @@
+from kaiengine.event import customEvent, addKeyPressListener, addKeyReleaseListener, addMousePressListener, addMouseReleaseListener
 from kaiengine.settings import settings
+
+from kaiengine.input.keys import *
 
 #TODO: move constants/defaults to another file
 
@@ -16,10 +19,12 @@ BINDS = {
          (KAI_KEY_Z, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
          (KAI_KEY_ENTER, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
          (KAI_KEY_RETURN, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
+         (KAI_KEY_MOUSE_LEFT, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CONFIRM,
 
          (KAI_KEY_X, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
          (KAI_KEY_BACKSPACE, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
          (KAI_KEY_SPACE, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
+         (KAI_KEY_MOUSE_RIGHT, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_CANCEL,
 
          (KAI_KEY_W, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_UP,
          (KAI_KEY_UP, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_UP,
@@ -31,18 +36,18 @@ BINDS = {
          (KAI_KEY_RIGHT, INPUT_EVENT_TYPE_PRESS): INPUT_EVENT_MOVE_RIGHT
          }
 
-def bindingResponse(event_type): #TODO: think of a better name
-    def relayBinding(kai_key): #TODO: think of a better name
+def createBindingRelayer(event_type):
+    def relayBinding(kai_key):
         try:
             bind = BINDS[(kai_key, event_type)] #TODO: correctly access binds via settings or whatever
         except KeyError:
             pass
         else:
-            inputEvent(bind) #TODO: create inputEvent method (maybe?)
+            customEvent(bind)
     return relayBinding
 
-relayPress = bindingResponse(INPUT_EVENT_TYPE_PRESS)
-relayRelease = bindingResponse(INPUT_EVENT_TYPE_RELEASE)
+relayPress = createBindingRelayer(INPUT_EVENT_TYPE_PRESS)
+relayRelease = createBindingRelayer(INPUT_EVENT_TYPE_RELEASE)
 
 addKeyPressListener(relayPress)
 addKeyReleaseListener(relayRelease)

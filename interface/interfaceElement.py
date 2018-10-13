@@ -23,3 +23,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def destroy(self):
         self.event(EVENT_INTERFACE_DESTROYED)
         super().destroy()
+
+    #if SELF.INTERACTABLE: connect to confirm, etc.?
+    #only the "focus" one should get confrim/cancel/etc
+    #move (mouse incl) should be handled by changing focus
