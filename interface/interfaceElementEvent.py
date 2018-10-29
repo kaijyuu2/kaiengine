@@ -36,6 +36,10 @@ def _event_response(event_key, priority=None, lock=False):
 def on_event(event_key, priority=None, lock=False):
     return _event_response(event_key, priority, lock)
 
+def on_input(input_key, priority=None, lock=False):
+    pass
+    #return _event_response(input_key, priority, lock)
+
 def _child_event_response(event_append, event_key, *args, **kwargs):
     if kwargs:
         try:

@@ -8,6 +8,7 @@ from .screenElement import ScreenElement
 class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElementMeta):
 
     top_level = False
+    interactive = False
     inherited_focus_key = None
 
     def __init__(self, *args, **kwargs):
