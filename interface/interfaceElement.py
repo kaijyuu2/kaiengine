@@ -36,8 +36,19 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def cancel(self):
         pass
 
-    def gainFocus(self):
+    def _gainFocus(self):
+        self.gainFocus()
+        for event_key, func, priority in self._input_listeners:
+            self.addCustomListener(event_key, func, priority)
         customEvent(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.id)
+
+    def gainFocus(self):
+        pass
+
+    def _loseFocus(self):
+        self.loseFocus()
+        for event_key, func, priority in self._input_listeners:
+            self.removeCustomListener(event_key, func)
 
     def loseFocus(self):
         pass

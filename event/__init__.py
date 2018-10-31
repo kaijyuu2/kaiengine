@@ -41,8 +41,8 @@ class ListenerRegistryMeta(type):
             p = kwargs["priority"]
         except:
             p = 0
-        for func, event_key, priority, lock in cls._listener_init:
-            obj._initListener(event_key, func, priority or p, lock)
+        for func, event_key, priority, lock, sleep_when_unfocused in cls._listener_init:
+            obj._initListener(event_key, func, priority or p, lock, sleep_when_unfocused)
         for func, child_key, event_key, priority, lock in cls._child_listener_init:
             obj._initChildListener(child_key, event_key, func, priority or p, lock)
         return obj

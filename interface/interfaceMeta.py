@@ -1,5 +1,5 @@
 from kaiengine.event import ListenerRegistryMeta
-from .interfaceElementEvent import on_event, on_activate
+from .interfaceElementEvent import on_event, on_activate, on_input
 
 class _EventDefHandler(type):
 
@@ -11,6 +11,7 @@ class _EventDefHandler(type):
             super().__init__(*args, **kwargs)
             self["on_activate"] = on_activate
             self["on_event"] = on_event
+            self["on_input"] = on_input
 
         def __setitem__(self, key, value):
             try:
