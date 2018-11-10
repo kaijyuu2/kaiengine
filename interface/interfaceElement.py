@@ -13,10 +13,27 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
 
     def __init__(self, *args, **kwargs):
         super().__init__(self)
-        self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
+        if self.interactive:
+			self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self._init(*args, **kwargs)
         if self.top_level:
             customEvent(EVENT_INTERFACE_TOP_LEVEL_ELEMENT_CREATED, self)
+
+	@on_input(INPUT_EVENT_MOVE_UP)
+	def respondMoveUp(self):
+		self.event(EVENT_INTERFACE_FOCUS_SHIFT_UP)
+		
+	@on_input(INPUT_EVENT_MOVE_DOWN)
+	def respondMoveDown(self):
+		self.event(EVENT_INTERFACE_FOCUS_SHIFT_DOWN)
+		
+	@on_input(INPUT_EVENT_MOVE_LEFT)
+	def respondMoveLeft(self):
+		self.event(EVENT_INTERFACE_FOCUS_SHIFT_LEFT)
+		
+	@on_input(INPUT_EVENT_MOVE_RIGHT)
+	def respondMoveRight(self):
+		self.event(EVENT_INTERFACE_FOCUS_SHIFT_RIGHT)
 
     @property
     def focus_key(self):

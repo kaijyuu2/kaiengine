@@ -39,7 +39,7 @@ def _event_response(event_key, priority=None, lock=False, sleep_when_unfocused=F
 def on_event(event_key, priority=None, lock=False):
     return _event_response(event_key, priority, lock)
 
-def on_input(input_key, priority=None, lock=False):
+def on_input(input_key, priority=None, lock=True):
     return _event_response(input_key, priority, lock, sleep_when_unfocused=True)
 
 def _child_event_response(event_append, event_key, *args, **kwargs):
