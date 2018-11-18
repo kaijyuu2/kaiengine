@@ -14,30 +14,40 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def __init__(self, *args, **kwargs):
         super().__init__(self)
         if self.interactive:
-			self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
+            self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self._init(*args, **kwargs)
         if self.top_level:
             customEvent(EVENT_INTERFACE_TOP_LEVEL_ELEMENT_CREATED, self)
 
-	@on_input(INPUT_EVENT_MOVE_UP)
-	def respondMoveUp(self):
-		self.event(EVENT_INTERFACE_FOCUS_SHIFT_UP)
-		
-	@on_input(INPUT_EVENT_MOVE_DOWN)
-	def respondMoveDown(self):
-		self.event(EVENT_INTERFACE_FOCUS_SHIFT_DOWN)
-		
-	@on_input(INPUT_EVENT_MOVE_LEFT)
-	def respondMoveLeft(self):
-		self.event(EVENT_INTERFACE_FOCUS_SHIFT_LEFT)
-		
-	@on_input(INPUT_EVENT_MOVE_RIGHT)
-	def respondMoveRight(self):
-		self.event(EVENT_INTERFACE_FOCUS_SHIFT_RIGHT)
-
     @property
     def focus_key(self):
         return self.inherited_focus_key or self.id
+
+    def _shiftFocus(self, direction):
+        def func(self):
+            self.event(EVENT_INTERFACE_FOCUS_SHIFT[direction], direction=direction, hint=self.position)
+        return func
+
+    shiftFocusUp = _shiftFocus(DIRECTION_UP)
+    shiftFocusDown = _shiftFocus(DIRECTION_DOWN)
+    shiftFocusLeft = _shiftFocus(DIRECTION_LEFT)
+    shiftFocusRight = _shiftFocus(DIRECTION_RIGHT)
+
+    @on_input(INPUT_EVENT_MOVE_UP)
+    def respondMoveUp(self):
+        self.shiftFocusUp()
+
+    @on_input(INPUT_EVENT_MOVE_DOWN)
+    def respondMoveDown(self):
+        self.shiftFocusDown()
+
+    @on_input(INPUT_EVENT_MOVE_LEFT)
+    def respondMoveLeft(self):
+        self.shiftFocusLeft()
+
+    @on_input(INPUT_EVENT_MOVE_RIGHT)
+    def respondMoveRight(self):
+        self.shiftFocusRight()
 
     def inheritFocusKey(self, key):
         self.removeCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
