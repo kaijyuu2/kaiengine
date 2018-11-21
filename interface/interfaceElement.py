@@ -1,4 +1,5 @@
-from kaiengine.event import customEvent
+from kaiengine.gconfig import *
+from kaiengine.event import customEvent, callQuery
 from kaiengine.keybinds import INPUT_EVENT_CONFIRM, INPUT_EVENT_CANCEL
 from .interfaceElementEvent import EventIDInterface
 from .interfaceElementKeys import *
@@ -16,6 +17,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
         if self.interactive:
             self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self._init(*args, **kwargs)
+        self.connectChildren()
         if self.top_level:
             customEvent(EVENT_INTERFACE_TOP_LEVEL_ELEMENT_CREATED, self)
 
@@ -23,9 +25,9 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def focus_key(self):
         return self.inherited_focus_key or self.id
 
-    def _shiftFocus(self, direction):
-        def func(self):
-            self.event(EVENT_INTERFACE_FOCUS_SHIFT[direction], direction=direction, hint=self.position)
+    def _shiftFocus(direction):
+        def func(self, position_hint=None, **kwargs):
+            callQuery(self.id + EVENT_INTERFACE_FOCUS_SHIFT[direction], source_direction=direction, position_hint=position_hint or self.position)
         return func
 
     shiftFocusUp = _shiftFocus(DIRECTION_UP)
@@ -49,6 +51,10 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def respondMoveRight(self):
         self.shiftFocusRight()
 
+    @property
+    def interactive_children(self):
+        return [child for child in self.children if child.interactive]
+
     def inheritFocusKey(self, key):
         self.removeCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self.inherited_focus_key = key
@@ -62,6 +68,9 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
 
     def cancel(self):
         pass
+
+    def acceptFocus(self, source_direction=None, position_hint=None):
+        self._gainFocus()
 
     def _gainFocus(self):
         self.gainFocus()
@@ -87,6 +96,9 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def addChild(self, child_element, *args, **kwargs):
         child_element.inheritFocusKey(self.focus_key)
         return super().addChild(child_element, *args, **kwargs)
+
+    def connectChildren(self):
+        pass
 
     def destroy(self):
         self.event(EVENT_INTERFACE_DESTROYED)

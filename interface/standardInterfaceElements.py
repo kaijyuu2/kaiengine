@@ -1,6 +1,7 @@
 from .interfaceElement import InterfaceElement
 
 from kaiengine.display import createGraphic
+from kaiengine.event import addQueryListener
 from kaiengine.safeminmax import dmax
 
 class HorizontalContainer(InterfaceElement):
@@ -11,11 +12,24 @@ class HorizontalContainer(InterfaceElement):
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
-        offset = sum([child.width + self.spacing for child in list(self._children.values())[:index]])
+        offset = sum([child.width + self.spacing for child in list(self.children)[:index]])
         return self._position + (offset, 0)
 
     def _calculateWidth(self):
-        return max(0, sum([child.width + self.spacing for child in self._children.values()]) - self.spacing)
+        return max(0, sum([child.width + self.spacing for child in self.children]) - self.spacing)
+
+    def connectChildren(self):
+        #TODO: ensure respect of focus keys
+        for child in self.interactive_children:
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_UP, self.shiftFocusUp)
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_DOWN, self.shiftFocusDown)
+        for child, child_two in zip(self.interactive_children, self.interactive_children[1:]):
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_RIGHT, child_two.acceptFocus)
+            addQueryListener(child_two.id + EVENT_INTERFACE_FOCUS_SHIFT_LEFT, child.acceptFocus)
+        for child in self.interactive_children[0:1]:
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_LEFT, self.shiftFocusLeft)
+        for child in self.interactive_children[-1:]:
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_RIGHT, self.shiftFocusRight)
 
 class VerticalContainer(InterfaceElement):
 
@@ -23,11 +37,23 @@ class VerticalContainer(InterfaceElement):
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
-        offset = sum([child.height + self.spacing for child in list(self._children.values())[:index]])
+        offset = sum([child.height + self.spacing for child in list(self.children)[:index]])
         return self._position + (0, offset)
 
     def _calculateHeight(self):
-        return max(0, sum([child.height + self.spacing for child in self._children.values()]) - self.spacing)
+        return max(0, sum([child.height + self.spacing for child in self.children]) - self.spacing)
+
+    def connectChildren(self):
+        for child in self.interactive_children:
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_LEFT, self.shiftFocusLeft)
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_RIGHT, self.shiftFocusRight)
+        for child, child_two in zip(self.interactive_children, self.interactive_children[1:]):
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_UP, child_two.acceptFocus)
+            addQueryListener(child_two.id + EVENT_INTERFACE_FOCUS_SHIFT_DOWN, child.acceptFocus)
+        for child in self.interactive_children[0:1]:
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_DOWN, self.shiftFocusDown)
+        for child in self.interactive_children[-1:]:
+            addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_UP, self.shiftFocusUp)
 
 class GridContainer(InterfaceElement):
 
