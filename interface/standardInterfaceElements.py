@@ -1,4 +1,5 @@
 from .interfaceElement import InterfaceElement
+from .interfaceElementKeys import *
 
 from kaiengine.display import createGraphic
 from kaiengine.event import addQueryListener
@@ -101,3 +102,8 @@ class SpriteElement(InterfaceElement):
 
     def _applyPosition(self):
         self._sprite.pos = self.position
+
+    def changeSprite(self, new_path):
+        self._sprite.destroy()
+        self._sprite = createGraphic(new_path)
+        self._applyPosition()
