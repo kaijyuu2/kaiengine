@@ -11,6 +11,11 @@ class HorizontalContainer(InterfaceElement):
 
     spacing = 0
 
+    @property
+    def interactive(self):
+        #TODO: fix the logic here in a better way
+        return self.interactive_children
+
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
         offset = sum([child.width + self.spacing for child in list(self.children)[:index]])
@@ -18,6 +23,26 @@ class HorizontalContainer(InterfaceElement):
 
     def _calculateWidth(self):
         return max(0, sum([child.width + self.spacing for child in self.children]) - self.spacing)
+
+    def closestInteractiveChild(self, position_hint):
+        #TODO: improve implementation
+        try:
+            x = position_hint[0]
+        except TypeError:
+            return self.interactive_children[0]
+        else:
+            for child in self.interactive_children:
+                if child.position[0] >= x:
+                    return child
+        return self.interactive_children[0]
+
+    def acceptFocus(self, source_direction=None, position_hint=None):
+        if source_direction in (DIRECTION_DOWN, DIRECTION_UP):
+            self.closestInteractiveChild(position_hint).acceptFocus(source_direction=source_direction, position_hint=position_hint)
+        elif source_direction == DIRECTION_RIGHT:
+            self.interactive_children[0].acceptFocus(source_direction=source_direction, position_hint=position_hint)
+        elif source_direction == DIRECTION_LEFT:
+            self.interactive_children[-1].acceptFocus(source_direction=source_direction, position_hint=position_hint)
 
     def connectChildren(self):
         #TODO: ensure respect of focus keys
@@ -35,6 +60,10 @@ class HorizontalContainer(InterfaceElement):
 class VerticalContainer(InterfaceElement):
 
     spacing = 0
+
+    @property
+    def interactive(self):
+        return self.interactive_children
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)

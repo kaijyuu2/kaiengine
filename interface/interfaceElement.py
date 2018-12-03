@@ -58,6 +58,9 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def inheritFocusKey(self, key):
         self.removeCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self.inherited_focus_key = key
+        for child in self.children:
+            #TODO: reduce inefficiency
+            child.inheritFocusKey(key)
         self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
 
     def _init(self, *args, **kwargs):
