@@ -91,7 +91,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
 
     def focusChanged(self, element_id):
         if element_id != self.id:
-            self.loseFocus()
+            self._loseFocus()
 
     def addChild(self, child_element, *args, **kwargs):
         child_element.inheritFocusKey(self.focus_key)
