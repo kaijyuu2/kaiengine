@@ -117,9 +117,9 @@ class GridContainer(InterfaceElement):
 class SpriteElement(InterfaceElement):
 
     def __init__(self, sprite_path=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self._sprite_path = sprite_path
-        self._sprite = createGraphic(sprite_path) #TODO: automatically set layer, etc
+        self._sprite = createGraphic(sprite_path)
+        super().__init__(*args, **kwargs)
 
     @property
     def height(self):

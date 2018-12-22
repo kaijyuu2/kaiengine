@@ -14,6 +14,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
 
     def __init__(self, *args, **kwargs):
         super().__init__(self)
+        self.has_focus = False
         if self.interactive:
             self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self._init(*args, **kwargs)
@@ -51,6 +52,11 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def respondMoveRight(self):
         self.shiftFocusRight()
 
+    def respondMouseMove(self, x, y):
+        if not self.has_focus:
+            if self.checkPointWithinElement(x, y):
+                self.acceptFocus()
+
     @property
     def interactive_children(self):
         return [child for child in self.children if child.interactive]
@@ -80,6 +86,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
         for event_key, func, priority in self._input_listeners:
             self.addCustomListener(event_key, func, priority)
         customEvent(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.id)
+        self.has_focus = True
 
     def gainFocus(self):
         pass
@@ -88,6 +95,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
         self.loseFocus()
         for event_key, func, priority in self._input_listeners:
             self.removeCustomListener(event_key, func)
+        self.has_focus = False
 
     def loseFocus(self):
         pass
@@ -102,6 +110,12 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
 
     def connectChildren(self):
         pass
+
+    def _setPosition(self, position):
+        super()._setPosition(position)
+        if self.interactive:
+            for event in self.mouse_move_partitions:
+                self.addCustomListener(event, self.respondMouseMove)
 
     def destroy(self):
         self.event(EVENT_INTERFACE_DESTROYED)
