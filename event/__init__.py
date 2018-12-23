@@ -18,8 +18,14 @@ class ListenerRegistryMeta(type):
     """
 
     def __init__(cls, *args, **kwargs):
-        cls._listener_init = []
-        cls._child_listener_init = []
+        try:
+            cls._listener_init = cls._listener_init[:]
+        except AttributeError:
+            cls._listener_init = []
+        try:
+            cls._child_listener_init = cls._child_listener_init[:]
+        except AttributeError:
+            cls._child_listener_init = []
         for key, attr in cls.__dict__.items():
             try:
                 attr._listener_init_data
