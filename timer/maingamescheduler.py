@@ -2,8 +2,9 @@
 
 #the object for the main scheduler
 
-
 import asyncio
+
+from math import inf
 
 scheduler = None
 
@@ -20,7 +21,7 @@ def initializeGame(init, close):
     init()
     
     from kaiengine.event import addGameCloseListener
-    addGameCloseListener(stopGameScheduler, 99999999999999999999999999999999999999999999999)
+    addGameCloseListener(stopGameScheduler, inf)
     
     try:
         scheduler.run_forever()
