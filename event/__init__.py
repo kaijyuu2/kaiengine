@@ -18,8 +18,14 @@ class ListenerRegistryMeta(type):
     """
 
     def __init__(cls, *args, **kwargs):
-        cls._listener_init = []
-        cls._child_listener_init = []
+        try:
+            cls._listener_init = cls._listener_init[:]
+        except AttributeError:
+            cls._listener_init = []
+        try:
+            cls._child_listener_init = cls._child_listener_init[:]
+        except AttributeError:
+            cls._child_listener_init = []
         for key, attr in cls.__dict__.items():
             try:
                 attr._listener_init_data
@@ -41,8 +47,8 @@ class ListenerRegistryMeta(type):
             p = kwargs["priority"]
         except:
             p = 0
-        for func, event_key, priority, lock in cls._listener_init:
-            obj._initListener(event_key, func, priority or p, lock)
+        for func, event_key, priority, lock, sleep_when_unfocused in cls._listener_init:
+            obj._initListener(event_key, func, priority or p, lock, sleep_when_unfocused)
         for func, child_key, event_key, priority, lock in cls._child_listener_init:
             obj._initChildListener(child_key, event_key, func, priority or p, lock)
         return obj
@@ -188,9 +194,17 @@ def mouseDragEvent(x, y, dx, dy, button):
     button = standardizedKey(button)
     eventdriver._callEvent(EVENT_MOUSE_DRAG, x, y, dx, dy, button)
 
-def mouseMoveEvent(x, y, dx, dy):
+def mouseMoveEvent(x,
+                   y,
+                   dx,
+                   dy,
+                   X_BLOCK_SIZE=MOUSE_PARTITION_SIZE_X,
+                   Y_BLOCK_SIZE=MOUSE_PARTITION_SIZE_Y,
+                   EVENT_MOUSE_MOVE_LOCALREF=EVENT_MOUSE_MOVE,
+                   EVENT_MOUSE_MOVE_SECTION_LOCALREF=EVENT_MOUSE_MOVE_SECTION):
     '''Process a mouse motion event. If any listener returns True, halt processing.'''
-    eventdriver._callEvent(EVENT_MOUSE_MOVE, x, y, dx, dy)
+    eventdriver._callEvent(EVENT_MOUSE_MOVE_LOCALREF, x, y, dx, dy)
+    eventdriver._callEvent(EVENT_MOUSE_MOVE_SECTION_LOCALREF[(x//X_BLOCK_SIZE, y//Y_BLOCK_SIZE)], x, y)
 
 def joybuttonPressEvent(joystick, button):
     '''Process a controller press event. If any listener returns True, halt processing.'''

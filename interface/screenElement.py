@@ -1,7 +1,14 @@
 from collections import defaultdict
 from itertools import zip_longest
 
+from kaiengine.event import MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVENT_MOUSE_MOVE_SECTION
 from kaiengine.safeminmax import dmax
+
+def getRelevantMousePartitions(x_min, y_min, x_max, y_max):
+    x_values = [x for x in range(x_min//MOUSE_PARTITION_SIZE_X, (x_max//MOUSE_PARTITION_SIZE_X)+1)]
+    y_values = [y for y in range(y_min//MOUSE_PARTITION_SIZE_Y, (y_max//MOUSE_PARTITION_SIZE_Y)+1)]
+    relevant_keys = [EVENT_MOUSE_MOVE_SECTION[(x, y)] for x in x_values for y in y_values]
+    return relevant_keys
 
 class ScreenCoordinates(list):
 
@@ -44,6 +51,18 @@ class ScreenElement(object):
     @property
     def children(self):
         return self._children.values()
+
+    @property
+    def extents(self):
+        return (self.position[0], self.position[1], self.position[0]+self.width, self.position[1]+self.height)
+
+    @property
+    def mouse_move_partitions(self):
+        return getRelevantMousePartitions(*self.extents)
+
+    def checkPointWithinElement(self, x, y):
+        extents = self.extents
+        return extents[0] <= x <= extents[2] and extents[1] <= y <= extents[3]
 
     def _calculateHeight(self):
         return dmax([child.height for child in self.children])
