@@ -12,14 +12,14 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     interactive = False
     inherited_focus_key = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, top_level=False, *args, **kwargs):
         super().__init__(self)
         self.has_focus = False
         if self.interactive:
             self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
         self._init(*args, **kwargs)
         self.connectChildren()
-        if self.top_level:
+        if self.top_level or top_level:
             customEvent(EVENT_INTERFACE_TOP_LEVEL_ELEMENT_CREATED, self)
 
     @property
