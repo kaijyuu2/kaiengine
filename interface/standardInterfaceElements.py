@@ -5,16 +5,18 @@ from kaiengine.display import createGraphic
 from kaiengine.event import addQueryListener
 from kaiengine.safeminmax import dmax
 
-class HorizontalContainer(InterfaceElement):
-
-    #TODO: allow location-based positioning
-
-    spacing = 0
+class ContainerElement(InterfaceElement):
 
     @property
     def interactive(self):
         #TODO: fix the logic here in a better way
         return self.interactive_children
+
+class HorizontalContainer(ContainerElement):
+
+    #TODO: allow location-based positioning
+
+    spacing = 0
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
@@ -57,13 +59,9 @@ class HorizontalContainer(InterfaceElement):
         for child in self.interactive_children[-1:]:
             addQueryListener(child.id + EVENT_INTERFACE_FOCUS_SHIFT_RIGHT, self.shiftFocusRight)
 
-class VerticalContainer(InterfaceElement):
+class VerticalContainer(ContainerElement):
 
     spacing = 0
-
-    @property
-    def interactive(self):
-        return self.interactive_children
 
     def _childPosition(self, child_id):
         index = list(self._children.keys()).index(child_id)
