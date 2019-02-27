@@ -1,6 +1,6 @@
 from .baseobject import BaseObject
 from .sDict import sDict
-from .uidgen import GenerateUniqueID
+from .uidgen import IdentifiedObject
 from .sGraphics import RED, GREEN, BLUE #import color constants
 from .debug import debugMessage
 from . import display
@@ -15,7 +15,7 @@ Xi = 0
 Yi = 1
 
 
-class GraphicObject(BaseObject):
+class GraphicObject(BaseObject, IdentifiedObject):
 
     #base prop
     vars()[EXTENSION] = GRAPHIC_OBJECT_EXTENSION
@@ -31,19 +31,11 @@ class GraphicObject(BaseObject):
         self._center = [False,False]
         self._flip = [False,False]
         self._follow_camera = False
-        self._unique_id = GenerateUniqueID()
 
         self.sprites = sDict()
 
         super(GraphicObject, self).__init__(path, *args, **kwargs)
 
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-    @unique_id.setter
-    def unique_id(self, val):
-        debugMessage("unique id in sprites not settable")
 
     @property
     def image_path(self):

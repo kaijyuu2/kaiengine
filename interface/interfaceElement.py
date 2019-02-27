@@ -1,12 +1,12 @@
 from kaiengine.gconfig import *
 from kaiengine.event import customEvent, callQuery
 from kaiengine.keybinds import INPUT_EVENT_CONFIRM, INPUT_EVENT_CANCEL
-from .interfaceElementEvent import EventIDInterface
+from kaiengine.objectinterface import EventInterface
 from .interfaceElementKeys import *
 from .interfaceMeta import _InterfaceElementMeta
 from .screenElement import ScreenElement
 
-class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElementMeta):
+class InterfaceElement(EventInterface, ScreenElement, metaclass=_InterfaceElementMeta):
 
     top_level = False
     interactive = False
@@ -73,7 +73,7 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
         pass
 
     def activate(self):
-        self.event(EVENT_INTERFACE_ACTIVATED)
+        self.callIDEvent(EVENT_INTERFACE_ACTIVATED)
 
     def cancel(self):
         pass
@@ -111,12 +111,12 @@ class InterfaceElement(EventIDInterface, ScreenElement, metaclass=_InterfaceElem
     def connectChildren(self):
         pass
 
-    def _setPosition(self, position):
-        super()._setPosition(position)
+    def setPos(self, *args, **kwargs):
+        super().setPos(*args, **kwargs)
         if self.interactive:
             for event in self.mouse_move_partitions:
                 self.addCustomListener(event, self.respondMouseMove)
 
     def destroy(self):
-        self.event(EVENT_INTERFACE_DESTROYED)
+        self.callIDEvent(EVENT_INTERFACE_DESTROYED)
         super().destroy()

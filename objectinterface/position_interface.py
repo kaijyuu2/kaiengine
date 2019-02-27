@@ -1,30 +1,59 @@
 
 
 from kaiengine.destroyinterface import DestroyInterface
+from kaiengine.coordinate import Coordinate
 
+def _interpretPositionArgs(*args, **kwargs):
+    try: args[0].__iter__
+    except (AttributeError, IndexError): pass
+    else: args = args[0]
+    if kwargs:
+        try: args[0] = kwargs["x"]
+        except KeyError: pass
+        try: 
+            newy = kwargs["y"]
+            args = args + [None]*(2 - len(args))
+            args[1] = newy
+        except KeyError: 
+            pass
+        try: 
+            newz = kwargs["z"]
+            args = args + [None]*(3 - len(args))
+            args[2] = newz
+        except KeyError:
+            pass
+    return args
 
 class PositionInterface(DestroyInterface):
     def __init__(self, *args, **kwargs):
         super(PositionInterface, self).__init__(*args, **kwargs)
-        self._pos = (0.0,0.0)
+        self._pos = Coordinate((0.0,0.0))
 
     @property
     def pos(self):
         return self.getPos()
     @pos.setter
     def pos(self, val):
-        self.setPos(*val)
+        self.setPos(val)
+        
+        
+    def setPos(self, *args, **kwargs):
+        newargs = _interpretPositionArgs(*args, **kwargs)
+        for i, arg in enumerate(newargs):
+            if arg is None:
+                try:
+                    newargs[i] = self._pos[i]
+                except IndexError:
+                    newargs[i] = 0
+        newargs = newargs + self._pos[len(newargs):]
+        self._pos = Coordinate(newargs) 
 
-    def setPos(self, x = None, y = None):
-        if x is None: x = self._pos[0]
-        if y is None: y = self._pos[1]
-        self._pos = (float(x),float(y)) #made a tuple so that "self.pos[0] = something" won't work, enforcing use of setPos
-
-    def movePos(self, x = 0, y = 0):
-        self.setPos(self.pos[0] + x, self.pos[1] + y)
-
-    def getPos(self, *args, **kwargs):
-        return self.getPos(*args, **kwargs)
+    def movePos(self, *args, **kwargs):
+        newargs = _interpretPositionArgs(*args, **kwargs)
+        for i, arg in enumerate(newargs):
+            if arg is None:
+                newargs[i] = 0
+        self.setPos(self.pos + newargs)
 
     def getPos(self):
         return self._pos

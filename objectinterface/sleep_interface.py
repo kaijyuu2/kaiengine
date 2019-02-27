@@ -12,7 +12,11 @@ class SleepInterface(DestroyInterface):
     
     
     def sleep(self, key = SLEEP_KEY):
+        started_sleeping = len(self.sleeping) == 0
         self.sleeping.add(key)
+        return started_sleeping
         
     def wakeUp(self, key = SLEEP_KEY):
+        previouslysleeping = len(self.sleeping) != 0
         self.sleeping.discard(key)
+        return previouslysleeping and not self.sleeping

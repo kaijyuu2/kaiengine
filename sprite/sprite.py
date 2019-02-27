@@ -12,7 +12,7 @@ from kaiengine import camera
 from kaiengine import settings
 from kaiengine.timer import FrameTimer, checkCurrentFrame, scheduleRealtime, unscheduleRealtime, schedule, unschedule
 from kaiengine.propertygetter import PropertyGetter
-from kaiengine.uidgen import GenerateUniqueID
+from kaiengine.uidgen import IdentifiedObject
 from kaiengine.debug import debugHasKeyMessage, debugMessage
 from kaiengine.resource import toStringPath, getInvalidGraphicPath, ResourceUnavailableError
 from kaiengine.objectdestroyederror import ObjectDestroyedError
@@ -35,9 +35,8 @@ Xi = 0
 Yi = 1
 
 
-SPRITE_ID = "SPRITE"
 
-class Sprite(sGraphics.sSprite):
+class Sprite(sGraphics.sSprite, IdentifiedObject):
 
     #default attributes
     vars()[SPRITE_ANIMATION_TYPE] = TIME_ANIMATION
@@ -52,7 +51,6 @@ class Sprite(sGraphics.sSprite):
 
     def __init__(self, img, layer = None, antialiasing = None, show = True):
         self._prop = {} #properties for loaded animations
-        self._unique_id = GenerateUniqueID(SPRITE_ID)
         self._follow_camera = False
         self._camera_index = None
         self.gridsize = [1,1]
@@ -87,13 +85,6 @@ class Sprite(sGraphics.sSprite):
         if layer is not None:
             self.layer = layer
         self.show = show
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-    @unique_id.setter
-    def unique_id(self, val):
-        debugMessage("unique id in sprites not settable")
 
     @property
     def ani_opacity(self):
@@ -543,7 +534,7 @@ class Sprite(sGraphics.sSprite):
         return self._generateAniKey(anikey, 0, "FINISH")
 
     def _generateAniKey(self, anikey, time, extra):
-        return self._unique_id + str(anikey) + str(time) + str(extra)
+        return self.id + str(anikey) + str(time) + str(extra)
 
     def callTimeListeners(self,anikey, times):
         for time in times:

@@ -1,6 +1,7 @@
 from .interfaceElement import InterfaceElement
 from .interfaceElementKeys import *
 
+from kaiengine.objectinterface import GraphicInterface
 from kaiengine.display import createGraphic
 from kaiengine.event import addQueryListener
 from kaiengine.safeminmax import dmax
@@ -112,25 +113,24 @@ class GridContainer(InterfaceElement):
         index = dmax([location[0] for location in self._child_locations.values()])
         return self.grid_size[0] + (index * (self.grid_size[0] + self.spacing[0]))
 
-class SpriteElement(InterfaceElement):
-
-    def __init__(self, sprite_path=None, *args, **kwargs):
-        self._sprite_path = sprite_path
-        self._sprite = createGraphic(sprite_path)
-        super().__init__(*args, **kwargs)
+class SpriteElement(GraphicInterface, InterfaceElement):
 
     @property
     def height(self):
-        return self._sprite.height
+        return self.getSpriteHeight()
 
     @property
     def width(self):
-        return self._sprite.width
+        return self.getSpriteWidth()
 
     def _applyPosition(self):
-        self._sprite.pos = self.position
+        super()._applyPosition()
+        self._updateSpritePos()
 
-    def changeSprite(self, new_path):
-        self._sprite.destroy()
-        self._sprite = createGraphic(new_path)
+    def changeSprite(self, *args, **kwargs):
+        '''alias for setSprite'''
+        self.setSprite(*args, **kwargs)
+ 
+    def setSprite(self, *args, **kwargs):
+        super().setSprite(*args, **kwargs)
         self._applyPosition()

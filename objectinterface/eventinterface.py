@@ -1,17 +1,26 @@
 
 from collections import defaultdict
 
+from kaiengine.uidgen import IdentifiedObject
 from kaiengine.destroyinterface import DestroyInterface
+
 from .sleep_interface import SleepInterface
 
 from kaiengine.event import *
 
 
-class EventInterface(SleepInterface):
+class EventInterface(SleepInterface, IdentifiedObject):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._event_methods = defaultdict(list)
         self._query_methods = {}
+        self._sleeplessKeys = set()
+        
+    def callIDEvent(self, event_key, *args, **kwargs):
+        customEvent(self.getEventID(event_key), self.id, *args, **kwargs)
+        
+    def getEventID(self, event_key):
+        return self.id + event_key
 
     def addQueryListener(self, key, method):
         self.removeQueryListener(self, key)
@@ -126,24 +135,31 @@ class EventInterface(SleepInterface):
         
     def _removeAllListeners(self):
         for key, methoddata in self._event_methods.items():
-            for method, priority in methoddata:
-                removeCustomListener(key, method)
+            if key not in self._sleeplessKeys:
+                for method, priority in methoddata:
+                    removeCustomListener(key, method)
         for key in self._query_methods:
-            removeQueryListener(key)
+            if key not in self._sleeplessKeys:
+                removeQueryListener(key)
 
     #overwritten stuff
-    def sleep(self, *args, **kwargs):
-        super().sleep(*args, **kwargs)
-        self._removeAllListeners() #don't remove them from local dictionaries, in case we wake up later
+    def sleep(self, ignored_keys = (), *args, **kwargs):
+        startedsleeping = super().sleep(*args, **kwargs)
+        if startedsleeping:
+            self._sleeplessKeys = self._sleeplessKeys.union(ignored_keys)
+            self._removeAllListeners(ignored_keys) #don't remove them from local dictionaries, in case we wake up later
+        return startedsleeping
     
     def wakeUp(self, *args, **kwargs):
-        super().wakeUp(*args, **kwargs)
-        if not self.sleeping:
+        previouslysleeping = super().wakeUp(*args, **kwargs)
+        if previouslysleeping:
+            self._sleeplessKeys = set()
             for key, methoddata in self._event_methods.items():
                 for method, priority in methoddata:
                     addCustomListener(key, method, priority)
             for key, query in self._query_methods.items():
                 addQueryListener(key, query)
+        return previouslysleeping
         
 
     def destroy(self, *args, **kwargs):

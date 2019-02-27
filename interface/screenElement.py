@@ -3,6 +3,8 @@ from itertools import zip_longest
 
 from kaiengine.event import MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVENT_MOUSE_MOVE_SECTION
 from kaiengine.safeminmax import dmax
+from kaiengine.objectinterface import PositionInterface
+from kaiengine.coordinate import Coordinate
 
 def getRelevantMousePartitions(x_min, y_min, x_max, y_max):
     x_values = [x for x in range(x_min//MOUSE_PARTITION_SIZE_X, (x_max//MOUSE_PARTITION_SIZE_X)+1)]
@@ -10,32 +12,21 @@ def getRelevantMousePartitions(x_min, y_min, x_max, y_max):
     relevant_keys = [EVENT_MOUSE_MOVE_SECTION[(x, y)] for x in x_values for y in y_values]
     return relevant_keys
 
-class ScreenCoordinates(list):
 
-    def __add__(self, other):
-        return ScreenCoordinates([a+b for a, b in zip_longest(self, other, fillvalue=0)])
+class ScreenElement(PositionInterface):
 
-    __radd__ = __add__
-
-    def __sub__(self, other):
-        return ScreenCoordinates([a-b for a, b in zip_longest(self, other, fillvalue=0)])
-
-    __rsub__ = __sub__
-
-class ScreenElement(object):
-
-    _position = ScreenCoordinates((0, 0))
-    _display_offset = ScreenCoordinates((0, 0))
+    _display_offset = Coordinate((0, 0))
 
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._children = {}
         self._child_locations = {}
-
+        
     @property
     def position(self):
-        return self._position
-
+        '''alias for pos attribute'''
+        return self.pos 
+        
     @property
     def size(self):
         return (self.width, self.height)
@@ -71,25 +62,27 @@ class ScreenElement(object):
         return dmax([child.width for child in self.children])
 
     def _childPosition(self, child_id):
-        return self._position
+        return self.getPos()
+    
+    def setPosition(self, *args, **kwargs):
+        '''alias for setPos'''
+        self.setPos(*args, **kwargs)
 
-    def _setPosition(self, position):
-        self._position = position + self._display_offset
+    def setPos(self, *args, **kwargs):
+        super().setPos(*args, **kwargs)
         self._applyPosition()
-
-    def setPosition(self, position):
-        self._setPosition(position)
         for child in self.children:
-            child.setPosition(self._childPosition(child.id))
+            child.setPos(self._childPosition(child.id))
 
-    def _shiftPosition(self, offset):
-        self._position = self._position + offset
+    def shiftPosition(self, *args, **kwargs):
+        '''alias for movePos'''
+        self.movePos(*args, **kwargs)
+        
+    def movePos(self, *args, **kwargs):
+        super().movePos(*args, **kwargs)
         self._applyPosition()
-
-    def shiftPosition(self, offset):
-        self._shiftPosition(offset)
         for child in self.children:
-            child.shiftPosition(offset)
+            child.movePos(*args, **kwargs)
 
     def _applyPosition(self):
         pass

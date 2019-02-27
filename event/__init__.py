@@ -4,6 +4,20 @@ from . import eventdriver
 from .eventkeys import *
 from kaiengine.input import standardizedKey
 
+
+def _initListener(self, event_key, func, priority, lock, sleep_when_unfocused):
+    def instantiated(*args, **kwargs):
+        if (not lock) or (not self._input_locks):
+            return func(self, *args, **kwargs)
+    self.addCustomListener(event_key, instantiated, priority)
+    if sleep_when_unfocused:
+        self._input_listeners.append((event_key, instantiated, priority))
+
+def _initChildListener(self, child_key, event_key, func, priority, lock):
+    child = getattr(self, child_key)
+    event_key = child.id + event_key
+    self._initListener(event_key, func, priority, lock, False)
+
 class ListenerRegistryMeta(type):
     """Allow subclasses to independently define listeners to initialize.
 
@@ -39,7 +53,12 @@ class ListenerRegistryMeta(type):
                 pass
             else:
                 cls._child_listener_init.append((attr, attr._base_key, *attr._child_listener_init_data))
+        cls._input_locks = set()
+        cls._input_listeners = []
+        cls._initListener = _initListener
+        cls._initChildListener = _initChildListener
         return super().__init__(*args, **kwargs)
+    
 
     def __call__(cls, *args, **kwargs):
         obj = super().__call__(*args, **kwargs)

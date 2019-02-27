@@ -1,7 +1,7 @@
 
 from .sleep_interface import SleepInterface
 
-from kaiengine.timer import schedule, unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, pauseScheduledListenerWithID, unpauseScheduledListener, unpauseScheduledListenerWithID, pauseRealtimeListener, unpauseRealtimeListener
+from kaiengine.timer import schedule, unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, pauseScheduledListenerWithID, unpauseScheduledListener, unpauseScheduledListenerWithID, pauseRealtimeListener, pauseRealtimeListenerWithID, unpauseRealtimeListener
 
 from collections import defaultdict
 
@@ -115,15 +115,18 @@ class SchedulerInterface(SleepInterface):
     #overwritten stuff
     
     def sleep(self, *args, **kwargs):
-        super().sleep(*args, **kwargs)
-        self.pauseAllScheduledListeners(SI_SLEEP_KEY)
-        self.pauseAllRealtimeListeners(SI_SLEEP_KEY)
+        startedsleeping = super().sleep(*args, **kwargs)
+        if startedsleeping:
+            self.pauseAllScheduledListeners(SI_SLEEP_KEY)
+            self.pauseAllRealtimeListeners(SI_SLEEP_KEY)
+        return startedsleeping
         
     def wakeUp(self, *args, **kwargs):
-        super().wakeUp(*args, **kwargs)
-        if not self.sleeping:
+        previouslysleeping = super().wakeUp(*args, **kwargs)
+        if previouslysleeping:
             self.unpauseAllScheduledListeners(SI_SLEEP_KEY)
             self.unpauseAllRealtimeListeners(SI_SLEEP_KEY)
+        return previouslysleeping
     
 
     def destroy(self, *args, **kwargs):

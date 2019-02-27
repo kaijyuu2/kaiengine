@@ -8,7 +8,7 @@ import os
 from kaiengine.container import Container
 from kaiengine.baseobject import BaseObject
 from kaiengine.objectdestroyederror import ObjectDestroyedError
-from kaiengine.uidgen import GenerateUniqueID
+from kaiengine.uidgen import IdentifiedObject
 from kaiengine.fonts import FontTypeError
 from kaiengine.debug import debugMessage
 
@@ -18,10 +18,9 @@ from .label_graphic2 import LabelGraphic2
 
 LABEL_ID = "LABEL"
 
-class Label(Container, BaseObject):
+class Label(Container, BaseObject, IdentifiedObject):
     def __init__(self, text, font_size = None, font = None, color = None, layer = None, show = True, *args, **kwargs):
         super(Label, self).__init__()
-        self._unique_id = GenerateUniqueID(LABEL_ID)
         self._sublabel = None
         self.setupContainer("_sublabel")
         if color is None:
@@ -29,14 +28,6 @@ class Label(Container, BaseObject):
         if font_size is None:
             font_size = DEFAULT_TEXT_SIZE
         self._SetupSublabel(text, font_size, font, color, layer, show, *args, **kwargs)
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-    @unique_id.setter
-    def unique_id(self, val):
-        debugMessage("unique id in labels not settable")
-
 
     def setText(self, text, font_size = None, font = None, color = None, layer = None):
         self._sublabel.setText(text, font_size, font, color)

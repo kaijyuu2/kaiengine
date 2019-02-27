@@ -15,7 +15,6 @@ class DestroyInterface(object):
     def destroyed(self):
         return self._destroyed
     @destroyed.setter
-    @property
     def destroyed(self, val):
         debugMessage("destroyed cannot be set outside of the destroy() method.")
 

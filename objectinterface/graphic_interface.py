@@ -4,21 +4,23 @@ from .position_interface import PositionInterface
 from .sleep_interface import SleepInterface
 
 from kaiengine.gconfig import *
-from kaiengine.resource import toStringPath
+from kaiengine.resource import toStringPath, toListPath
 from kaiengine.display import createGraphic, createGlowSprite
 
 GI_SLEEP_KEY = "_GRAPHIC_INTERFACE_SLEEP_KEY"
 
-class GraphicInterface(PositionInterface, SleepInterface):
+class GraphicInterface(SleepInterface, PositionInterface):
 
     vars()[GPATH] = None
     vars()[GRAPHIC_INTERFACE_GLOWABLE] = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, sprite_path = None, *args, **kwargs):
         super(GraphicInterface, self).__init__(*args, **kwargs)
         self.sprite = None
         self._sprite_listener_keys = []
         self.setSpriteDefaults()
+        if sprite_path:
+            self.setSprite(sprite_path)
 
     def addSpriteFlagListener(self, anikey, listener, *args, **kwargs):
         self._sprite_listener_keys.append((self.sprite.addAniFlagListener(anikey, listener,*args, **kwargs), listener))
@@ -55,9 +57,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def setGraphicPath(self, newpath):
         """pass a path in list format to update it"""
-        if isinstance(newpath, str):
-            newpath = newpath.split('/')
-        self._gpath = list(newpath)
+        self._gpath = toListPath(newpath)
 
     def setSpriteDefaults(self):
         self._layer = 0
