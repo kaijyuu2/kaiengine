@@ -28,7 +28,7 @@ class InterfaceElement(EventInterface, ScreenElement, metaclass=_InterfaceElemen
 
     def _shiftFocus(direction):
         def func(self, position_hint=None, **kwargs):
-            callQuery(self.id + EVENT_INTERFACE_FOCUS_SHIFT[direction], source_direction=direction, position_hint=position_hint or self.position)
+            callQuery(self.getEventID(EVENT_INTERFACE_FOCUS_SHIFT[direction]), source_direction=direction, position_hint=position_hint or self.position)
         return func
 
     shiftFocusUp = _shiftFocus(DIRECTION_UP)

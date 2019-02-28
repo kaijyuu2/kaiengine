@@ -22,6 +22,7 @@ class ScreenElement(PositionInterface):
         self._children = {}
         self._child_locations = {}
         
+        
     @property
     def position(self):
         '''alias for pos attribute'''

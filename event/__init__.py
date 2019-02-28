@@ -53,8 +53,6 @@ class ListenerRegistryMeta(type):
                 pass
             else:
                 cls._child_listener_init.append((attr, attr._base_key, *attr._child_listener_init_data))
-        cls._input_locks = set()
-        cls._input_listeners = []
         cls._initListener = _initListener
         cls._initChildListener = _initChildListener
         return super().__init__(*args, **kwargs)
@@ -62,6 +60,8 @@ class ListenerRegistryMeta(type):
 
     def __call__(cls, *args, **kwargs):
         obj = super().__call__(*args, **kwargs)
+        obj._input_locks = set()
+        obj._input_listeners = []
         try:
             p = kwargs["priority"]
         except:
