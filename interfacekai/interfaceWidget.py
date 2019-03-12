@@ -491,19 +491,19 @@ class InterfaceWidget(GraphicInterface, EventInterface):
 
     #overwritable functions
 
-    def respondKeyPress(self, symbol, modifiers):
+    def respondKeyPress(self, symbol):
         """Respond to a key being pressed."""
         return False
 
-    def respondKeyRelease(self, symbol, modifiers):
+    def respondKeyRelease(self, symbol):
         """Respond to a key being released."""
         return False
 
-    def respondMousePress(self, x, y, button, modifiers):
+    def respondMousePress(self, x, y, button):
         """Respond to a mouse button being pressed."""
         return False
 
-    def respondMouseRelease(self, x, y, button, modifiers):
+    def respondMouseRelease(self, x, y, button):
         """Respond to a mouse button being released."""
         return False
 
@@ -511,7 +511,7 @@ class InterfaceWidget(GraphicInterface, EventInterface):
         """Respond to the mouse cursor moving."""
         return False
 
-    def respondMouseDrag(self, x, y, dx, dy, button, modifiers):
+    def respondMouseDrag(self, x, y, dx, dy, button):
         """Respond to the mouse cursor moving with a button held down."""
         return False
 

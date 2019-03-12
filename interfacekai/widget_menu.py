@@ -4,7 +4,7 @@ from .interfaceWidget import InterfaceWidget
 from .widget_label import LabelWidget
 
 from kaiengine.resource import toStringPath
-from kaiengine.keybinds import keyMatches
+from kaiengine.keybinds_legacy import keyMatches
 from kaiengine.debug import debugMessage
 
 from kaiengine.gconfig import *
@@ -284,7 +284,7 @@ class MenuWidget(InterfaceWidget):
             return super(MenuWidget, self)._respond(*args, **kwargs)
         return False
 
-    def respondKeyPress(self, symbol, modifiers):
+    def respondKeyPress(self, symbol):
         if keyMatches(MOVE_UP, symbol):
             self._moveCursor(1, -1)
             return True

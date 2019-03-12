@@ -9,7 +9,7 @@ from kaiengine.display import createGraphic, createGlowSprite
 
 GI_SLEEP_KEY = "_GRAPHIC_INTERFACE_SLEEP_KEY"
 
-class GraphicInterface(SleepInterface, PositionInterface):
+class GraphicInterface(PositionInterface, SleepInterface):
 
     vars()[GPATH] = None
     vars()[GRAPHIC_INTERFACE_GLOWABLE] = False
@@ -112,7 +112,7 @@ class GraphicInterface(SleepInterface, PositionInterface):
                 self._offsets.update(self.sprite._offsets)
         except AttributeError: pass
         self._updateSprite()
-        
+
     def getSpriteImagePath(self):
         if self.sprite:
             return self.sprite.getImagePath()
@@ -227,7 +227,7 @@ class GraphicInterface(SleepInterface, PositionInterface):
         if self._follow_camera != val:
             self._follow_camera = val
             self._updateSprite()
-            
+
     def checkSpriteOffscreen(self, *args, **kwargs):
         if self.sprite:
             return self.sprite.checkOffscreen(*args, **kwargs)
@@ -296,7 +296,7 @@ class GraphicInterface(SleepInterface, PositionInterface):
             else:
                 temppath = [filename]
         return toStringPath(temppath)
-    
+
     def getSpriteScreenPosition(self, *args, **kwargs):
         return self.sprite.getScreenPosition(*args, **kwargs)
 
@@ -403,15 +403,15 @@ class GraphicInterface(SleepInterface, PositionInterface):
     def _updateSpriteShow(self):
         try: self.sprite.show = False if self.sleeping else self._show
         except AttributeError: pass
-    
-    
+
+
     #overwritten stuff
-    
+
     def sleep(self, *args, **kwargs):
         super().sleep(*args, **kwargs)
         self.pauseSpriteAnimations(GI_SLEEP_KEY)
         self._updateSpriteShow()
-        
+
     def wakeUp(self, *args, **kwargs):
         super().wakeUp(*args, **kwargs)
         if not self.sleeping:

@@ -9,16 +9,16 @@ from .sleep_interface import SleepInterface
 from kaiengine.event import *
 
 
-class EventInterface(SleepInterface, IdentifiedObject):
+class EventInterface(IdentifiedObject, SleepInterface):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._event_methods = defaultdict(list)
         self._query_methods = {}
         self._sleeplessKeys = set()
-        
+
     def callIDEvent(self, event_key, *args, **kwargs):
         customEvent(self.getEventID(event_key), self.id, *args, **kwargs)
-        
+
     def getEventID(self, event_key):
         return self.id + event_key
 
@@ -127,12 +127,12 @@ class EventInterface(SleepInterface, IdentifiedObject):
 
     def removeJoybuttonReleaseListener(self,*args, **kwargs):
         self.removeCustomListener(EVENT_JOYPAD_RELEASE, *args, **kwargs)
-        
+
     def removeAllListeners(self):
         self._removeAllListeners()
         self._event_methods.clear()
         self._query_methods.clear()
-        
+
     def _removeAllListeners(self):
         for key, methoddata in self._event_methods.items():
             if key not in self._sleeplessKeys:
@@ -149,7 +149,7 @@ class EventInterface(SleepInterface, IdentifiedObject):
             self._sleeplessKeys = self._sleeplessKeys.union(ignored_keys)
             self._removeAllListeners(ignored_keys) #don't remove them from local dictionaries, in case we wake up later
         return startedsleeping
-    
+
     def wakeUp(self, *args, **kwargs):
         previouslysleeping = super().wakeUp(*args, **kwargs)
         if previouslysleeping:
@@ -160,7 +160,7 @@ class EventInterface(SleepInterface, IdentifiedObject):
             for key, query in self._query_methods.items():
                 addQueryListener(key, query)
         return previouslysleeping
-        
+
 
     def destroy(self, *args, **kwargs):
         super().destroy(*args, **kwargs)

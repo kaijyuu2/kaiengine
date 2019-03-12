@@ -36,7 +36,7 @@ Yi = 1
 
 
 
-class Sprite(sGraphics.sSprite, IdentifiedObject):
+class Sprite(IdentifiedObject, sGraphics.sSprite):
 
     #default attributes
     vars()[SPRITE_ANIMATION_TYPE] = TIME_ANIMATION
@@ -559,7 +559,7 @@ class Sprite(sGraphics.sSprite, IdentifiedObject):
 
     def update_opacity(self):
         self.alpha = self.fade_opacity * self.ani_opacity
-        
+
     def getScreenPosition(self, centered = False):
         if centered:
             pos = self.getCenterPosition()
@@ -673,7 +673,7 @@ class Sprite(sGraphics.sSprite, IdentifiedObject):
 
     def stopUpdatingWithCamera(self):
         self.remove_offset(CAMERA_KEY)
-        
+
     def checkOffscreen(self, x_buffer = None, y_buffer = None):
         from kaiengine.display import getWindowDimensionsScaled
         if x_buffer is None: x_buffer = self.width
