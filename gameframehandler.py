@@ -14,7 +14,7 @@ main_loop = None
 framerate = 1/60.0
 
 
-def initializeGameFrames(func):
+def initializeGameFrames(func = None):
     global frametimer, main_loop, framerate
 
 
@@ -50,7 +50,8 @@ def gameFrame(dt):
     updateTimeSinceLastFrame(dt)
     dispatchInputEvents()
     runCamera()
-    main_loop(dt)
+    if main_loop:
+        main_loop(dt)
     checkSchedule()
     updateGraphics()
     incrementFPSCount()
