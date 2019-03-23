@@ -6,7 +6,7 @@ from .interfaceElementKeys import *
 from .interfaceMeta import _InterfaceElementMeta
 from .screenElement import ScreenElement
 
-class InterfaceElement(EventInterface, ScreenElement, metaclass=_InterfaceElementMeta):
+class InterfaceElement(ScreenElement, EventInterface, metaclass=_InterfaceElementMeta):
 
     top_level = False
     interactive = False
