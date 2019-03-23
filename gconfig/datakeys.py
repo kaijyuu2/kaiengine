@@ -38,6 +38,7 @@ MULTI_SPRITE_SPRITES = "multi_sprites"
 MULTI_SPRITE_SPRITE_PATH = "path"
 MULTI_SPRITE_SPRITE_LAYER = "layer"
 
+
 #scenes
 
 SCENE_BG_FILENAME = "bg" 
