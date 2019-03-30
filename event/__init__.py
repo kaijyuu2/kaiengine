@@ -56,7 +56,7 @@ class ListenerRegistryMeta(type):
         cls._initListener = _initListener
         cls._initChildListener = _initChildListener
         return super().__init__(*args, **kwargs)
-    
+
 
     def __call__(cls, *args, **kwargs):
         obj = super().__call__(*args, **kwargs)

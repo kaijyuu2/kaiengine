@@ -360,7 +360,7 @@ class sSprite(object):
                 self._update_all = True
                 self.update_queue.append(self.posVBOUpdate)
             self._pos = newvalue
-            
+
     def getPos(self):
         return self._pos
 
@@ -537,7 +537,7 @@ class sSprite(object):
                 self.update_image = True
                 self._update_color = True
                 self.update_queue.append(self.colorVBOUpdate)
-                
+
     def getAlpha(self):
         return self._alpha
 
@@ -607,7 +607,7 @@ class sSprite(object):
                 self.tex_widths = TEX_COORD_BASIC_ARRAY
                 self.tex_heights = TEX_COORD_BASIC_ARRAY
             self.other_offsets.clear()
-            
+
     def getImagePath(self):
         return self._image_path
 
@@ -1643,6 +1643,8 @@ class sWindow(Window, windowVBOInterface):
             UNIFORM_FUNC[uniform_type](loc, *self.getUniformArgs(uniform_name, uniform_type))
         glBindVertexArray(self.vao)
         for layer in self.sorted_layer_keys:
+            _layer = glGetUniformLocation(self.shader, "layer")
+            glUniform1f(_layer, layer)
             for image in self.images[layer].values():
                 glBindTexture(GL_TEXTURE_2D, image[IMAGE_TEXTURE])
                 glDrawArrays(GL_TRIANGLES, image[IMAGE_VBO]*VERTEX_PER_TRIANGLE_PER_QUAD, image[IMAGE_COUNT]*VERTEX_PER_TRIANGLE_PER_QUAD)
