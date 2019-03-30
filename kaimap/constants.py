@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+
+MAP_WIDTH = "width"
+MAP_HEIGHT = "height"
+MAP_TILE_PROPERTIES = "tile_properties"
+MAP_LAYERS = "layers"
+MAP_LAYER_TYPE = "type"
+MAP_LAYER_TYPE_GRAPHIC = "graphic"
+MAP_LAYER_TYPE_OBJECT = "object"
+MAP_LAYER_OBJECTS_LIST = "objects"
+MAP_TILE_GRAPHICS_LIST = "tile_graphics"
+MAP_TILE_GRAPHIC = "graphic"
+MAP_TILE_XFLIP = "xflip"
+MAP_TILE_YFLIP = "yflip"
+MAP_TILE_WIDTH = "tile_width"
+MAP_TILE_HEIGHT = "tile_height"
