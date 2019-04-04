@@ -89,13 +89,15 @@ class MapBase(ContainerElement):
                     self.tile_layers[layernum][(x,y)] = self.tile_graphic_type()
                     self.tile_layers[layernum][(x,y)].setupTile(tiledata, x, y)
                     self.tile_layers[layernum][(x,y)].setPos(x * self.map_tile_width, y * self.map_tile_height)
+                    #TODO: hardcoding layers for now
+                    self.tile_layers[layernum][(x,y)].setLayer(1000 + layernum)
             else:
                 #object layer
                 for objdata in layer.get(MAP_LAYER_OBJECTS_LIST, []):
-                    self.parseObject(objdata)
+                    self.parseObject(objdata, layernum)
                     
     
-    def parseObject(self, objdata):
+    def parseObject(self, objdata, layernum = 1):
         #simple object parser
         pass
         
