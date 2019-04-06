@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from .constants import *
+from .mapobject import MapObject
 
+from kaiengine.gconfig import FULL_GRAPHIC_PATH, GPATH
 from kaiengine.destroyinterface import DestroyInterface
-from kaiengine.interface import ContainerElement
+from kaiengine.interface import ContainerElement, SpriteElement
 from kaiengine.resource import toStringPath
 from kaiengine.jsonfuncs import jsonload
+from kaiengine.sDict import sDict
 
 class TileProperties(DestroyInterface):
     def __init__(self, data = {}):
@@ -16,6 +19,8 @@ class TileProperties(DestroyInterface):
         self.tiledata.clear()
         
 class TileGraphic(SpriteElement):
+    
+    vars()[GPATH] = FULL_GRAPHIC_PATH
     
     def setupTile(self, tiledata, xpos, ypos):
         newsprite = tiledata.get(MAP_TILE_GRAPHIC, None)
@@ -78,27 +83,41 @@ class MapBase(ContainerElement):
         for i, tiledata in enumerate(data.get(MAP_TILE_PROPERTIES, [])):
             x = int(i % self.map_width)
             y = int(i / self.map_height)
-            self.tile_properties[(x,y)] = self.tile_type(tiledata)
+            self.tile_properties[(x,y)] = self.tile_properties_type(tiledata)
         for layernum, layer in enumerate(data.get(MAP_LAYERS, [])):
             if layer[MAP_LAYER_TYPE] == MAP_LAYER_TYPE_GRAPHIC:
                 #graphic layer
                 self.tile_layers[layernum] = {}
                 for i, tiledata in enumerate(layer.get(MAP_TILE_GRAPHICS_LIST, [])):
                     x = int(i % self.map_width)
-                    y = int(i / self.map_height)
+                    y = int(i / self.map_width)
                     self.tile_layers[layernum][(x,y)] = self.tile_graphic_type()
                     self.tile_layers[layernum][(x,y)].setupTile(tiledata, x, y)
                     self.tile_layers[layernum][(x,y)].setPos(x * self.map_tile_width, y * self.map_tile_height)
                     #TODO: hardcoding layers for now
-                    self.tile_layers[layernum][(x,y)].setLayer(1000 + layernum)
+                    self.tile_layers[layernum][(x,y)].setSpriteLayer(1000 + layernum)
             else:
                 #object layer
+                self.objects[layernum] = sDict()
                 for objdata in layer.get(MAP_LAYER_OBJECTS_LIST, []):
                     self.parseObject(objdata, layernum)
                     
     
     def parseObject(self, objdata, layernum = 1):
-        #simple object parser
-        pass
+        #simple object parser. Overwrite with your own function for better behavior
+        #objdata also contains strings in MAP_OBJECT_TYPE and MAP_OBJECT_NAME, if you need them
+        #along with any other data you put in its properties
+        newobj = MapObject()
+        newobj.setSprite(objdata.get(MAP_OBJECT_SPRITE, None))
+        newobj.setPos(*objdata.get(MAP_OBJECT_POS, [0,0]))
+        newobj.setSpriteLayer(1000 + layernum)
+        self.addObject(obj, layernum)
         
+    def addObject(self, obj, layernum):
+        return self.objects[layernum].append(newobj)
         
+    def getObject(self, layernum, objindex):
+        return self.objects[layernum][objindex]
+    
+    def getTile(self, layernum, x, y):
+        return self.tile_properties[layernum][(x,y)]

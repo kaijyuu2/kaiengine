@@ -14,3 +14,8 @@ MAP_TILE_XFLIP = "xflip"
 MAP_TILE_YFLIP = "yflip"
 MAP_TILE_WIDTH = "tile_width"
 MAP_TILE_HEIGHT = "tile_height"
+
+MAP_OBJECT_SPRITE = "sprite"
+MAP_OBJECT_POS = "pos"
+MAP_OBJECT_TYPE = "type"
+MAP_OBJECT_NAME = "name"

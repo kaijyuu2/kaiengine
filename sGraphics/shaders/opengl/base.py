@@ -46,7 +46,7 @@ BASE_VERTEX_SHADER = '''#version 130
                     texcoord = tex;
                     colormod = color;
                     vec2 clampedcoords = vec2(floor(coord.x+0.001f), floor(coord.y+0.001f));
-                    gl_Position = vec4(clampedcoords.x, clampedcoords.y, layer, 1.0) * orthom;
+                    gl_Position = vec4(clampedcoords.x, clampedcoords.y, 0.0, 1.0) * orthom;
                 }'''
 
 BASE_SVERTEX_SHADER = '''#version 130

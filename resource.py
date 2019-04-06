@@ -85,5 +85,8 @@ def toListPath(path, *args):
         returnval.insert(0,tail)
     return returnval
 
+def combineStringPaths(*args):
+    return os.path.join(*args)
+
 def getInvalidGraphicPath():
-    return toStringPath(FULL_GRAPHIC_MISC_PATH + [DEFAULT_INVALID_GRAPHIC])
+    return toStringPath(FULL_MISC_PATH + [DEFAULT_INVALID_GRAPHIC])

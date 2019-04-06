@@ -4,7 +4,7 @@ from .position_interface import PositionInterface
 from .sleep_interface import SleepInterface
 
 from kaiengine.gconfig import *
-from kaiengine.resource import toStringPath, toListPath
+from kaiengine.resource import toStringPath, toListPath, combineStringPaths
 from kaiengine.display import createGraphic, createGlowSprite
 
 GI_SLEEP_KEY = "_GRAPHIC_INTERFACE_SLEEP_KEY"
@@ -287,15 +287,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def _getGraphicPath(self, path, filename):
         '''for those who want to set a custom directory path'''
-        tempbool = isinstance(filename, str)
-        if not tempbool:
-            temppath = filename
-        else:
-            if path is not None:
-                temppath = path + [filename]
-            else:
-                temppath = [filename]
-        return toStringPath(temppath)
+        return combineStringPaths(toStringPath(path), toStringPath(filename))
 
     def getSpriteScreenPosition(self, *args, **kwargs):
         return self.sprite.getScreenPosition(*args, **kwargs)
