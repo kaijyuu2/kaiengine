@@ -9,9 +9,10 @@ def _initListener(self, event_key, func, priority, lock, sleep_when_unfocused):
     def instantiated(*args, **kwargs):
         if (not lock) or (not self._input_locks):
             return func(self, *args, **kwargs)
-    self.addCustomListener(event_key, instantiated, priority)
     if sleep_when_unfocused:
         self._input_listeners.append((event_key, instantiated, priority))
+    else:
+        self.addCustomListener(event_key, instantiated, priority)
 
 def _initChildListener(self, child_key, event_key, func, priority, lock):
     child = getattr(self, child_key)

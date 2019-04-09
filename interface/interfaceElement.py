@@ -13,7 +13,7 @@ class InterfaceElement(ScreenElement, EventInterface, metaclass=_InterfaceElemen
     inherited_focus_key = None
 
     def __init__(self, top_level=False, *args, **kwargs):
-        super().__init__(self)
+        super().__init__(*args, **kwargs)
         self.has_focus = False
         if self.interactive:
             self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
