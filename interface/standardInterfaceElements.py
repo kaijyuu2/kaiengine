@@ -115,10 +115,10 @@ class GridContainer(InterfaceElement):
     def _childPosition(self, child_id):
         location = self._child_locations[child_id]
         if not location:
-            return self._position
+            return self.position
         x = (self.grid_size[0] + self.spacing[0]) * location[0]
         y = (self.grid_size[1] + self.spacing[1]) * location[1]
-        return self._position + (x, y)
+        return self.position + (x, y)
 
     def _calculateHeight(self):
         index = dmax([location[1] for location in self._child_locations.values()])
