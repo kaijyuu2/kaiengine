@@ -115,6 +115,9 @@ class GridContainer(InterfaceElement):
 
 class SpriteElement(GraphicInterface, InterfaceElement):
 
+    def setLayer(self, layer):
+        self.setSpriteLayer(layer)
+
     @property
     def height(self):
         return self.getSpriteHeight()
@@ -130,7 +133,7 @@ class SpriteElement(GraphicInterface, InterfaceElement):
     def changeSprite(self, *args, **kwargs):
         '''alias for setSprite'''
         self.setSprite(*args, **kwargs)
- 
+
     def setSprite(self, *args, **kwargs):
         super().setSprite(*args, **kwargs)
         self._applyPosition()

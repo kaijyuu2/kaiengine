@@ -16,18 +16,31 @@ def getRelevantMousePartitions(x_min, y_min, x_max, y_max):
 class ScreenElement(PositionInterface):
 
     _display_offset = Coordinate((0, 0))
+    _layer_thickness = None
 
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._children = {}
         self._child_locations = {}
-        
-        
+        self.layer = 0
+
+    def setLayer(self, layer):
+        self.layer = layer
+
+    @property
+    def layer_thickness(self):
+        if self._layer_thickness is not None:
+            return self._layer_thickness
+        children_thickness = dmax([child.layer_thickness for child in self.children], default=None)
+        if children_thickness is not None:
+            return children_thickness + 1
+        return 1
+
     @property
     def position(self):
         '''alias for pos attribute'''
-        return self.pos 
-        
+        return self.pos
+
     @property
     def size(self):
         return (self.width, self.height)
@@ -64,7 +77,7 @@ class ScreenElement(PositionInterface):
 
     def _childPosition(self, child_id):
         return self.getPos()
-    
+
     def setPosition(self, *args, **kwargs):
         '''alias for setPos'''
         self.setPos(*args, **kwargs)
@@ -78,7 +91,7 @@ class ScreenElement(PositionInterface):
     def shiftPosition(self, *args, **kwargs):
         '''alias for movePos'''
         self.movePos(*args, **kwargs)
-        
+
     def movePos(self, *args, **kwargs):
         super().movePos(*args, **kwargs)
         self._applyPosition()
@@ -91,4 +104,5 @@ class ScreenElement(PositionInterface):
     def addChild(self, child_element, location=None, *args, **kwargs):
         self._children[child_element.id] = child_element
         self._child_locations[child_element.id] = location
+        child_element.setLayer(self.layer + 1) #TODO: improve
         return child_element
