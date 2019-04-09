@@ -114,7 +114,7 @@ class MapBase(ContainerElement):
         self.addObject(obj, layernum)
         
     def addObject(self, obj, layernum):
-        return self.objects[layernum].append(newobj)
+        return self.objects[layernum].append(obj)
         
     def getObject(self, layernum, objindex):
         return self.objects[layernum][objindex]
