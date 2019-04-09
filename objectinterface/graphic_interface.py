@@ -283,11 +283,9 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def getGraphicPath(self, filename):
         '''return a formated graphic path in string format'''
-        return self._getGraphicPath(self._gpath, filename)
-
-    def _getGraphicPath(self, path, filename):
-        '''for those who want to set a custom directory path'''
-        return combineStringPaths(toStringPath(path), toStringPath(filename))
+        if self._gpath:
+            return combineStringPaths(toStringPath(self._gpath), toStringPath(filename))
+        return filename
 
     def getSpriteScreenPosition(self, *args, **kwargs):
         return self.sprite.getScreenPosition(*args, **kwargs)

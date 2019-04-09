@@ -65,6 +65,8 @@ def loadResource(filepath):
 
 
 def toStringPath(path, *args):
+    if path is None:
+        return ""
     if len(args) > 0:
         path = [path]
         path.extend(args)
@@ -73,6 +75,8 @@ def toStringPath(path, *args):
     return path
 
 def toListPath(path, *args):
+    if path is None:
+        return []
     if len(args) > 0:
         path = [path]
         path.extend(args)
