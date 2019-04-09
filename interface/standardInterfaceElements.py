@@ -128,6 +128,20 @@ class GridContainer(InterfaceElement):
         index = dmax([location[0] for location in self._child_locations.values()])
         return self.grid_size[0] + (index * (self.grid_size[0] + self.spacing[0]))
 
+    def flailUselessly(self, location):
+        def flail(source_direction=None, position_hint=None):
+            print("Sorry, grid movement not yet implemented. ", location)
+        return flail
+
+    def connectChildren(self):
+        for child in self.interactive_children:
+            child_id = child.id
+            location = self._child_locations[child_id]
+            addQueryListener(child.getEventID(EVENT_INTERFACE_FOCUS_SHIFT_LEFT), self.flailUselessly(location))
+            addQueryListener(child.getEventID(EVENT_INTERFACE_FOCUS_SHIFT_RIGHT), self.flailUselessly(location))
+            addQueryListener(child.getEventID(EVENT_INTERFACE_FOCUS_SHIFT_DOWN), self.flailUselessly(location))
+            addQueryListener(child.getEventID(EVENT_INTERFACE_FOCUS_SHIFT_UP), self.flailUselessly(location))
+
 class SpriteElement(GraphicInterface, InterfaceElement):
 
     def setLayer(self, layer):
