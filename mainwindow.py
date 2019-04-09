@@ -53,21 +53,43 @@ class main_window(sWindow):
         event.keyReleaseEvent(symbol)
 
     def on_mouse_press(self, x, y, button, modifiers):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = x / scaling
+        y = y / scaling
         event.mousePressEvent(x, y, button)
 
     def on_mouse_release(self, x, y, button, modifiers):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = x / scaling
+        y = y / scaling
         event.mouseReleaseEvent(x, y, button)
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = x / scaling
+        y = y / scaling
+        dx = dx / scaling
+        dy = dy / scaling
         event.mouseDragEvent(x, y, dx, dy, buttons)
 
     def on_mouse_motion(self, x, y, dx, dy):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = x / scaling
+        y = y / scaling
+        dx = dx / scaling
+        dy = dy / scaling
         event.mouseMoveEvent(x, y, dx, dy)
 
     def on_mouse_enter(self, x, y):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = x / scaling
+        y = y / scaling
         event.mouseEnterEvent(x, y)
 
     def on_mouse_leave(self, x, y):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = x / scaling
+        y = y / scaling
         event.mouseExitEvent(x, y)
 
     def on_activate(self, *args, **kwargs):
