@@ -13,6 +13,21 @@ class ContainerElement(InterfaceElement):
         #TODO: fix the logic here in a better way
         return self.interactive_children
 
+class StackContainer(InterfaceElement):
+
+    # "stacks" children in layers
+
+    @property
+    def layer_thickness(self):
+        return sum([child.layer_thickness for child in self.children])+1
+
+    def connectChildren(self):
+        #TODO: don't misuse like this
+        layer = self.layer + 1
+        for child in self.children:
+            child.setLayer(layer)
+            layer += child.layer_thickness
+
 class HorizontalContainer(ContainerElement):
 
     #TODO: allow location-based positioning
