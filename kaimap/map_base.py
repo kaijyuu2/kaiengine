@@ -45,7 +45,7 @@ class MapBase(ContainerElement):
             self.tile_graphic_type = tile_graphic_type
         self.tile_properties = {}
         self.tile_layers = {}
-        self.objects = {}
+        self.objects = []
         self.map_height = 0
         self.map_width = 0
         self.map_tile_height = 1
@@ -115,8 +115,24 @@ class MapBase(ContainerElement):
     def addObject(self, obj, layernum):
         return self.objects[layernum].append(self.addChild(obj).id)
         
-    def getObject(self, layernum, objindex):
-        return self.getChild(self.objects[layernum][objindex])
+    def getObjectIDList(self, layernum):
+        return self.objects[layernum][:]
+    
+    def getAllObjects(self, layernum = None):
+        if layernum is None:
+            returnlist = []
+            for otherlayernum in self.objects.keys():
+                returnlist.extend(self._getAllObjects(otherlayernum))
+            return returnlist
+        else:
+            return self._getAllObjects(layernum)
+        
+    def _getAllObjects(self, layernum):
+        return [self.getObject(layernum, objid) for objid in self.getObjectIDList(layernum)]
+    
+    def getObject(self, objindex):
+        #essentially just getChild but may add additional behavior later
+        return self.getChild(objindex)
     
     def getTile(self, x, y):
         return self.getChild(self.tile_properties[(x,y)])
