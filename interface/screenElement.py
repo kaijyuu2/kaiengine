@@ -106,3 +106,9 @@ class ScreenElement(PositionInterface):
         self._child_locations[child_element.id] = location
         child_element.setLayer(self.layer + 1) #TODO: improve
         return child_element
+    
+    def getChild(self, child_id):
+        return self._children[child_id]
+    
+    def getChildLocation(self, child_id):
+        return self._children_locations[child_id]

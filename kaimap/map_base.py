@@ -76,6 +76,7 @@ class MapBase(ContainerElement):
     def loadMapFromPath(self, map_path):
         data = jsonload(toStringPath(map_path))
         self.clearMap()
+        self.setLayer(1000) #TODO: better handling
         self.map_height = data.get(MAP_HEIGHT, 1)
         self.map_width = data.get(MAP_WIDTH, 1)
         self.map_tile_height = data.get(MAP_TILE_HEIGHT, 1)
@@ -83,7 +84,7 @@ class MapBase(ContainerElement):
         for i, tiledata in enumerate(data.get(MAP_TILE_PROPERTIES, [])):
             x = int(i % self.map_width)
             y = int(i / self.map_height)
-            self.tile_properties[(x,y)] = self.tile_properties_type(tiledata)
+            self.tile_properties[(x,y)] = self.addChild(self.tile_properties_type(tiledata)).id
         for layernum, layer in enumerate(data.get(MAP_LAYERS, [])):
             if layer[MAP_LAYER_TYPE] == MAP_LAYER_TYPE_GRAPHIC:
                 #graphic layer
@@ -91,11 +92,10 @@ class MapBase(ContainerElement):
                 for i, tiledata in enumerate(layer.get(MAP_TILE_GRAPHICS_LIST, [])):
                     x = int(i % self.map_width)
                     y = int(i / self.map_width)
-                    self.tile_layers[layernum][(x,y)] = self.tile_graphic_type()
-                    self.tile_layers[layernum][(x,y)].setupTile(tiledata, x, y)
-                    self.tile_layers[layernum][(x,y)].setPos(x * self.map_tile_width, y * self.map_tile_height)
-                    #TODO: hardcoding layers for now
-                    self.tile_layers[layernum][(x,y)].setSpriteLayer(1000 + layernum)
+                    newtile = self.addChild(self.tile_graphic_type())
+                    self.tile_layers[layernum][(x,y)] = newtile.id
+                    newtile.setupTile(tiledata, x, y)
+                    newtile.setPos(x * self.map_tile_width, y * self.map_tile_height)
             else:
                 #object layer
                 self.objects[layernum] = sDict()
@@ -110,14 +110,16 @@ class MapBase(ContainerElement):
         newobj = MapObject()
         newobj.setSprite(objdata.get(MAP_OBJECT_SPRITE, None))
         newobj.setPos(*objdata.get(MAP_OBJECT_POS, [0,0]))
-        newobj.setSpriteLayer(1000 + layernum)
         self.addObject(obj, layernum)
         
     def addObject(self, obj, layernum):
-        return self.objects[layernum].append(obj)
+        return self.objects[layernum].append(self.addChild(obj).id)
         
     def getObject(self, layernum, objindex):
-        return self.objects[layernum][objindex]
+        return self.getChild(self.objects[layernum][objindex])
     
-    def getTile(self, layernum, x, y):
-        return self.tile_properties[layernum][(x,y)]
+    def getTile(self, x, y):
+        return self.getChild(self.tile_properties[(x,y)])
+    
+    def getTileGraphic(self, layernum, x, y):
+        return self.getChild(self.tile_layers[layernum][(x,y)])

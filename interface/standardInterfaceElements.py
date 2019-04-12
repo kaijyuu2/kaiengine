@@ -145,6 +145,7 @@ class GridContainer(InterfaceElement):
 class SpriteElement(GraphicInterface, InterfaceElement):
 
     def setLayer(self, layer):
+        super().setLayer(layer)
         self.setSpriteLayer(layer)
 
     @property
