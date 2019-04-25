@@ -1,122 +1,139 @@
 from kaiengine.gconfig import *
-from kaiengine.event import customEvent, callQuery
+
+from kaiengine.event import customEvent, callQuery, MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVENT_MOUSE_MOVE_SECTION
 from kaiengine.keybinds import INPUT_EVENT_CONFIRM, INPUT_EVENT_CANCEL
-from kaiengine.objectinterface import EventInterface
+from kaiengine.objectinterface import EventInterface, GraphicInterface, PositionInterface
+
 from .interfaceElementKeys import *
 from .interfaceMeta import _InterfaceElementMeta
-from .screenElement import ScreenElement
 
-class InterfaceElement(ScreenElement, EventInterface, metaclass=_InterfaceElementMeta):
 
-    top_level = False
-    interactive = False
-    inherited_focus_key = None
+def getRelevantMousePartitions(x_min, y_min, x_max, y_max):
+    x_values = [x for x in range(x_min//MOUSE_PARTITION_SIZE_X, (x_max//MOUSE_PARTITION_SIZE_X)+1)]
+    y_values = [y for y in range(y_min//MOUSE_PARTITION_SIZE_Y, (y_max//MOUSE_PARTITION_SIZE_Y)+1)]
+    relevant_keys = [EVENT_MOUSE_MOVE_SECTION[(x, y)] for x in x_values for y in y_values]
+    return relevant_keys
 
-    def __init__(self, top_level=False, *args, **kwargs):
+
+class InterfaceElement(EventInterface, GraphicInterface, metaclass=_InterfaceElementMeta):
+
+    can_have_focus = False
+    focus_group = None
+
+    def __init__(self, top_level = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.has_focus = False
-        if self.interactive:
-            self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
-        self._init(*args, **kwargs)
-        self.connectChildren()
-        if self.top_level or top_level:
-            customEvent(EVENT_INTERFACE_TOP_LEVEL_ELEMENT_CREATED, self)
+
+    def setLayer(self, *args, **kwargs):
+        super().setSpriteLayer(*args, **kwargs)
 
     @property
-    def focus_key(self):
-        return self.inherited_focus_key or self.id
-
-    def _shiftFocus(direction):
-        def func(self, position_hint=None, **kwargs):
-            callQuery(self.getEventID(EVENT_INTERFACE_FOCUS_SHIFT[direction]), source_direction=direction, position_hint=position_hint or self.position)
-        return func
-
-    shiftFocusUp = _shiftFocus(DIRECTION_UP)
-    shiftFocusDown = _shiftFocus(DIRECTION_DOWN)
-    shiftFocusLeft = _shiftFocus(DIRECTION_LEFT)
-    shiftFocusRight = _shiftFocus(DIRECTION_RIGHT)
-
-    @on_input(INPUT_EVENT_MOVE_UP)
-    def respondMoveUp(self):
-        self.shiftFocusUp()
-
-    @on_input(INPUT_EVENT_MOVE_DOWN)
-    def respondMoveDown(self):
-        self.shiftFocusDown()
-
-    @on_input(INPUT_EVENT_MOVE_LEFT)
-    def respondMoveLeft(self):
-        self.shiftFocusLeft()
-
-    @on_input(INPUT_EVENT_MOVE_RIGHT)
-    def respondMoveRight(self):
-        self.shiftFocusRight()
-
-    def respondMouseMove(self, x, y):
-        if not self.has_focus:
-            if self.checkPointWithinElement(x, y):
-                self.acceptFocus()
+    def height(self):
+        return self.getSpriteHeight() or 0
 
     @property
-    def interactive_children(self):
-        return [child for child in self.children if child.interactive]
+    def width(self):
+        return self.getSpriteWidth() or 0
 
-    def inheritFocusKey(self, key):
-        self.removeCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
-        self.inherited_focus_key = key
-        for child in self.children:
-            #TODO: reduce inefficiency
-            child.inheritFocusKey(key)
-        self.addCustomListener(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.focusChanged)
+    def _applyPosition(self):
+        super()._applyPosition()
+        self._updateSpritePos()
 
-    def _init(self, *args, **kwargs):
-        pass
+    def setSprite(self, *args, **kwargs):
+        super().setSprite(*args, **kwargs)
+        self._applyPosition()
 
-    def activate(self):
-        self.callIDEvent(EVENT_INTERFACE_ACTIVATED)
 
-    def cancel(self):
-        pass
+class InteractiveElement(InterfaceElement):
 
-    def acceptFocus(self, source_direction=None, position_hint=None):
-        self._gainFocus()
+    can_have_focus = True
 
-    def _gainFocus(self):
-        self.gainFocus()
-        for event_key, func, priority in self._input_listeners:
-            self.addCustomListener(event_key, func, priority)
-        customEvent(EVENT_INTERFACE_GAIN_FOCUS + self.focus_key, self.id)
-        self.has_focus = True
 
-    def gainFocus(self):
-        pass
+class TextButtonElement(InteractiveElement):
 
-    def _loseFocus(self):
-        self.loseFocus()
-        for event_key, func, priority in self._input_listeners:
-            self.removeCustomListener(event_key, func)
-        self.has_focus = False
+    frame = None
 
-    def loseFocus(self):
-        pass
+    def __init__(self, text="DEBUG", *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def focusChanged(self, element_id):
-        if element_id != self.id:
-            self._loseFocus()
 
-    def addChild(self, child_element, *args, **kwargs):
-        child_element.inheritFocusKey(self.focus_key)
-        return super().addChild(child_element, *args, **kwargs)
+class InterfaceContainer(InterfaceElement):
 
-    def connectChildren(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._children = {}
+        self._child_locations = {}
+        for arg in *args:
+            self.addChild(arg)
 
-    def setPos(self, *args, **kwargs):
-        super().setPos(*args, **kwargs)
-        if self.interactive:
-            for event in self.mouse_move_partitions:
-                self.addCustomListener(event, self.respondMouseMove)
+    @property
+    def child_locations(self):
+        return sorted([(child_id, location) for child_id, location in self._child_locations.items()], key=lambda x: x[1])
 
-    def destroy(self):
-        self.callIDEvent(EVENT_INTERFACE_DESTROYED)
-        super().destroy()
+    def nextDefaultLocation(self):
+        return len(self._child_locations)
+
+    def calculateChildPosition(self, child):
+        return self.position
+
+    def addChild(self, child, location=None):
+        self._children[child.id] = child
+        self._child_locations[child.id] = location or self.nextDefaultLocation()
+
+
+class StackContainer(InterfaceContainer):
+
+    pass
+
+
+class VerticalContainer(InterfaceContainer):
+
+    def calculateChildPosition(self, child):
+        locations = self.child_locations
+        child_location_index = locations.index(child.id)
+        preceding_height = sum([self._children[child_id].height for child_id in locations[:child_location_index]])
+        return self.position + [0, preceding_height]
+
+class HorizontalContainer(InterfaceContainer):
+
+    def calculateChildPosition(self, child):
+        locations = self.child_locations
+        child_location_index = locations.index(child.id)
+        preceding_width = sum([self._children[child_id].width for child_id in locations[:child_location_index]])
+        return self.position + [preceding_width, 0]
+
+class GridContainer(InterfaceContainer):
+
+    @property
+    def grid_size(self):
+        try:
+            first_child = list(self._children.values())[0]
+            return (first_child.width, first_child.height)
+        except IndexError:
+            return (0, 0)
+
+    def nextDefaultLocation(self):
+        return (len(self._child_locations), len(self._child_locations))
+
+    def calculateChildPosition(self, child):
+        location = self._child_locations(child.id)
+        return self.position + (self.grid_size[0] * location[0], self.grid_size[1] * location[1])
+
+
+class GenericMenu(StackContainer):
+
+    frame_style = None
+    internal_container_type = InterfaceContainer
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, **kwargs)
+        if self.frame_style:
+            self.frame = self.addChild(FrameElement, 0)
+        self.menu_options = self.addChild(internal_container_type(*args), 1)
+
+class VerticalMenu(GenericMenu):
+
+    internal_container_type = VerticalContainer
+
+class HorizontalMenu(GenericMenu):
+
+    internal_container_type = HorizontalContainer
