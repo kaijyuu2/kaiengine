@@ -17,6 +17,7 @@ from kaiengine.sDict import sDict
 from kaiengine.objectdestroyederror import ObjectDestroyedError
 from kaiengine.resource import loadResource, ResourceUnavailableError
 from kaiengine.debug import debugMessage
+from kaiengine.uidgen import generateUniqueID
 
 #external things
 from OpenGL.GL import glBufferSubData, glGenTextures, glTexParameterf
@@ -196,7 +197,6 @@ class sSprite(object):
         self._pos = [0,0]
         self._offset = [0,0]
         self.other_offsets = {}
-        self._other_offsets_counter = 0
         self._layer = 0
         self._width = 0
         self._height = 0
@@ -381,8 +381,7 @@ class sSprite(object):
             self._offset = newvalue
 
     def append_offset(self, x = 0, y = 0):
-        key = "_APPENDED_OFFSET_" + str(self._other_offsets_counter)
-        self._other_offsets_counter += 1
+        key = generateUniqueID("SPRITE_APPENDED_OFFSET")
         self.change_offset(key, x, y)
         return key
 
@@ -622,6 +621,35 @@ class sSprite(object):
 
     def get_effective_dimensions(self):
         return self.width * self.get_effective_size()[0], self.height * self.get_effective_size()[1]
+    
+    def getExtents(self):
+        effective_size = self.get_effective_size()
+        width = self.width * effective_size[Xi]
+        height = self.height * effective_size[Yi]
+        if self.center[Xi]:
+            center_xoffset = width / 2
+        else:
+            center_xoffset = 0
+        if self.center[Yi]:
+            center_yoffset = height / 2
+        else:
+            center_yoffset = 0
+        xoffset = self.offset[Xi] * effective_size[Xi]
+        yoffset = self.offset[Yi] * effective_size[Yi]
+        xleft = self.pos[Xi] + xoffset - center_xoffset
+        xright = self.pos[Xi] + xoffset - center_xoffset + width
+        ybottom = self.pos[Yi] + yoffset - center_yoffset
+        ytop = self.pos[Yi] + yoffset - center_yoffset + height
+        for key, offset in self.other_offsets.items():
+            try:
+                xleft += offset[Xi]
+                xright += offset[Xi]
+                ybottom += offset[Yi]
+                ytop += offset[Yi]
+            except TypeError:
+                debugMessage("error with graphical offset. Key: " + key)
+                self.other_offsets[key] = [0,0]
+        return xleft, xright, ybottom, ytop
 
     def set_antialiasing(self, val):
         if gameWindow is not None and self.image_path is not None:
@@ -670,32 +698,7 @@ class sSprite(object):
         tex_bottom = -self.tex_heights[BOTTOM] / self.original_height
         texture_array = [tex_left, tex_bottom, tex_right, tex_bottom, tex_left, tex_top,
                     tex_right, tex_top, tex_right, tex_bottom, tex_left, tex_top]
-        effective_size = self.get_effective_size()
-        width = self.width * effective_size[Xi]
-        height = self.height * effective_size[Yi]
-        if self.center[Xi]:
-            center_xoffset = width / 2
-        else:
-            center_xoffset = 0
-        if self.center[Yi]:
-            center_yoffset = height / 2
-        else:
-            center_yoffset = 0
-        xoffset = self.offset[Xi] * effective_size[Xi]
-        yoffset = self.offset[Yi] * effective_size[Yi]
-        xleft = self.pos[Xi] + xoffset - center_xoffset
-        xright = self.pos[Xi] + xoffset - center_xoffset + width
-        ybottom = self.pos[Yi] + yoffset - center_yoffset
-        ytop = self.pos[Yi] + yoffset - center_yoffset + height
-        for key, offset in self.other_offsets.items():
-            try:
-                xleft += offset[Xi]
-                xright += offset[Xi]
-                ybottom += offset[Yi]
-                ytop += offset[Yi]
-            except TypeError:
-                debugMessage("error with graphical offset. Key: " + key)
-                self.other_offsets[key] = [0,0]
+        xleft, xright, ytop, ybottom = self.getExtents()
         if self.flip[Xi]:
             xleft, xright = [xright, xleft]
         if self.flip[Yi]:

@@ -315,9 +315,6 @@ class GraphicInterface(PositionInterface, SleepInterface):
             return self.sprite.height
         return 0
 
-    def getSpriteShow(self):
-        return self._show
-
     def getSpriteColor(self):
         return self._color[:]
 
@@ -326,6 +323,12 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def getSpriteDimensions(self):
         return self.sprite.get_dimensions()
+    
+    def getSpriteExtents(self):
+        return self.sprite.getExtents()
+    
+    def getSpriteExtentsMinusCamera(self):
+        return self.sprite.getExtentsMinusCamera()
 
     def getSpriteLeftSide(self):
         try:
