@@ -2,6 +2,7 @@
 
 #most basic element
 import copy
+import operator
 
 from kaiengine.event import customEvent
 from kaiengine.event import MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVENT_MOUSE_MOVE_SECTION
@@ -26,6 +27,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._focused_child_id = None
         self._parent = None
         self._layer = 0
+        self._mouse_over = False
+        self._element_position = (0,0)
         for string in self._focus_event_keys + self._other_event_keys:
             try:
                 self._funcs[string] = getattr(self, string)
@@ -35,6 +38,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 self._funcs[string] = kwargs[string]
             except KeyError:
                 pass
+        if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
+            self.addMouseMoveListener(self._mouseMove)
         
     @property
     def position(self):
@@ -163,9 +168,10 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         #convenience function for delaying a custom event
         return lambda: customEvent(key, *args, **kwargs)
     
-    def _activateConfirm(self):
+    def _activateConfirm(self, x = None, y = None):
         if self.focus:
-            return self.callEventFunc(CONFIRM_KEY)
+            if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
+                return self.callEventFunc(CONFIRM_KEY)
         return False
     
     def _activateConfirmHold(self):
@@ -222,16 +228,22 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         if self.focus:
             return self.callEventFunc(MOVERIGHTHOLD_KEY)
         return False
-            
-    def _mouseEnter(self):
-        return self.callEventFunc(MOUSEENTER_KEY)
-        
-    def _mouseOver(self):
-        return self.callEventFunc(MOUSEOVER_KEY)
-        
-    def _mouseLeave(self):
-        return self.callEventFunc(MOUSELEAVE_KEY)
     
+    def _mouseMove(self, x, y, dx, dy):
+        returnval = False
+        inside = self.checkPointWithinElement(x, y)
+        if not self._mouse_over and inside:
+            returnval = self.callEventFunc(MOUSEENTER_KEY)
+        if inside:
+            self._mouse_over = True
+            if not returnval:
+                returnval = self.callEventFunc(MOUSEOVER_KEY, x, y, dx, dy)
+        else:
+            self._mouse_over = False
+        if not returnval and self._mouse_over and not inside:
+            returnval = self.callEventFunc(MOUSELEAVE_KEY)
+        return returnval
+            
     def _gainFocus(self):
         self.addFocusListeners()
         self.callEventFunc(GAINFOCUS_KEY)
@@ -297,9 +309,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def getExtents(self):
         return self.getSpriteExtentsMinusCamera()
 
-    def _childPosition(self, child_id):
-        return self.getPos()
-
     def setPosition(self, *args, **kwargs):
         '''alias for setPos'''
         self.setPos(*args, **kwargs)
@@ -307,9 +316,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def shiftPosition(self, *args, **kwargs):
         '''alias for movePos'''
         self.movePos(*args, **kwargs)
-
-    def _applyPosition(self):
-        pass
 
     def addChild(self, newchild, skip_layer_update = False):
         self._children[newchild.id] = newchild
@@ -332,18 +338,45 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def getAllChildren(self):
         return self._children.values()
     
+    def getElementPosition(self):
+        return self._element_position
+    
+    def setElementPosition(self, x = None, y = None):
+        currentpos = self.getElementPosition()
+        if x is None: x = currentpos[0]
+        if y is None: y = currentpos[1]
+        if x != currentpos[0] or y != currentpos[1]:
+            self._element_position = (x,y)
+            self._applyPosition()
+        
+    def moveElementPosition(self, x = 0, y = 0):
+        self.setElementPosition(*map(operator.add, self.getElementPosition(), (x,y)))
+    
+    def getAnchorPoint(self):
+        #returns origin point. overwrite if you want different behavior (bottom left, etc)
+        return self.getPos()
+    
+    def getParentAnchorPoint(self):
+        parent = self.getParent()
+        if parent:
+            return parent.getAnchorPoint()
+        return (0,0)
+    
+    def _applyPosition(self):
+        self.setPos(*map(operator.add, self.getElementPosition(), self.getParentAnchorPoint()))
+            
+    def _applyChildrenPositions(self):
+        for child in self.getAllChildren():
+            child._applyPosition()
+
     #overwritten stuff
     def setPos(self, *args, **kwargs):
         super().setPos(*args, **kwargs)
-        self._applyPosition()
-        for child in self.children:
-            child.setPos(self._childPosition(child.id))
+        self._applyChildrenPositions()
     
     def movePos(self, *args, **kwargs):
         super().movePos(*args, **kwargs)
-        self._applyPosition()
-        for child in self.children:
-            child.movePos(*args, **kwargs)
+        self._applyChildrenPositions()
     
     def sleep(self, *args, **kwargs):
         super().sleep(*args, **kwargs)

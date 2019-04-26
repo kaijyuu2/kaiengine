@@ -9,7 +9,7 @@ from kaiengine.input.keys import *
 _held_keys = set()
 
 def createBindingRelayer(event_type, hold_func):
-    def relayBinding(kai_key):
+    def relayBinding(kai_key, *args, **kwargs):
         binds = settings.getValue(DYNAMIC_SETTINGS_KEY_BINDS)
         try:
             bind = binds[(kai_key + event_type)]
@@ -17,7 +17,7 @@ def createBindingRelayer(event_type, hold_func):
             pass
         else:
             hold_func(kai_key)
-            customEvent(bind)
+            customEvent(bind, *args, **kwargs)
     return relayBinding
 
 def _fireHeldKeyEvents():
@@ -42,6 +42,7 @@ def endHeld(kai_key):
 
 relayPress = createBindingRelayer(INPUT_EVENT_TYPE_PRESS, startHeld)
 relayRelease = createBindingRelayer(INPUT_EVENT_TYPE_RELEASE, endHeld)
+    
 
 addKeyPressListener(relayPress)
 addKeyReleaseListener(relayRelease)

@@ -201,7 +201,7 @@ def mousePressEvent(x, y, button):
     '''Process a mouse press event. If any listener returns True, halt processing.'''
     button = standardizedKey(button)
     eventdriver._callEvent(EVENT_MOUSE_MOVE, x, y, 0, 0)
-    eventdriver._callEvent(EVENT_MOUSE_PRESS, button)
+    eventdriver._callEvent(EVENT_MOUSE_PRESS, button, x, y)
 
 def mouseReleaseEvent(x, y, button):
     '''Process a mouse release event. If any listener returns True, halt processing.'''
