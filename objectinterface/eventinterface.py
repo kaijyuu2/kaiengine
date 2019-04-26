@@ -143,7 +143,7 @@ class EventInterface(IdentifiedObject, SleepInterface):
                 removeQueryListener(key)
 
     #overwritten stuff
-    def sleep(self, ignored_keys = (), *args, **kwargs):
+    def sleep(self, *args, ignored_keys = (), **kwargs):
         startedsleeping = super().sleep(*args, **kwargs)
         if startedsleeping:
             self._sleeplessKeys = self._sleeplessKeys.union(ignored_keys)

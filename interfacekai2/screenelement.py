@@ -6,20 +6,27 @@ import copy
 from kaiengine.event import customEvent
 from kaiengine.event import MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVENT_MOUSE_MOVE_SECTION
 from kaiengine.objectinterface import GraphicInterface, EventInterface, SchedulerInterface
+from kaiengine.weakrefhelper import weakRef, unWeakRef
+from kaiengine.debug import debugMessage
+from kaiengine.gconfig.default_keybinds import *
 
 from .basiceventkeys import *
 
 class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     
-    _event_keys = copy.copy(BASIC_EVENT_KEYS)
+    _focus_event_keys = copy.copy(FOCUS_EVENT_KEYS)
+    _other_event_keys = copy.copy(OTHER_EVENT_KEYS)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._children = {}
         self._funcs = {}
+        self._focus_listeners = set()
         self._hidden = set()
-        self.focus = False
-        for string in self._event_keys:
+        self._focused_child_id = None
+        self._parent = None
+        self._layer = 0
+        for string in self._focus_event_keys + self._other_event_keys:
             try:
                 self._funcs[string] = getattr(self, string)
             except AttributeError:
@@ -64,31 +71,212 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def mouse_move_partitions(self):
         return _getRelevantMousePartitions(*self.extents)
     
+    @property
+    def parent(self):
+        return self.getParent()
+    @parent.setter
+    def parent(self, *args, **kwargs):
+        self.setParent(*args, **kwargs)
+        
+    @property
+    def focus(self):
+        try:
+            return self.getParent()._focused_child_id == self.id
+        except AttributeError:
+            return False
+    @focus.setter
+    def focus(self, *args, **kwargs):
+        raise AttributeError("Cannot set focus directly. Set the parent's focused child instead.")
+        
+    def getLayer(self):
+        return self._layer
+    
+    def setLayer(self, val):
+        #should return the highest layer used by self and/or children
+        self._layer = val
+        self.setSpriteLayer(self._layer)
+        return self.updateChildrenLayers(val)
+        
+    def updateChildrenLayers(self):
+        #should return the highest used layer
+        lastlayer = self.getLayer()
+        for child in self.getAllChildren():
+            lastlayer = child.setLayer(lastlayer + 1)
+        return lastlayer
+    
+    def updateAllLayers(self):
+        try: 
+            self.getParent().updateAllLayers()
+        except AttributeError:
+            self.updateChildrenLayers() #only call this on top element
+            
+    def getMaxLayer(self):
+        return max(self.getLayer(), *[child.getMaxLayer() for child in self.getAllChildren()])
+            
+        
+    def getParent(self):
+        return unWeakRef(self._parent)
+    
+    def setParent(self, newparent):
+        self._parent = weakRef(newparent)
+        
+    def setFocus(self, child):
+        #pass None to clear focus
+        try:
+            ID = child.id
+        except AttributeError:
+            ID = child
+        if ID != self._focused_child_id:
+            oldfocus = self.getFocusedChild()
+            if oldfocus:
+                oldfocus._loseFocus()
+            if ID is not None:
+                if ID in self._children:
+                    self._focused_child_id = ID
+                    self.getChild(ID)._gainFocus()
+                else:
+                    debugMessage("Probable error: child ID not found when setting focus: " + str(ID))
+        
+    def clearFocus(self):
+        #convenience function
+        self.setFocus(None)
+    
+    def getFocusedChild(self):
+        try:
+            return self.getChild(self._focused_child_id)
+        except KeyError:
+            return None
+    
     def callEventFunc(self, key, *args, **kwargs):
-        if key in self._funcs:
-            self._funcs[key](*args, **kwargs)
+        if self.hasEventFunc(key):
+            returnval = self._funcs[key](*args, **kwargs)
+            return returnval if returnval != None else True
+        return False
+            
+    def hasEventFunc(self, key):
+        return key in self._funcs
     
     def getEventKey(self, key = ""):
-        return str(self.id) + "_" + key + "_EVENT"
+        return str(self.id) + "_" + str(key) + "_EVENT"
     
     def getEventCaller(self, key, *args, **kwargs):
         #convenience function for delaying a custom event
         return lambda: customEvent(key, *args, **kwargs)
     
+    def _activateConfirm(self):
+        if self.focus:
+            return self.callEventFunc(CONFIRM_KEY)
+        return False
+    
+    def _activateConfirmHold(self):
+        if self.focus:
+            return self.callEventFunc(CONFIRMHOLD_KEY)
+        return False
+        
+    def _activateCancel(self):
+        if self.focus:
+            return self.callEventFunc(CANCEL_KEY)
+        return False
+    
+    def _activateCancelHold(self):
+        if self.focus:
+            return self.callEventFunc(CANCELHOLD_KEY)
+        return False
+        
+    def _moveUp(self):
+        if self.focus:
+            return self.callEventFunc(MOVEUP_KEY)
+        return False
+    
+    def _moveUpHold(self):
+        if self.focus:
+            return self.callEventFunc(MOVEUPHOLD_KEY)
+        return False
+        
+    def _moveDown(self):
+        if self.focus:
+            return self.callEventFunc(MOVEDOWN_KEY)
+        return False
+    
+    def _moveDownHold(self):
+        if self.focus:
+            return self.callEventFunc(MOVEDOWNHOLD_KEY)
+        return False
+        
+    def _moveLeft(self):
+        if self.focus:
+            return self.callEventFunc(MOVELEFT_KEY)
+        return False
+    
+    def _moveLeftHold(self):
+        if self.focus:
+            return self.callEventFunc(MOVELEFTHOLD_KEY)
+        return False
+        
+    def _moveRight(self):
+        if self.focus:
+            return self.callEventFunc(MOVERIGHT_KEY)
+        return False
+    
+    def _moveRightHold(self):
+        if self.focus:
+            return self.callEventFunc(MOVERIGHTHOLD_KEY)
+        return False
+            
+    def _mouseEnter(self):
+        return self.callEventFunc(MOUSEENTER_KEY)
+        
+    def _mouseOver(self):
+        return self.callEventFunc(MOUSEOVER_KEY)
+        
+    def _mouseLeave(self):
+        return self.callEventFunc(MOUSELEAVE_KEY)
+    
     def _gainFocus(self):
-        if not self.focus:
-            self.focus = True
-            self.addFocusListeners()
-            self.callEventFunc(GAIN_FOCUS_KEY)
+        self.addFocusListeners()
+        self.callEventFunc(GAINFOCUS_KEY)
             
     def _loseFocus(self):
-        if self.focus:
-            self.focus = False
-            self.removeFocusListeners()
-            self.callEventFunc(LOSE_FOCUS_KEY)
+        self.removeFocusListeners()
+        self.callEventFunc(LOSEFOCUS_KEY)
             
     def addFocusListeners(self):
-        self.addListener()
+        if self.hasEventFunc(CONFIRM_KEY):
+            self.addFocusListener(INPUT_EVENT_CONFIRM_UP, self._activateConfirm)
+        if self.hasEventFunc(CONFIRMHOLD_KEY):
+            self.addFocusListener(INPUT_EVENT_CONFIRM_HOLD, self._activateConfirmHold)
+        if self.hasEventFunc(CANCEL_KEY):
+            self.addFocusListener(INPUT_EVENT_CANCEL_UP, self._activateCancel)
+        if self.hasEventFunc(CANCELHOLD_KEY):
+            self.addFocusListener(INPUT_EVENT_CANCEL_HOLD, self._activateCancelHold)
+        if self.hasEventFunc(MOVEUP_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_UP_UP, self._moveUp)
+        if self.hasEventFunc(MOVEUPHOLD_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_UP_HOLD, self._moveUpHold)
+        if self.hasEventFunc(MOVEDOWN_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_DOWN_UP, self._moveDown)
+        if self.hasEventFunc(MOVEDOWNHOLD_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_DOWN_HOLD, self._moveDownHold)
+        if self.hasEventFunc(MOVERIGHT_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_RIGHT_UP, self._moveRight)
+        if self.hasEventFunc(MOVERIGHTHOLD_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_RIGHT_HOLD, self._moveRightHold)
+        if self.hasEventFunc(MOVELEFT_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_LEFT_UP, self._moveLeft)
+        if self.hasEventFunc(MOVELEFTHOLD_KEY):
+            self.addFocusListener(INPUT_EVENT_MOVE_LEFT_HOLD, self._moveLeftHold)
+    
+    def addFocusListener(self, key, listener):
+        self.addCustomListener(key, listener, priority = self.getEventListenerPriority)
+        self._focus_listeners.add((key, listener))
+        
+    def removeFocusListeners(self):
+        for key, listener in self._focus_listeners:
+            self.removeCustomListener(key, listener)
+        self._focus_listeners.clear()
+    
+    def getEventListenerPriority(self):
+        return self.getLayer()
 
     def checkPointWithinElement(self, x, y):
         extents = self.extents
@@ -116,55 +304,64 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         '''alias for setPos'''
         self.setPos(*args, **kwargs)
 
+    def shiftPosition(self, *args, **kwargs):
+        '''alias for movePos'''
+        self.movePos(*args, **kwargs)
+
+    def _applyPosition(self):
+        pass
+
+    def addChild(self, newchild, skip_layer_update = False):
+        self._children[newchild.id] = newchild
+        newchild.setParent(self)
+        if not skip_layer_update:
+            self.updateAllLayers()
+        return newchild
+    
+    def getChild(self, child_id):
+        try: return self._children[child_id]
+        except (KeyError, TypeError):
+            child_id = unWeakRef(child_id) #just in case weakref
+            try: 
+                child_id.id
+            except AttributeError:
+                raise KeyError("Child not found by ID: " + str(child_id))
+            else:
+                return child_id #probably an actual reference
+    
+    def getAllChildren(self):
+        return self._children.values()
+    
+    #overwritten stuff
     def setPos(self, *args, **kwargs):
         super().setPos(*args, **kwargs)
         self._applyPosition()
         for child in self.children:
             child.setPos(self._childPosition(child.id))
-
-    def shiftPosition(self, *args, **kwargs):
-        '''alias for movePos'''
-        self.movePos(*args, **kwargs)
-
+    
     def movePos(self, *args, **kwargs):
         super().movePos(*args, **kwargs)
         self._applyPosition()
         for child in self.children:
             child.movePos(*args, **kwargs)
-
-    def _applyPosition(self):
-        pass
-
-    def addChild(self, newchild):
-        self._children[newchild.id] = newchild
-        return newchild
     
-    def getChild(self, child_id):
-        return self._children[child_id]
-    
-    def getAllChildren(self):
-        return self._children.values()
-    
-    def hide(self, key = None):
-        if key is None:
-            key = self.id
-        self._hidden.add(key)
+    def sleep(self, *args, **kwargs):
+        super().sleep(*args, **kwargs)
         for child in self.getAllChildren():
-            child.hide(key)
-        self.setSpriteShow(False)
-        
-    def unhide(self, key = None):
-        if key is None:
-            key = self.id
-        self._hidden.remove(key)
-        for child in self.getAllChildren():
-            child.unhide(key)
-        if not self.isHidden():
-            self.setSpriteShow(True)
+            child.sleep(*args, **kwargs)
             
-    def isHidden(self):
-        return bool(self._hidden)
+    def wakeUp(self, *args, **kwargs):
+        super().wakeUp(*args, **kwargs)
+        for child in self.getAllChildren():
+            child.wakeUp(*args, **kwargs)
         
+    def destroy(self):
+        super().destroy()
+        self._funcs.clear()
+        for child in self.getAllChildren():
+            child.destroy()
+        self._children.clear()
+        self.removeFocusListeners()
     
     
 def _getRelevantMousePartitions(x_min, y_min, x_max, y_max):
