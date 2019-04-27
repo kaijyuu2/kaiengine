@@ -23,7 +23,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._children = {}
         self._funcs = {}
         self._focus_listeners = set()
-        self._hidden = set()
         self._focused_child_id = None
         self._parent = None
         self._layer = 0
