@@ -466,7 +466,7 @@ class sSprite(object):
         self.tex_widths = [xLeft, xRight]
         self.tex_heights = [yBottom, yTop]
 
-    def tile_texture(self, xfactor = 1.0, yfactor = 1.0):
+    def tileTexture(self, xfactor = 1.0, yfactor = 1.0):
         current = self.get_effective_dimensions()
         targetDimensions = [current[0] / xfactor, current[1] / yfactor]
         self.set_texture_dimensions(0, targetDimensions[0], 0, targetDimensions[1])

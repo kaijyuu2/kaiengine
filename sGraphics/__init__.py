@@ -97,7 +97,7 @@ sSprite
     Uses floats and goes from 0.0 to 1.0 (1.0 spans the length of the image)
     Basic state is: xLeft = 0.0, xRight = 1.0, yBottom = 0.0, yTop = 1.0
 
-    tile_texture(self, xfactor = 1.0, yfactor = 1.0)
+    tileTexture(self, xfactor = 1.0, yfactor = 1.0)
     Convenience function for set_texture_dimensions
     Automatically sets the texture dimensions while taking into account the sprite's dimensions,
     such that the texture will appear tiled appropriately.

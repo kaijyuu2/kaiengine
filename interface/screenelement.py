@@ -316,10 +316,10 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         '''alias for movePos'''
         self.movePos(*args, **kwargs)
 
-    def addChild(self, newchild, skip_layer_update = False):
+    def addChild(self, newchild, update_layers = True):
         self._children[newchild.id] = newchild
         newchild.setParent(self)
-        if not skip_layer_update:
+        if update_layers:
             self.updateAllLayers()
         return newchild
     
