@@ -28,10 +28,5 @@ class IdentifiedObject(object):
         super().__init__(*args, **kwargs)
         self.id = generateUniqueID(self.__class__.__name__)
         
-    def __eq__(self, other):
-        try: 
-            return self.id == other.id
-        except AttributeError:
-            return False
 
 GenerateUniqueID = generateUniqueID #deprecated function name

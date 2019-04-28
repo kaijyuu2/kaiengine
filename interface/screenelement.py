@@ -96,7 +96,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         #should return the highest layer used by self and/or children
         self._layer = val
         self.setSpriteLayer(self._layer)
-        return self.updateChildrenLayers(val)
+        return self.updateChildrenLayers()
         
     def updateChildrenLayers(self):
         #should return the highest used layer

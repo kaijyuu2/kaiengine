@@ -2,4 +2,4 @@
 
 from .containers import VerticalContainer, HorizontalContainer, GridContainer
 from .menus import BaseMenu
-from .toplevelelements import Scene
+from .toplevelelements import Scene, SplashScreen

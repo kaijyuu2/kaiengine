@@ -7,7 +7,7 @@ from kaiengine.gconfig import WHITE_PIXEL_FILEPATH, COLOR_BLACK
 class Scene(ScreenElement):
     '''A very basic top level element, with fade ins/outs and convenience functions to switch to different ones.'''
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, fade_in_time = 20, **kwargs):
         super().__init__(*args, **kwargs)
         #fade attributes
         self.fade_total_time = 0
@@ -20,12 +20,15 @@ class Scene(ScreenElement):
         self.getSprite().tileTexture()
         
         #setup darkener
-        self._darkener_id = self.addChild(ScreenElement(WHITE_PIXEL_FILEPATH), False)
-        darkener = self.getDarkener()
+        darkener = ScreenElement(WHITE_PIXEL_FILEPATH)
+        self._darkener_id = self.addChild(darkener, False)
         darkener.setSpriteFollowCamera(True)
         darkener.setSpriteDimensions(*getWindowDimensionsScaled())
         darkener.setSpriteColor(*COLOR_BLACK)
         darkener.setSpriteAlpha(0.0)
+        
+        if fade_in_time > 0:
+            self.fadeIn(fade_in_time)
         
         
         
@@ -82,6 +85,13 @@ class Scene(ScreenElement):
             popTopElement()
         pushTopElement(scene)
         
+    def fadeToPreviousScene(self, time):
+        self.fadeOut(time)
+        self.waitForCondition(self._fadeToPreviousScene, self.checkDoneFading)
+        
+    def _fadeToPreviousScene(self):
+        popTopElement()
+        
         
     #overwritten stuff
 
@@ -91,3 +101,43 @@ class Scene(ScreenElement):
         self.getDarkener().setLayer(lastlayer) #ensure darkener on top
         return lastlayer
     
+    
+class SplashScreen(Scene):
+    def __init__(self, *args, hang_time = 120, fade_out_time = 20, next_scenes = [], **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self._fade_out_time = fade_out_time
+        self._hang_time = hang_time
+        self._next_scenes = next_scenes
+        
+        self.waitForCondition(self.schedule, self.checkDoneFading, self.endHangTime, self._hang_time)
+        
+        
+    def endHangTime(self):
+        self.unschedule(self.endHangTime)
+        scene_type = None
+        args = None
+        kwargs = None
+        while scene_type is None:
+            try:
+                data = self._next_scenes.pop(0)
+            except IndexError:
+                break
+            try:
+                scene_type, args, kwargs = data
+            except ValueError:
+                from kaiengine.debug import debugMessage
+                debugMessage("Cannot unpack scene data. Requires 3 arguments (scene_type, args, kwargs).")
+                debugMessage(data)
+        if scene_type is None:
+            self.fadeToPreviousScene(self._fade_out_time)
+        else:
+            kwargs["next_scenes"] = self._next_scenes
+            self.fadeToScene(scene_type, self._fade_out_time, True, args, kwargs)
+        
+    #input events
+    
+    def confirm(self):
+        if self.checkDoneFading():
+            self.endHangTime()
+            return True

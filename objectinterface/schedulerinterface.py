@@ -117,7 +117,7 @@ class SchedulerInterface(SleepInterface):
         self.schedule(self._waitForCondition, 1, True, func, condition, *args, **kwargs)
         
     def _waitForCondition(self, func, condition, *args, **kwargs):
-        if condition:
+        if condition():
             func(*args, **kwargs)
             return True
         
