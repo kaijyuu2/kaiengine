@@ -698,7 +698,7 @@ class sSprite(object):
         tex_bottom = -self.tex_heights[BOTTOM] / self.original_height
         texture_array = [tex_left, tex_bottom, tex_right, tex_bottom, tex_left, tex_top,
                     tex_right, tex_top, tex_right, tex_bottom, tex_left, tex_top]
-        xleft, xright, ytop, ybottom = self.getExtents()
+        xleft, xright, ybottom, ytop = self.getExtents()
         if self.flip[Xi]:
             xleft, xright = [xright, xleft]
         if self.flip[Yi]:

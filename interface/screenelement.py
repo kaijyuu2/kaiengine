@@ -84,10 +84,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         
     @property
     def focus(self):
-        try:
-            return self.getParent()._focused_child_id == self.id
-        except AttributeError:
-            return False
+        return self.isFocused()
     @focus.setter
     def focus(self, *args, **kwargs):
         raise AttributeError("Cannot set focus directly. Set the parent's focused child instead.")
@@ -150,6 +147,12 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             return self.getChild(self._focused_child_id)
         except KeyError:
             return None
+        
+    def isFocused(self):
+        try:
+            return self.getParent()._focused_child_id == self.id
+        except AttributeError:
+            return True #top level element always focused
     
     def callEventFunc(self, key, *args, **kwargs):
         if self.hasEventFunc(key):

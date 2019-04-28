@@ -42,7 +42,13 @@ def runDelayedEvents():
     _currently_running_events = True
     for priority, val in _delayed_events.items():
         listener, args, kwargs, ID = val
-        listener(*args, **kwargs)
+        try:
+            listener(*args, **kwargs)
+        except:
+            import traceback
+            from kaiengine.debug import debugMessage
+            debugMessage("Error in delayed event.")
+            traceback.print_exc()
     _removeAllDelayEvents()
     _currently_running_events = False
     
