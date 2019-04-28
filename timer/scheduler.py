@@ -38,7 +38,8 @@ class TimedEvent(object):
         if self.paused:
             return
         try:
-            self.listener(*self.args, **self.kwargs)
+            if self.listener(*self.args, **self.kwargs):
+                self.delete_me = True
         except Exception as e:
             from kaiengine.debug import debugMessage
             debugMessage(traceback.format_exc())

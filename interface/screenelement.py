@@ -292,6 +292,12 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def checkPointWithinElement(self, x, y):
         extents = self.extents
         return extents[0] <= x <= extents[2] and extents[1] <= y <= extents[3]
+    
+    def setDimensions(self, x = None, y = None):
+        if x is None: x = self.getWidth()
+        if y is None: y = self.getHeight()
+        self.setWidth(x)
+        self.setHeight(y)
 
     def getWidth(self):
         return self.getSpriteWidth()
@@ -333,6 +339,18 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 raise KeyError("Child not found by ID: " + str(child_id))
             else:
                 return child_id #probably an actual reference
+            
+    def removeChild(self, childid):
+        child = self.getChild(childid) #cast to reference
+        childid = child.id
+        self._children.pop(childid, None)
+        child.destroy()
+        return childid
+        
+    def removeAllChildren(self):
+        for child in self.getAllChildren():
+            child.destroy()
+        self._children.clear()
     
     def getAllChildren(self):
         return self._children.values()
@@ -390,9 +408,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def destroy(self):
         super().destroy()
         self._funcs.clear()
-        for child in self.getAllChildren():
-            child.destroy()
-        self._children.clear()
+        self.removeAllChildren()
         self.removeFocusListeners()
     
     

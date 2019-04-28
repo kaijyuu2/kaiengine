@@ -111,6 +111,13 @@ class SchedulerInterface(SleepInterface):
         self._scheduled_realtime_methods.clear()
         self._scheduled_realtime_method_keys.clear()
         
+    def waitForCondition(self, func, condition, *args, **kwargs):
+        self.schedule(self._waitForCondition, 1, True, func, condition, *args, **kwargs)
+        
+    def _waitForCondition(self, func, condition, *args, **kwargs):
+        if condition:
+            func(*args, **kwargs)
+            return True
         
     #overwritten stuff
     
