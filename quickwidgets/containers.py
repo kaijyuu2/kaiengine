@@ -10,6 +10,7 @@ class _Container(ScreenElement):
         self.border = (0,0)
         self.spacing = None
         self.strict_spacing = False
+        self._update_positions = False
 
     def setBorder(self, x = None, y = None):
         if x is None: x = self.border[0]
@@ -30,13 +31,18 @@ class _Container(ScreenElement):
     def getStrictSpacing(self):
         return self.strict_spacing
     
+    def delayUpdatePositions(self):
+        if not self._update_positions:
+            self._update_positions = self.delay(self.updateContainerPositions)
+            
+    def updateContainerPositions(self):
+        self._update_positions = False
+    
     #template functions
     
     def setSpacing(self, *args, **kwargs):
         pass
         
-    def updateContainerPositions(self):
-        pass
     
     #overwritten stuff
         
@@ -58,14 +64,14 @@ class _LinearContainer(_Container):
     def addChild(self, *args, **kwargs):
         newchild = super().addChild(*args, **kwargs)
         self._child_pos_list.append(newchild.id)
-        self.updateContainerPositions()
+        self.delayUpdatePositions()
         return newchild
     
     def removeChild(self, *args, **kwargs):
         childid = super().removeChild(*args, **kwargs)
         try: self._child_pos_list.remove(childid)
         except ValueError: pass
-        self.updateContainerPositions()
+        self.delayUpdatePositions()
         return childid
     
 class VerticalContainer(_LinearContainer):
@@ -73,6 +79,7 @@ class VerticalContainer(_LinearContainer):
     #overwritten stuff
     
     def updateContainerPositions(self):
+        super().updateContainerPositions()
         maxwidth = 0
         maxheight = 0
         totalheight = self.getBorder()[1]
@@ -92,6 +99,7 @@ class HorizontalContainer(_LinearContainer):
     #overwritten stuff
     
     def updateContainerPositions(self):
+        super().updateContainerPositions()
         maxwidth = 0
         maxheight = 0
         totalwidth = self.getBorder()[0]
@@ -122,6 +130,7 @@ class GridContainer(_Container):
         self.spacing = (x,y)
         
     def updateContainerPositions(self):
+        super().updateContainerPositions()
         maxwidth = {}
         maxheight = {}
         totalelements = [0,0]
@@ -151,11 +160,13 @@ class GridContainer(_Container):
     def addChild(self, pos_tuple, *args, **kwargs):
         newchild = super().addChild(*args, **kwargs)
         self._child_pos_dict[newchild.id] = tuple(pos_tuple)
+        self.delayUpdatePositions()
         return newchild
     
     def removeChild(self, *args, **kwargs):
         childid = super().removeChild(*args, **kwargs)
         self._child_pos_dict.pop(childid, None)
+        self.delayUpdatePositions()
         return childid
     
     

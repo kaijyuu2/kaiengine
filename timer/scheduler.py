@@ -171,28 +171,29 @@ def _cleanupRealtimeScheduledEvent(listener, key):
 def _realtimeRunOnce(time, event, *args, **kwargs): #this is used so we can catch the call and delete the event
     try:
         run = not event._destroyed
-        _cleanupRealtimeEvent(event)
     except AttributeError:
         run = False
     if run: #only run if not unscheduled
         event.listener(time, *args, **kwargs)
+    if event:
+        _cleanupRealtimeScheduledEvent(event.listener, event.key)
 
 def _pauseRealtimeListener(listener, *args, **kwargs):
     for key in sorted(realtime_events.keys()):
-        if not realtimeEvent[key].paused:
-            realtimeEvent[key].pauseEvent(*args, **kwargs)
+        if not realtime_events[key].paused:
+            realtime_events[key].pauseEvent(*args, **kwargs)
             break
         
 def _pauseRealtimeListenerWithID(listener, eventid, *args, **kwargs):
-    for event in realtime_events.values():
+    for key, event in realtime_events.items():
         if event.eventid == eventid:
-            realtimeEvent[key].pauseEvent(*args, **kwargs)
+            realtime_events[key].pauseEvent(*args, **kwargs)
             break
 
 def _unpauseRealtimeListener(listener, *args, **kwargs):
     for key in sorted(realtime_events.keys()):
-        if realtimeEvent[key].paused:
-            event = realtimeEvent[key]
+        if realtime_events[key].paused:
+            event = realtime_events[key]
             pause_time = event.unpauseEvent(*args, **kwargs)
             if not event.paused:
                 event.scheduler_time += pause_time

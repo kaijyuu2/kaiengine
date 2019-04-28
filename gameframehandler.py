@@ -1,7 +1,7 @@
 
 
 from .camera import runCamera
-from .timer import Timer, scheduleRealtime, unscheduleRealtime, checkSchedule, updateTimeSinceLastFrame
+from .timer import Timer, scheduleRealtime, unscheduleRealtime, checkSchedule, updateTimeSinceLastFrame, runDelayedEvents
 from .simplefpscounter import incrementFPSCount
 from . import settings
 from .display import updateGraphics, getWindow
@@ -53,6 +53,7 @@ def gameFrame(dt):
     if main_loop:
         main_loop(dt)
     checkSchedule()
+    runDelayedEvents()
     updateGraphics()
     incrementFPSCount()
     scheduleGameFrame()

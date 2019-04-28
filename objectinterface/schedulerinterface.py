@@ -2,6 +2,7 @@
 from .sleep_interface import SleepInterface
 
 from kaiengine.timer import schedule, unschedule, scheduleRealtime, unscheduleRealtime, pauseScheduledListener, pauseScheduledListenerWithID, unpauseScheduledListener, unpauseScheduledListenerWithID, pauseRealtimeListener, pauseRealtimeListenerWithID, unpauseRealtimeListener
+from kaiengine.timer import delay, undelay
 
 from collections import defaultdict
 
@@ -14,6 +15,7 @@ class SchedulerInterface(SleepInterface):
         self._scheduled_method_keys = defaultdict(set)
         self._scheduled_realtime_methods = defaultdict(int)
         self._scheduled_realtime_method_keys = defaultdict(set)
+        self._delayed_methods = set()
 
     def schedule(self, method, *args, **kwargs):
         if not self.destroyed:
@@ -119,6 +121,20 @@ class SchedulerInterface(SleepInterface):
             func(*args, **kwargs)
             return True
         
+    def delay(self, listener, priority = 0, *args, **kwargs):
+        ID = delay(listener, priority, *args, **kwargs)
+        self._delayed_methods.add(ID)
+        return ID
+    
+    def undelay(self, ID):
+        undelay(ID)
+        self._delayed_methods.discard(ID)
+        
+    def undelayAll(self):
+        for ID in self._delayed_methods:
+            undelay(ID)
+        self._delayed_methods.clear()
+        
     #overwritten stuff
     
     def sleep(self, *args, **kwargs):
@@ -139,3 +155,4 @@ class SchedulerInterface(SleepInterface):
     def destroy(self, *args, **kwargs):
         super().destroy(*args, **kwargs)
         self.unscheduleAllListeners()
+        self.undelayAll()
