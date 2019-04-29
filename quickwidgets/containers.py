@@ -4,7 +4,7 @@ import operator
 
 from kaiengine.interface import ScreenElement
 
-class _Container(ScreenElement):
+class Container(ScreenElement):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.border = (0,0)
@@ -50,7 +50,7 @@ class _Container(ScreenElement):
         super().removeAllChildren()
         self.updateContainerPositions()
 
-class _LinearContainer(_Container):
+class _LinearContainer(Container):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._child_pos_list = []
@@ -115,7 +115,7 @@ class HorizontalContainer(_LinearContainer):
         self.setDimensions(totalwidth + self.getBorder()[0] * 2, maxheight + self.getBorder()[1] * 2)
         
         
-class GridContainer(_Container):
+class GridContainer(Container):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._child_pos_dict = {}

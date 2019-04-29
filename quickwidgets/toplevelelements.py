@@ -134,6 +134,9 @@ class SplashScreen(Scene):
         else:
             kwargs["next_scenes"] = self._next_scenes
             self.fadeToScene(scene_type, self._fade_out_time, True, args, kwargs)
+            
+    def addNextScene(self, scene, *args, **kwargs):
+        self._next_scenes.append((scene, args, kwargs))
         
     #input events
     

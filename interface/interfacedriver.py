@@ -17,6 +17,7 @@ def pushTopElement(newelement):
     _topElements.append(newelement)
     newelement.setLayer(newlayer)
     newelement._gainFocus()
+    return newelement
     
 def popTopElement():
     try: 
