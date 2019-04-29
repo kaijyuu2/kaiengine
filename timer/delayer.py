@@ -21,10 +21,10 @@ def delay(listener, priority = 0, *args, **kwargs):
             pass
         newid = generateUniqueID("DELAY_EVENT")
         try:
-            newkey = _delayed_events[priority].append(listener, args, kwargs, newid)
+            newkey = _delayed_events[priority].append((listener, args, kwargs, newid))
         except KeyError:
             _delayed_events[priority] = sDict()
-            newkey = _delayed_events[priority].append(listener, args, kwargs, newid)
+            newkey = _delayed_events[priority].append((listener, args, kwargs, newid))
         _delayed_events_ids[newid] = (priority, newkey)
         return newid
     else:
@@ -40,15 +40,16 @@ def undelay(ID):
 def runDelayedEvents():
     global _currently_running_events
     _currently_running_events = True
-    for priority, val in _delayed_events.items():
-        listener, args, kwargs, ID = val
-        try:
-            listener(*args, **kwargs)
-        except:
-            import traceback
-            from kaiengine.debug import debugMessage
-            debugMessage("Error in delayed event.")
-            traceback.print_exc()
+    for priority, data in _delayed_events.items():
+        for key, val in data.items():
+            listener, args, kwargs, ID = val
+            try:
+                listener(*args, **kwargs)
+            except:
+                import traceback
+                from kaiengine.debug import debugMessage
+                debugMessage("Error in delayed event.")
+                traceback.print_exc()
     _removeAllDelayEvents()
     _currently_running_events = False
     

@@ -42,6 +42,9 @@ class Container(ScreenElement):
     
     def setSpacing(self, *args, **kwargs):
         pass
+    
+    def getChildKey(self, *args, **kwargs):
+        return None
         
     
     #overwritten stuff
@@ -56,7 +59,20 @@ class _LinearContainer(Container):
         self._child_pos_list = []
         self.spacing = 0
         
+    def insertChild(self, index, *args, **kwargs):
+        newchild = self.addChild(*args, **kwargs)
+        newchildid = self._child_pos_list.pop(-1)
+        self._child_pos_list.insert(index, newchildid)
+        return newchild
+        
     #overwritten stuff
+    
+    def getChildKey(self, childid):
+        childid = self.getChild(childid).id #in case child reference was passed
+        for i, child in enumerate(self._child_pos_list):
+            if child.id == childid:
+                return i
+        raise IndexError("Child ID not found: " + str(childid))
     
     def setSpacing(self, newval):
         self.spacing = newval
@@ -124,6 +140,10 @@ class GridContainer(Container):
             
     #overwritten stuff
     
+    def getChildKey(self, childid):
+        childid = self.getChild(childid).id
+        return self._child_pos_dict[childid]
+    
     def setSpacing(self, x = None, y = None):
         if x is None: x = self.getSpacing()[0]
         if y is None: y = self.getSpacing()[1]
@@ -157,8 +177,8 @@ class GridContainer(Container):
         self.setDimensions(totalmaxwidth + self.getBorder()[0], totalmaxheight + self.getBorder()[1])
             
     
-    def addChild(self, pos_tuple, *args, **kwargs):
-        newchild = super().addChild(*args, **kwargs)
+    def addChild(self, child, pos_tuple, *args, **kwargs):
+        newchild = super().addChild(child, *args, **kwargs)
         self._child_pos_dict[newchild.id] = tuple(pos_tuple)
         self.delayUpdatePositions()
         return newchild

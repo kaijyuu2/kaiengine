@@ -298,7 +298,7 @@ class sSprite(object):
 
     @property
     def size(self):
-        return self._size[DEFAULT_SIZE_KEY]
+        return self.getSize()
     @size.setter
     def size(self, newvalue):
         self.setSize(*newvalue)
@@ -498,10 +498,8 @@ class sSprite(object):
         except KeyError:
             pass
 
-    def get_size(self, key = DEFAULT_SIZE_KEY):
-        if key not in self._size.keys():
-            return [1.0,1.0]
-        return self._size[key]
+    def getSize(self, key = DEFAULT_SIZE_KEY):
+        return self._size.get(key, [1.0,1.0])
 
     def get_effective_size(self):
         returnval = [1.0,1.0]

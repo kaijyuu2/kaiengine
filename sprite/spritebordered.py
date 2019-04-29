@@ -115,8 +115,8 @@ class SpriteBordered(graphicobject.GraphicObject):
         self.update_sprites()
 
 
-    def setPos(self, x = None, y = None):
-        super(SpriteBordered, self).setPos(x,y)
+    def setPos(self, *args, **kwargs):
+        super(SpriteBordered, self).setPos(*args, **kwargs)
         try:
             self.sprites[0]
         except KeyError:
@@ -195,13 +195,13 @@ class SpriteBordered(graphicobject.GraphicObject):
     def get_border_dim(self):
         return [self.border_width,self.border_height]
 
-    def get_width(self):
+    def getWidth(self):
         try:
             return self.width
         except:
             return 0
 
-    def get_height(self):
+    def getHeight(self):
         try:
             return self.height
         except:

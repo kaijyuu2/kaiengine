@@ -14,6 +14,8 @@ from .gconfig import *
 Xi = 0
 Yi = 1
 
+DEFAULT_SIZE_KEY = "_GRAPHIC_OBJECT_DEFAULT_SIZE_KEY"
+
 
 class GraphicObject(BaseObject, IdentifiedObject):
 
@@ -24,7 +26,8 @@ class GraphicObject(BaseObject, IdentifiedObject):
     def __init__(self, path = None, layer = -1, show = True, *args, **kwargs):
         self._pos = [0,0]
         self._layer = layer
-        self._size = [1.0,1.0]
+        self._size = sDict()
+        self._size[DEFAULT_SIZE_KEY] = [1.0, 1.0]
         self._color = [1.0,1.0,1.0]
         self._alpha = 1.0
         self._show = show
@@ -139,11 +142,11 @@ class GraphicObject(BaseObject, IdentifiedObject):
 
     @property
     def size(self):
-        return self._size
+        return self.getSize()
     @size.setter
-    def size(self, newvalue):
-        self._size = newvalue
-        self.update_size()
+    def size(self, *args, **kwargs):
+        self.setSize(*args, **kwargs)
+        
     def update_size(self):
         for sprite in self.sprites.values():
             sprite.size = self.size
@@ -259,13 +262,23 @@ class GraphicObject(BaseObject, IdentifiedObject):
 
     def set_texture_dimensions(self, xLeft = None, xRight = None, yBottom = None, yTop = None):
         debugMessage("set_texture_dimensions function not defined for " + self.getFilename())
+        
+    def getSize(self, key = DEFAULT_SIZE_KEY):
+        return self._size.get(key, (1.0,1.0))
 
-    def setSize(self, x = None, y = None):
+    def setSize(self, x = None, y = None, key = DEFAULT_SIZE_KEY):
         if x is None:
-            x = self.size[Xi]
+            x = self.getSize(key)[Xi]
         if y is None:
-            y = self.size[Yi]
-        self.size = [x,y]
+            y = self.getSize(key)[Yi]
+        self._size[key] = (x,y)
+        
+    def get_effective_size(self):
+        returnval = [1.0,1.0]
+        for size in self._size.values():
+            returnval[Xi] *= size[Xi]
+            returnval[Yi] *= size[Yi]
+        return returnval
 
     def setColor(self, r = None, g = None, b = None, alpha = None):
         #alpha setting is completely ignored
@@ -315,6 +328,49 @@ class GraphicObject(BaseObject, IdentifiedObject):
         except:
             debugMessage("effective width and/or height not defined for " + self.getFilename())
             return [0,0]
+        
+    def getExtents(self):
+        effective_size = self.get_effective_size()
+        width = self.width * effective_size[Xi]
+        height = self.height * effective_size[Yi]
+        if self.center[Xi]:
+            center_xoffset = width / 2
+        else:
+            center_xoffset = 0
+        if self.center[Yi]:
+            center_yoffset = height / 2
+        else:
+            center_yoffset = 0
+        xoffset = self.offset[Xi] * effective_size[Xi]
+        yoffset = self.offset[Yi] * effective_size[Yi]
+        xleft = self.pos[Xi] + xoffset - center_xoffset
+        xright = self.pos[Xi] + xoffset - center_xoffset + width
+        ybottom = self.pos[Yi] + yoffset - center_yoffset
+        ytop = self.pos[Yi] + yoffset - center_yoffset + height
+        for key, offset in self.other_offsets.items():
+            try:
+                xleft += offset[Xi]
+                xright += offset[Xi]
+                ybottom += offset[Yi]
+                ytop += offset[Yi]
+            except TypeError:
+                debugMessage("error with graphical offset. Key: " + key)
+                self.other_offsets[key] = [0,0]
+        return xleft, xright, ybottom, ytop
+
+        
+    def getExtentsMinusCamera(self):
+        extents = list(self.getExtents())
+        try:
+            offset = self.other_offsets[CAMERA_KEY]
+            extents[0] -= offset[0]
+            extents[1] -= offset[0]
+            extents[2] -= offset[1]
+            extents[3] -= offset[1]
+        except KeyError:
+            pass
+        return extents
+
         
     def getScreenPosition(self, centered = False):
         if centered:

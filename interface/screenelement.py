@@ -245,6 +245,18 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         if not returnval and self._mouse_over and not inside:
             returnval = self.callEventFunc(MOUSELEAVE_KEY)
         return returnval
+    
+    def setSelfFocused(self):
+        #convenience function
+        parent = self.getParent()
+        if parent:
+            parent.setFocus(self)
+            
+    def clearParentFocus(self):
+        #convenience function
+        parent = self.getParent()
+        if parent:
+            parent.setFocus(None)
             
     def _gainFocus(self):
         self.addFocusListeners()
@@ -301,6 +313,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         if y is None: y = self.getHeight()
         self.setWidth(x)
         self.setHeight(y)
+
+    def getDimensions(self):
+        return self.getWidth(), self.getHeight()
 
     def getWidth(self):
         return self.getSpriteWidth()

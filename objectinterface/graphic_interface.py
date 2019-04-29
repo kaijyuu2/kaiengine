@@ -242,6 +242,12 @@ class GraphicInterface(PositionInterface, SleepInterface):
             if y == None: y = self._dimensions[1]
         self._dimensions = [x,y]
         self._updateDimensions()
+        
+    def setSpriteWidth(self, newval):
+        self.setSpriteDimensions(newval)
+        
+    def setSpriteHeight(self, newval):
+        self.setSpriteDimensions(y=newval)
 
     def tileSprite(self):
         self._tiled = not self._tiled

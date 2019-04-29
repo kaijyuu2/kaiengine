@@ -115,7 +115,7 @@ sSprite
     Specifying a key will allow you to create a new size modifier on top of the default one.
     They stack multiplicatively (two 3.0 size mods will result in an effective size of 9.0)
 
-    get_size(self, key = DEFAULT_SIZE_KEY)
+    getSize(self, key = DEFAULT_SIZE_KEY)
     Returns the sprite's size multiplier
     See setSize for details on what size does
     Returns [1.0,1.0] with an invalid key
