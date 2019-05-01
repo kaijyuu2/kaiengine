@@ -47,15 +47,18 @@ class Button(ScreenElement):
         self.getHighlight().setSpriteShow(False)
     
     def setPressedDown(self):
-        self.setSpriteGraphic(self.default_pressed_graphic)
+        self.setSprite(self.default_pressed_graphic)
         
     def setUnpressed(self):
-        self.setSpriteGraphic(self.default_graphic)
+        self.setSprite(self.default_graphic)
         
     def _updateHighlight(self):
         self.getHighlight().setDimensions(*self.getDimensions())
         
     #event stuff
+    
+    def mouseenter(self):
+        self.setSelfFocused()
     
     def confirmhold(self):
         self.setPressedDown()

@@ -305,8 +305,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         return self.getLayer()
 
     def checkPointWithinElement(self, x, y):
-        extents = self.extents
-        return extents[0] <= x <= extents[2] and extents[1] <= y <= extents[3]
+        extents = self.getExtents()
+        return extents[0] <= x <= extents[1] and extents[2] <= y <= extents[3]
     
     def setDimensions(self, x = None, y = None):
         if x is None: x = self.getWidth()
