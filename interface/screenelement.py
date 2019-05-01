@@ -153,6 +153,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             return self.getParent()._focused_child_id == self.id
         except AttributeError:
             return True #top level element always focused
+        
+    def hasFocusedChild(self):
+        return self._focused_child_id != None
     
     def callEventFunc(self, key, *args, **kwargs):
         if self.hasEventFunc(key):

@@ -45,6 +45,9 @@ class Container(ScreenElement):
     
     def getChildKey(self, *args, **kwargs):
         return None
+    
+    def getChildByKey(self, *args, **kwargs):
+        return None
         
     
     #overwritten stuff
@@ -68,15 +71,21 @@ class _LinearContainer(Container):
         newchildid = self._child_pos_list.pop(-1)
         self._child_pos_list.insert(index, newchildid)
         return newchild
+    
+    def getLength(self):
+        return len(self._child_pos_list)
         
     #overwritten stuff
     
     def getChildKey(self, childid):
         childid = self.getChild(childid).id #in case child reference was passed
-        for i, child in enumerate(self._child_pos_list):
-            if child.id == childid:
+        for i, otherchildid in enumerate(self._child_pos_list):
+            if otherchildid == childid:
                 return i
         raise IndexError("Child ID not found: " + str(childid))
+        
+    def getChildByKey(self, child_key):
+        return self.getChild(self._child_pos_list[child_key])
     
     def setSpacing(self, newval):
         self.spacing = newval
@@ -95,6 +104,19 @@ class _LinearContainer(Container):
         return childid
     
 class VerticalContainer(_LinearContainer):
+    
+    #input stuff
+    
+    def moveup(self):
+        if self.hasFocusedChild():
+            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) - 1) % self.getLength()))
+            return True
+        
+    def movedown(self):
+        if self.hasFocusedChild():
+            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) + 1) % self.getLength()))
+            return True
+            
     
     #overwritten stuff
     
@@ -115,6 +137,18 @@ class VerticalContainer(_LinearContainer):
         self.setDimensions(maxwidth + self.getBorder()[0] * 2, totalheight + self.getBorder()[1])
         
 class HorizontalContainer(_LinearContainer):
+    
+    #input stuff
+    
+    def moveleft(self):
+        if self.hasFocusedChild():
+            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) - 1) % self.getLength()))
+            return True
+        
+    def moveright(self):
+        if self.hasFocusedChild():
+            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) + 1) % self.getLength()))
+            return True
     
     #overwritten stuff
     
