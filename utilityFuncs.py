@@ -6,6 +6,19 @@ from kaiengine.localization import getLocaleUnitLengths, getLocaleUnit, getLocal
 from math import floor, log
 from numpy import array, linalg
 
+#a simple mouse tracker
+_mouse_x = 0
+_mouse_y = 0
+
+def setMousePosition(x, y, *args, **kwargs):
+    global _mouse_x, _mouse_y
+    _mouse_x = x
+    _mouse_y = y
+    
+def getMousePosition():
+    '''Returns the current mouse position'''
+    return (_mouse_x, _mouse_y)
+
 def getDistance(source, dest):
     a = array((source[0], source[1]))
     b = array((dest[0], dest[1]))

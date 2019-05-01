@@ -24,6 +24,7 @@ class MenuTemplate(ScreenElement):
         super().__init__(sprite_path, **kwargs)
         if button_type is not None:
             self.button_type = button_type
+        self._first_button = True
         
         #defaults
         self.border = (8,8)
@@ -32,7 +33,11 @@ class MenuTemplate(ScreenElement):
         self.setPos(*map(operator.truediv, getWindowDimensionsScaled(), (2,2)))
         
     def addButton(self, *args, **kwargs):
-        self.addChild(self.button_type(*args, **kwargs))
+        ID = self.addChild(self.button_type(*args, **kwargs))
+        if self._first_button:
+            self.setFocus(ID)
+            self._first_button = False
+        return ID
     
     #overwritten stuff
     

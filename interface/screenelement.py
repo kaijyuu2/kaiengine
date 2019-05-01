@@ -131,12 +131,13 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             oldfocus = self.getFocusedChild()
             if oldfocus:
                 oldfocus._loseFocus()
+            self._focused_child_id = ID
             if ID is not None:
                 if ID in self._children:
-                    self._focused_child_id = ID
                     self.getChild(ID)._gainFocus()
                 else:
                     debugMessage("Probable error: child ID not found when setting focus: " + str(ID))
+                    self._focused_child_id = None
         
     def clearFocus(self):
         #convenience function
@@ -179,9 +180,10 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 return self.callEventFunc(CONFIRM_KEY)
         return False
     
-    def _activateConfirmHold(self):
+    def _activateConfirmHold(self, x = None, y = None):
         if self.focus:
-            return self.callEventFunc(CONFIRMHOLD_KEY)
+            if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
+                return self.callEventFunc(CONFIRMHOLD_KEY)
         return False
         
     def _activateCancel(self):
@@ -244,10 +246,13 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             if not returnval:
                 returnval = self.callEventFunc(MOUSEOVER_KEY, x, y, dx, dy)
         else:
+            if not returnval and self._mouse_over:
+                returnval = self.callEventFunc(MOUSELEAVE_KEY)
             self._mouse_over = False
-        if not returnval and self._mouse_over and not inside:
-            returnval = self.callEventFunc(MOUSELEAVE_KEY)
         return returnval
+    
+    def isMousedOver(self):
+        return self._mouse_over
     
     def setSelfFocused(self):
         #convenience function

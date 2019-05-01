@@ -1,8 +1,10 @@
 
+import math
 
 from . import eventdriver
 from .eventkeys import *
 from kaiengine.input import standardizedKey
+from kaiengine.utilityFuncs import setMousePosition
 
 
 def _initListener(self, event_key, func, priority, lock, sleep_when_unfocused):
@@ -207,11 +209,12 @@ def mouseReleaseEvent(x, y, button):
     '''Process a mouse release event. If any listener returns True, halt processing.'''
     button = standardizedKey(button)
     eventdriver._callEvent(EVENT_MOUSE_MOVE, x, y, 0, 0)
-    eventdriver._callEvent(EVENT_MOUSE_RELEASE, button)
+    eventdriver._callEvent(EVENT_MOUSE_RELEASE, button, x, y)
 
 def mouseDragEvent(x, y, dx, dy, button):
     '''Process a mouse drag event. If any listener returns True, halt processing.'''
     button = standardizedKey(button)
+    eventdriver._callEvent(EVENT_MOUSE_MOVE, x, y, dx, dy)
     eventdriver._callEvent(EVENT_MOUSE_DRAG, x, y, dx, dy, button)
 
 def mouseMoveEvent(x,
@@ -252,3 +255,6 @@ def customEvent(key, *args, **kwargs):
 
 def callQuery(key, *args, **kwargs):
     return eventdriver._callQuery(key, *args, **kwargs)
+
+
+addMouseMoveListener(setMousePosition, math.inf)

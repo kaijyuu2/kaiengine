@@ -3,6 +3,7 @@ from kaiengine.gconfig import *
 from kaiengine.event import customEvent, addKeyPressListener, addKeyReleaseListener, addMousePressListener, addMouseReleaseListener
 from kaiengine.settings import settings
 from kaiengine.timer import schedule, unschedule
+from kaiengine.utilityFuncs import getMousePosition
 
 from kaiengine.input.keys import *
 
@@ -23,13 +24,16 @@ def createBindingRelayer(event_type, hold_func):
 def _fireHeldKeyEvents():
     binds = settings.getValue(DYNAMIC_SETTINGS_KEY_BINDS)
     for key in _held_keys:
+        args = []
+        if key in (KAI_KEY_MOUSE_LEFT, KAI_KEY_MOUSE_RIGHT):
+            args = list(getMousePosition())
         key += INPUT_EVENT_TYPE_HOLD
         try:
-            bind = binds[key]
+            args.insert(0,binds[key])
         except KeyError:
             pass
         else:
-            customEvent(bind)
+            customEvent(*args)
 
 def startHeld(kai_key):
     if len(_held_keys) == 0:

@@ -59,6 +59,13 @@ class Button(ScreenElement):
     
     def mouseenter(self):
         self.setSelfFocused()
+        
+    def mouseover(self, *args, **kwargs):
+        if not self.isFocused():
+            self.setSelfFocused()
+        
+    def mouseleave(self):
+        self.setUnpressed()
     
     def confirmhold(self):
         self.setPressedDown()
