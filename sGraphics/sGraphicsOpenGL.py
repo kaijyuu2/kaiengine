@@ -430,7 +430,7 @@ class sSprite(object):
                 self._update_all = True
             self._height = newvalue
 
-    def set_dimensions(self, width = None, height = None):
+    def setDimensions(self, width = None, height = None):
         if width is not None:
             self.width = width
         if height is not None:

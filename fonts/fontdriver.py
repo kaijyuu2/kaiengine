@@ -501,4 +501,4 @@ class FontDriver(object):
 
 def set_pixel_border(sprite): #set one pixel border. Don't call multiple times
     sprite.set_texture_dimensions(sprite.tex_widths[0] + 1, sprite.tex_widths[1] - 1, sprite.tex_heights[0] + 1, sprite.tex_heights[1] - 1)
-    sprite.set_dimensions(sprite.width -2, sprite.height -2)
+    sprite.setDimensions(sprite.width -2, sprite.height -2)

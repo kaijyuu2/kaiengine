@@ -392,7 +392,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def _updateDimensions(self):
         try:
-            try: self.sprite.set_dimensions(*self._dimensions)
+            try: self.sprite.setDimensions(*self._dimensions)
             except TypeError: pass
             if self._tiled:
                 self.sprite.set_texture_dimensions(0, self.sprite.width, 0, self.sprite.height)

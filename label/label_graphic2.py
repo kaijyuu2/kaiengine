@@ -261,7 +261,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
 
     def _setPixelBorder(self): #set one pixel border. Don't call multiple times
         self.set_texture_dimensions(self.tex_widths[0] + 1, self.tex_widths[1] - 1, self.tex_heights[0] + 1, self.tex_heights[1] - 1)
-        self.set_dimensions(self.width -2, self.height -2)
+        self.setDimensions(self.width -2, self.height -2)
 
     def destroy(self):
         if LabelGraphic2 is not None: #end of game error suppression:

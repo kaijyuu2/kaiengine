@@ -97,7 +97,7 @@ class SpriteGlow(Sprite):
 
     def _updateGlowDimensions(self):
         try:
-            self._glow_sprite.set_dimensions(self.width, self.height)
+            self._glow_sprite.setDimensions(self.width, self.height)
         except AttributeError:
             pass
 

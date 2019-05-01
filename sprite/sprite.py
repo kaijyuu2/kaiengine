@@ -183,7 +183,7 @@ class Sprite(IdentifiedObject, sGraphics.sSprite):
 
     def set_pixel_border(self): #set one pixel border. Don't call multiple times
         self.set_texture_dimensions(self.tex_widths[0] + 1, self.tex_widths[1] - 1, self.tex_heights[0] + 1, self.tex_heights[1] - 1)
-        self.set_dimensions(self.width -2, self.height -2)
+        self.setDimensions(self.width -2, self.height -2)
 
     def update_grid_texture(self):
         if self.sheet_type == SHEET_PROPORTIONAL:

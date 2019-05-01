@@ -72,9 +72,9 @@ class SpriteMulti(graphicobject.GraphicObject):
         for sprite in list(self.sprites.values()):
             sprite.setOffset(*args, **kwargs)
 
-    def set_dimensions(self, *args, **kwargs):
+    def setDimensions(self, *args, **kwargs):
         for sprite in list(self.sprites.values()):
-            sprite.set_dimensions(*args, **kwargs)
+            sprite.setDimensions(*args, **kwargs)
 
     def setPos(self, *args, **kwargs):
         super(SpriteMulti, self).setPos(*args, **kwargs)

@@ -285,7 +285,7 @@ class Label_Graphic(Label_Base, GraphicObject):
         self.update_other_offsets()
 
 
-    def set_dimensions(self, x = None, y = None):
+    def setDimensions(self, x = None, y = None):
         if x is None: x = self.width
         if y is None: y = self.height
         if x != self.width or y != self.height:

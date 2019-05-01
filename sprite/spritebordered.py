@@ -4,8 +4,7 @@ import kaiengine.display as display
 import kaiengine.graphicobject as graphicobject
 from kaiengine.resource import toStringPath
 from kaiengine.debug import debugMessage
-import os
-import traceback
+import traceback, copy
 
 BORDERED_POS_KEY = "BORDERED_POS_KEY"
 BORDERED_CENTER_KEY = "BORDERED_CENTER_KEY"
@@ -46,6 +45,7 @@ class SpriteBordered(graphicobject.GraphicObject):
         self.border_width = 0
         self.border_height = 0
         self._tiled = tiled
+        self._offset = (0,0)
 
         self.add_graphic()
 
@@ -86,12 +86,35 @@ class SpriteBordered(graphicobject.GraphicObject):
         if self._tiled != newvalue:
             self._tiled = newvalue
             self.update_dimensions()
+            
+    @property
+    def offset(self):
+        return self._offset
+    @offset.setter
+    def offset(self, newvalue):
+        self.setOffset(*newvalue)
 
-    def setOffset(self, *args, **kwargs): #TODO: make this not look glitchy
+    @property
+    def other_offsets(self):
+        try:
+            offsets = copy.deepcopy(list(self.sprites.values())[0].other_offsets) #just get one of these
+            offsets.pop(BORDERED_POS_KEY, None) #this is fairly shitty... reimplement with parent owning canon copy of offsets?
+            offsets.pop(BORDERED_CENTER_KEY, None)
+            return offsets
+        except IndexError:
+            return {}
+    @other_offsets.setter
+    def other_offsets(self, *args, **kwargs):
+        debugMessage("Cannot set other_offsets directly")
+
+    def setOffset(self, x = None, y = None): #TODO: make this not look glitchy
+        x = x if x is not None else self._offset[0]
+        y = y if y is not None else self._offset[1]
+        self._offset = (x,y)
         for sprite in list(self.sprites.values()):
-            sprite.setOffset(*args, **kwargs)
+            sprite.setOffset(*self._offset)
 
-    def set_dimensions(self, x = None, y = None):
+    def setDimensions(self, x = None, y = None):
         if x is not None:
             self._width = x
         if y is not None:
@@ -149,13 +172,15 @@ class SpriteBordered(graphicobject.GraphicObject):
             self.sprites[TOP_LEFT].pos = [0, self.height - self.border_height]
             self.sprites[TOP_LEFT].height = self.border_height
             self.sprites[TOP_LEFT].width = self.border_width
+            self.sprites[TOP_LEFT].set_texture_dimensions(0.0, self.sprites[TOP_LEFT].width, self.sprites[TOP_LEFT].original_height - self.sprites[TOP_LEFT].height,self.sprites[TOP_LEFT].original_height)
             self.sprites[TOP].pos = [self.border_width, self.height - self.border_height]
             self.sprites[TOP].width = self.width - 2 * self.border_width
             self.sprites[TOP].height = self.border_height
-            self.sprites[TOP].set_texture_dimensions(0.0, self.sprites[TOP].width, 0.0,self.sprites[TOP].height)
+            self.sprites[TOP].set_texture_dimensions(0.0, self.sprites[TOP].width, self.sprites[TOP].original_height - self.sprites[TOP].height,self.sprites[TOP].original_height)
             self.sprites[TOP_RIGHT].pos = [self.width - self.border_width, self.height - self.border_height]
             self.sprites[TOP_RIGHT].height = self.border_height
             self.sprites[TOP_RIGHT].width = self.border_width
+            self.sprites[TOP_RIGHT].set_texture_dimensions(self.sprites[TOP_RIGHT].original_width - self.sprites[TOP_RIGHT].width, self.sprites[TOP_RIGHT].original_width, self.sprites[TOP_RIGHT].original_height - self.sprites[TOP_RIGHT].height,self.sprites[TOP_RIGHT].original_height)
             self.sprites[LEFT].pos = [0, self.border_height]
             self.sprites[LEFT].height = self.height - 2 * self.border_height
             self.sprites[LEFT].width = self.border_width
@@ -174,13 +199,15 @@ class SpriteBordered(graphicobject.GraphicObject):
             self.sprites[BOTTOM_LEFT].pos = [0,0]
             self.sprites[BOTTOM_LEFT].height = self.border_height
             self.sprites[BOTTOM_LEFT].width = self.border_width
+            self.sprites[BOTTOM_LEFT].set_texture_dimensions(0.0, self.sprites[BOTTOM_LEFT].width, 0.0, self.sprites[BOTTOM_LEFT].height)
             self.sprites[BOTTOM].pos = [self.border_width,0]
             self.sprites[BOTTOM].width = self.width - 2 * self.border_width
             self.sprites[BOTTOM].height = self.border_height
-            self.sprites[BOTTOM].set_texture_dimensions(0.0, self.sprites[BOTTOM].width, 0.0, self.sprites[BOTTOM].height)
+            self.sprites[BOTTOM].set_texture_dimensions(self.sprites[BOTTOM].original_width - self.sprites[BOTTOM].width, self.sprites[BOTTOM].original_width, 0.0, self.sprites[BOTTOM].height)
             self.sprites[BOTTOM_RIGHT].pos = [self.width - self.border_width, 0]
             self.sprites[BOTTOM_RIGHT].height = self.border_height
             self.sprites[BOTTOM_RIGHT].width = self.border_width
+            self.sprites[BOTTOM_RIGHT].set_texture_dimensions(self.sprites[BOTTOM_RIGHT].original_width - self.sprites[BOTTOM_RIGHT].width, self.sprites[BOTTOM_RIGHT].original_width, 0.0, self.sprites[BOTTOM_RIGHT].height)
         except Exception as e:
             debugMessage(traceback.format_exc())
             debugMessage(e)

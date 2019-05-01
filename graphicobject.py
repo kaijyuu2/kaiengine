@@ -245,20 +245,20 @@ class GraphicObject(BaseObject, IdentifiedObject):
     def setOffset(self, x = None, y = None):
         debugMessage("setOffset function not defined for " + self.getFilename())
 
-    def append_offset(self, x = 0, y = 0):
+    def append_offset(self, *args, **kwargs):
         for sprite in self.sprites.values():
-            sprite.append_offset(x,y)
+            sprite.append_offset(*args, **kwargs)
 
-    def remove_offset(self, index):
+    def remove_offset(self, *args, **kwargs):
         for sprite in self.sprites.values():
-            sprite.remove_offset(index)
+            sprite.remove_offset(*args, **kwargs)
 
-    def change_offset(self, index, x = None, y = None):
+    def change_offset(self, *args, **kwargs):
         for sprite in self.sprites.values():
-            sprite.change_offset(index, x, y)
+            sprite.change_offset(*args, **kwargs)
 
-    def set_dimensions(self, width = None, height = None):
-        debugMessage("set_dimensions function not defined for " + self.getFilename())
+    def setDimensions(self, *args, **kwargs):
+        debugMessage("setDimensions function not defined for " + self.getFilename())
 
     def set_texture_dimensions(self, xLeft = None, xRight = None, yBottom = None, yTop = None):
         debugMessage("set_texture_dimensions function not defined for " + self.getFilename())

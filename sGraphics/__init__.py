@@ -89,7 +89,7 @@ sSprite
     Sets the update_image flag, unlike setting the other_offsets attribute directly would
     If index does not exist, a new one is created.
 
-    set_dimensions(self, width = None, height = None)
+    setDimensions(self, width = None, height = None)
     Sets the width and height of the sprite, if you want it different from the image file's sizes
 
     set_texture_dimensions(self, xLeft = None, xRight = None, yBottom = None, yTop = None)

@@ -52,6 +52,10 @@ class Container(ScreenElement):
     def removeAllChildren(self):
         super().removeAllChildren()
         self.updateContainerPositions()
+        
+    def setDimensions(self, *args, **kwargs):
+        super().setDimensions(*args, **kwargs)
+        self._applyChildrenPositions()
 
 class _LinearContainer(Container):
     def __init__(self, *args, **kwargs):
@@ -108,7 +112,7 @@ class VerticalContainer(_LinearContainer):
             child.setElementPosition(self.getBorder()[0], totalheight)
             if not self.getStrictSpacing():
                 totalheight += child.getHeight()
-        self.setDimensions(maxwidth + self.getBorder()[0] * 2, totalheight + self.getBorder()[1] * 2)
+        self.setDimensions(maxwidth + self.getBorder()[0] * 2, totalheight + self.getBorder()[1])
         
 class HorizontalContainer(_LinearContainer):
     
@@ -128,7 +132,7 @@ class HorizontalContainer(_LinearContainer):
             child.setElementPosition(totalwidth, self.getBorder()[1])
             if not self.getStrictSpacing():
                 totalwidth += child.getWidth() 
-        self.setDimensions(totalwidth + self.getBorder()[0] * 2, maxheight + self.getBorder()[1] * 2)
+        self.setDimensions(totalwidth + self.getBorder()[0], maxheight + self.getBorder()[1] * 2)
         
         
 class GridContainer(Container):
