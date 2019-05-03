@@ -34,7 +34,15 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             except AttributeError:
                 pass
             try:
-                self._funcs[string] = kwargs[string]
+                newfunc = kwargs[string]
+                try:
+                    oldfunc = self._funcs[string]
+                    def combinedfunc(*args, **kwargs): #create a pseudo super 
+                        oldfunc()
+                        newfunc()
+                    self._funcs[string] = combinedfunc
+                except KeyError:
+                    self._funcs[string] = newfunc
             except KeyError:
                 pass
         if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
