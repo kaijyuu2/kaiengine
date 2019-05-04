@@ -17,7 +17,7 @@ DEFAULT_INPUT_LOCK = "_DEFAULT_INPUT_LOCK"
 
 class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     
-    _focus_event_keys = copy.copy(FOCUS_EVENT_KEYS)
+    _keybind_map = copy.deepcopy(KEYBIND_MAP)
     _other_event_keys = copy.copy(OTHER_EVENT_KEYS)
 
     def __init__(self, *args, **kwargs):
@@ -31,7 +31,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._mouse_over = False
         self._element_position = (0,0)
         self._lock_input = set()
-        for string in self._focus_event_keys + self._other_event_keys:
+        for string in list(self._keybind_map.keys()) + list(self._other_event_keys):
             try:
                 self._funcs[string] = getattr(self, string)
             except AttributeError:
@@ -192,68 +192,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         #convenience function for delaying a custom event
         return lambda: customEvent(key, *args, **kwargs)
     
-    def _activateConfirm(self, x = None, y = None):
-        if self.isFullyFocused() and not self.isInputLocked():
-            if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
-                return self.callEventFunc(CONFIRM_KEY)
-        return False
-    
-    def _activateConfirmHold(self, x = None, y = None):
-        if self.isFullyFocused() and not self.isInputLocked():
-            if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
-                return self.callEventFunc(CONFIRMHOLD_KEY)
-        return False
-        
-    def _activateCancel(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(CANCEL_KEY)
-        return False
-    
-    def _activateCancelHold(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(CANCELHOLD_KEY)
-        return False
-        
-    def _moveUp(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVEUP_KEY)
-        return False
-    
-    def _moveUpHold(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVEUPHOLD_KEY)
-        return False
-        
-    def _moveDown(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVEDOWN_KEY)
-        return False
-    
-    def _moveDownHold(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVEDOWNHOLD_KEY)
-        return False
-        
-    def _moveLeft(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVELEFT_KEY)
-        return False
-    
-    def _moveLeftHold(self):
-        if self.focus and not self.isInputLocked():
-            return self.callEventFunc(MOVELEFTHOLD_KEY)
-        return False
-        
-    def _moveRight(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVERIGHT_KEY)
-        return False
-    
-    def _moveRightHold(self):
-        if self.isFullyFocused() and not self.isInputLocked():
-            return self.callEventFunc(MOVERIGHTHOLD_KEY)
-        return False
-    
     def _mouseMove(self, x, y, dx, dy):
         returnval = False
         inside = self.checkPointWithinElement(x, y)
@@ -293,35 +231,17 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self.callEventFunc(LOSEFOCUS_KEY)
             
     def addFocusListeners(self):
-        if self.hasEventFunc(CONFIRM_KEY):
-            self.addFocusListener(INPUT_EVENT_CONFIRM_UP, self._activateConfirm)
-        if self.hasEventFunc(CONFIRMHOLD_KEY):
-            self.addFocusListener(INPUT_EVENT_CONFIRM_HOLD, self._activateConfirmHold)
-        if self.hasEventFunc(CANCEL_KEY):
-            self.addFocusListener(INPUT_EVENT_CANCEL_UP, self._activateCancel)
-        if self.hasEventFunc(CANCELHOLD_KEY):
-            self.addFocusListener(INPUT_EVENT_CANCEL_HOLD, self._activateCancelHold)
-        if self.hasEventFunc(MOVEUP_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_UP_UP, self._moveUp)
-        if self.hasEventFunc(MOVEUPHOLD_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_UP_HOLD, self._moveUpHold)
-        if self.hasEventFunc(MOVEDOWN_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_DOWN_UP, self._moveDown)
-        if self.hasEventFunc(MOVEDOWNHOLD_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_DOWN_HOLD, self._moveDownHold)
-        if self.hasEventFunc(MOVERIGHT_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_RIGHT_UP, self._moveRight)
-        if self.hasEventFunc(MOVERIGHTHOLD_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_RIGHT_HOLD, self._moveRightHold)
-        if self.hasEventFunc(MOVELEFT_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_LEFT_UP, self._moveLeft)
-        if self.hasEventFunc(MOVELEFTHOLD_KEY):
-            self.addFocusListener(INPUT_EVENT_MOVE_LEFT_HOLD, self._moveLeftHold)
+        for key, input_keys in self._keybind_map.items():
+            for input_key in input_keys:
+                self._addFocusListener(key, input_key)
+            
+    def _addFocusListener(self, key, input_key):
+        if self.hasEventFunc(key):
+            self.addCustomListener(input_key, lambda x=None,y=None: self.callEventFunc(key) if self._checkFocusListenerConditions(x,y) else None, priority = self.getEventListenerPriority)
+            
+    def _checkFocusListenerConditions(self, x, y):
+        return self.isFullyFocused() and not self.isInputLocked() and not (x is not None and not self.checkPointWithinElement(x,y)) #weird pattern to avoid unnecessary evalution of second condition
     
-    def addFocusListener(self, key, listener):
-        self.addCustomListener(key, listener, priority = self.getEventListenerPriority)
-        self._focus_listeners.add((key, listener))
-        
     def removeFocusListeners(self):
         for key, listener in self._focus_listeners:
             self.removeCustomListener(key, listener)
