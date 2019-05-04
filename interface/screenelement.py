@@ -13,6 +13,8 @@ from kaiengine.gconfig.default_keybinds import *
 
 from .basiceventkeys import *
 
+DEFAULT_INPUT_LOCK = "_DEFAULT_INPUT_LOCK"
+
 class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     
     _focus_event_keys = copy.copy(FOCUS_EVENT_KEYS)
@@ -28,6 +30,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._layer = 0
         self._mouse_over = False
         self._element_position = (0,0)
+        self._lock_input = set()
         for string in self._focus_event_keys + self._other_event_keys:
             try:
                 self._funcs[string] = getattr(self, string)
@@ -120,7 +123,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             self.updateChildrenLayers() #only call this on top element
             
     def getMaxLayer(self):
-        return max(self.getLayer(), *[child.getMaxLayer() for child in self.getAllChildren()])
+        return max([self.getLayer(), *[child.getMaxLayer() for child in self.getAllChildren()]]) #put in list avoid typeerror if no children 
             
         
     def getParent(self):
@@ -183,64 +186,64 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         return lambda: customEvent(key, *args, **kwargs)
     
     def _activateConfirm(self, x = None, y = None):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
                 return self.callEventFunc(CONFIRM_KEY)
         return False
     
     def _activateConfirmHold(self, x = None, y = None):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
                 return self.callEventFunc(CONFIRMHOLD_KEY)
         return False
         
     def _activateCancel(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(CANCEL_KEY)
         return False
     
     def _activateCancelHold(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(CANCELHOLD_KEY)
         return False
         
     def _moveUp(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVEUP_KEY)
         return False
     
     def _moveUpHold(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVEUPHOLD_KEY)
         return False
         
     def _moveDown(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVEDOWN_KEY)
         return False
     
     def _moveDownHold(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVEDOWNHOLD_KEY)
         return False
         
     def _moveLeft(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVELEFT_KEY)
         return False
     
     def _moveLeftHold(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVELEFTHOLD_KEY)
         return False
         
     def _moveRight(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVERIGHT_KEY)
         return False
     
     def _moveRightHold(self):
-        if self.focus:
+        if self.focus and not self.isInputLocked():
             return self.callEventFunc(MOVERIGHTHOLD_KEY)
         return False
     
@@ -419,6 +422,19 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def _applyChildrenPositions(self):
         for child in self.getAllChildren():
             child._applyPosition()
+            
+    def lockInput(self, key = DEFAULT_INPUT_LOCK):
+        self._lock_input.add(key)
+        for child in self.getAllChildren():
+            child.lockInput(key)
+        
+    def unlockInput(self, key = DEFAULT_INPUT_LOCK):
+        self._lock_input.discard(key)
+        for child in self.getAllChildren():
+            child.unlockInput(key)
+        
+    def isInputLocked(self):
+        return bool(self._lock_input)
 
     #overwritten stuff
     def setPos(self, *args, **kwargs):
@@ -430,14 +446,16 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._applyChildrenPositions()
     
     def sleep(self, *args, **kwargs):
-        super().sleep(*args, **kwargs)
+        started_sleeping = super().sleep(*args, **kwargs)
         for child in self.getAllChildren():
             child.sleep(*args, **kwargs)
+        return started_sleeping
             
     def wakeUp(self, *args, **kwargs):
-        super().wakeUp(*args, **kwargs)
+        awoken = super().wakeUp(*args, **kwargs)
         for child in self.getAllChildren():
             child.wakeUp(*args, **kwargs)
+        return awoken
         
     def destroy(self):
         super().destroy()

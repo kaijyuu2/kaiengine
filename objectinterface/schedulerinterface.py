@@ -56,7 +56,7 @@ class SchedulerInterface(SleepInterface):
         unpauseScheduledListenerWithID(*args, **kwargs)
 
     def unpauseAllScheduledListeners(self, *args, **kwargs):
-        for method, keyset in self._scheduled_methods_keys.items():
+        for method, keyset in self._scheduled_method_keys.items():
             for key in keyset:
                 self.unpauseScheduledListenerWithID(method, key, *args, **kwargs)
 
@@ -122,9 +122,11 @@ class SchedulerInterface(SleepInterface):
             return True
         
     def delay(self, listener, priority = 0, *args, **kwargs):
-        ID = delay(listener, priority, *args, **kwargs)
-        self._delayed_methods.add(ID)
-        return ID
+        if not self.destroyed:
+            ID = delay(listener, priority, *args, **kwargs)
+            self._delayed_methods.add(ID)
+            return ID
+        return None
     
     def undelay(self, ID):
         undelay(ID)

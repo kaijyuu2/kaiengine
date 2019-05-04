@@ -16,6 +16,7 @@ class Container(ScreenElement):
         if x is None: x = self.border[0]
         if y is None: y = self.border[1]
         self.border = (x,y)
+        self.updateContainerPositions()
         
     def getBorder(self):
         return self.border
@@ -26,7 +27,7 @@ class Container(ScreenElement):
     def setStrictSpacing(self, val):
         if val != self.strict_spacing:
             self.strict_spacing = val
-            self.updateContainerPositions()
+            self.delayUpdatePositions()
         
     def getStrictSpacing(self):
         return self.strict_spacing
@@ -54,7 +55,7 @@ class Container(ScreenElement):
         
     def removeAllChildren(self):
         super().removeAllChildren()
-        self.updateContainerPositions()
+        self.delayUpdatePositions()
         
     def setDimensions(self, *args, **kwargs):
         super().setDimensions(*args, **kwargs)

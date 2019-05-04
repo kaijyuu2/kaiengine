@@ -25,6 +25,7 @@ class MenuTemplate(ScreenElement):
         if button_type is not None:
             self.button_type = button_type
         self._first_button = True
+        self._buttons = set()
         
         #defaults
         self.border = (8,8)
@@ -37,9 +38,22 @@ class MenuTemplate(ScreenElement):
         if self._first_button:
             self.setFocus(ID)
             self._first_button = False
+        self._buttons.add(ID)
         return ID
     
+    def getAllButtons(self):
+        return [self.getChild(ID) for ID in self._buttons]
+    
     #overwritten stuff
+    
+    def removeChild(self, *args, **kwargs):
+        ID = super().removeChild(*args, **kwargs)
+        self._buttons.discard(ID)
+        return ID
+    
+    def removeAllChildren(self, *args, **kwargs):
+        super().removeAllChildren(*args, **kwargs)
+        self._buttons.clear()
     
     def getAnchorPoint(self): 
         #return bottom left corner
@@ -49,6 +63,22 @@ class MenuTemplate(ScreenElement):
     def setSpriteCenter(self, *args, **kwargs):
         super().setSpriteCenter(*args, **kwargs)
         self._applyChildrenPositions()
+        
+    def updateContainerPositions(self, *args, **kwargs):
+        maxwidth = 0
+        maxheight = 0
+        for button in self.getAllButtons():
+            try:
+                button.updateContainerPositions
+            except:
+                pass
+            else:
+                button.updateContainerPositions()
+            maxwidth = max(maxwidth, button.getWidth())
+            maxheight = max(maxheight, button.getHeight())
+        for button in self.getAllButtons():
+            button.setDimensions(maxwidth, maxheight)
+        super().updateContainerPositions(*args, **kwargs)
     
     
 class VerticalMenu(MenuTemplate, VerticalContainer):

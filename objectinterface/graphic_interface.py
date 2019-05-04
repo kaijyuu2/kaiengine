@@ -249,8 +249,11 @@ class GraphicInterface(PositionInterface, SleepInterface):
     def setSpriteHeight(self, newval):
         self.setSpriteDimensions(y=newval)
 
-    def tileSprite(self):
-        self._tiled = not self._tiled
+    def tileSprite(self, val = None):
+        if val is None:
+            self._tiled = not self._tiled
+        else:
+            self._tiled = val
         self._updateDimensions()
 
     def setSpriteTexDimensions(self, left = None, right = None, bottom = None, top = None):
@@ -395,7 +398,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
             try: self.sprite.setDimensions(*self._dimensions)
             except TypeError: pass
             if self._tiled:
-                self.sprite.set_texture_dimensions(0, self.sprite.width, 0, self.sprite.height)
+                self.sprite.tileTexture()
         except AttributeError:
             pass
 
@@ -407,15 +410,18 @@ class GraphicInterface(PositionInterface, SleepInterface):
     #overwritten stuff
 
     def sleep(self, *args, **kwargs):
-        super().sleep(*args, **kwargs)
-        self.pauseSpriteAnimations(GI_SLEEP_KEY)
-        self._updateSpriteShow()
+        started_sleeping = super().sleep(*args, **kwargs)
+        if started_sleeping:
+            self.pauseSpriteAnimations(GI_SLEEP_KEY)
+            self._updateSpriteShow()
+        return started_sleeping
 
     def wakeUp(self, *args, **kwargs):
-        super().wakeUp(*args, **kwargs)
-        if not self.sleeping:
+        awoken = super().wakeUp(*args, **kwargs)
+        if awoken:
             self.unpauseSpriteAnimations(GI_SLEEP_KEY)
             self._updateSpriteShow()
+        return awoken
 
     def destroy(self):
         super().destroy()

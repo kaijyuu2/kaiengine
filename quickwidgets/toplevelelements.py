@@ -4,10 +4,14 @@ from kaiengine.display import getWindowDimensionsScaled
 from kaiengine.interface import ScreenElement, pushTopElement, popTopElement
 from kaiengine.gconfig import WHITE_PIXEL_FILEPATH, COLOR_BLACK
 
+DEFAULT_FADE_TIME = 20
+
+SCENE_FADE_LOCK = "_SCENE_FADE_LOCK"
+
 class Scene(ScreenElement):
     '''A very basic top level element, with fade ins/outs and convenience functions to switch to different ones.'''
     
-    def __init__(self, *args, fade_in_time = 20, **kwargs):
+    def __init__(self, *args, fade_in_time = DEFAULT_FADE_TIME, **kwargs):
         super().__init__(*args, **kwargs)
         #fade attributes
         self.fade_total_time = 0
@@ -17,7 +21,7 @@ class Scene(ScreenElement):
         #setup background
         self.setSpriteFollowCamera(True) #set background to follow camera by default
         self.setSpriteDimensions(*getWindowDimensionsScaled()) # tile the background
-        self.getSprite().tileTexture()
+        self.tileSprite(True)
         
         #setup darkener
         darkener = ScreenElement(WHITE_PIXEL_FILEPATH)
@@ -37,12 +41,12 @@ class Scene(ScreenElement):
         #convenience function
         return self.getChild(self._darkener_id)
 
-    def fadeIn(self, time):
+    def fadeIn(self, time = DEFAULT_FADE_TIME):
         self._fadeStart(time)
         self.getDarkener().setSpriteAlpha(1.0)
         self.schedule(self._fadeIn, 0, True)
 
-    def fadeOut(self, time):
+    def fadeOut(self, time = DEFAULT_FADE_TIME):
         self._fadeStart(time)
         self.getDarkener().setSpriteAlpha(0.0)
         self.schedule(self._fadeOut, 0, True)
@@ -51,6 +55,7 @@ class Scene(ScreenElement):
         return self.done_fading
 
     def _fadeStart(self, time):
+        self.lockInput(SCENE_FADE_LOCK)
         self.unschedule(self._fadeIn)
         self.unschedule(self._fadeOut)
         time = max(0.0, float(time))
@@ -62,18 +67,22 @@ class Scene(ScreenElement):
         self.fade_time -= 1
         self.getDarkener().setSpriteAlpha(max(0.0, self.fade_time) / self.fade_total_time)
         if self.fade_time <= 0:
-            self.done_fading = True
-            self.unschedule(self._fadeIn)
+            self._fadeFinish()
 
     def _fadeOut(self):
         self.fade_time -= 1
         self.getDarkener().setSpriteAlpha(1.0 - max(0.0, self.fade_time) / self.fade_total_time)
         if self.fade_time <= 0:
-            self.done_fading = True
-            self.unschedule(self._fadeOut)
+            self._fadeFinish()
+            
+    def _fadeFinish(self):
+        self.done_fading = True
+        self.unschedule(self._fadeOut)
+        self.unschedule(self._fadeIn)
+        self.unlockInput(SCENE_FADE_LOCK)
             
     #scene change functions
-    def fadeToScene(self, scene_type, time, popself = False, args = [], kwargs = {}):
+    def fadeToScene(self, scene_type, time = DEFAULT_FADE_TIME, popself = False, args = [], kwargs = {}):
         self.fadeOut(time)
         self.waitForCondition(self._fadeToScene, self.checkDoneFading, scene_type, popself, args, kwargs)
         
@@ -85,7 +94,7 @@ class Scene(ScreenElement):
             popTopElement()
         pushTopElement(scene)
         
-    def fadeToPreviousScene(self, time):
+    def fadeToPreviousScene(self, time = DEFAULT_FADE_TIME):
         self.fadeOut(time)
         self.waitForCondition(self._fadeToPreviousScene, self.checkDoneFading)
         
@@ -101,9 +110,15 @@ class Scene(ScreenElement):
         self.getDarkener().setLayer(lastlayer) #ensure darkener on top
         return lastlayer
     
+    def wakeUp(self, *args, **kwargs):
+        awoken = super().wakeUp(*args, **kwargs)
+        if awoken:
+            self.fadeIn()
+        return awoken
+    
     
 class SplashScreen(Scene):
-    def __init__(self, *args, hang_time = 120, fade_out_time = 20, next_scenes = [], **kwargs):
+    def __init__(self, *args, hang_time = 120, fade_out_time = DEFAULT_FADE_TIME, next_scenes = [], **kwargs):
         super().__init__(*args, **kwargs)
         
         self._fade_out_time = fade_out_time

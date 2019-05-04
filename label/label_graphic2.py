@@ -73,7 +73,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
         else:
             raise fonts.FontTypeError("fonts other than gfont2/3 aren't supported for graphic font 2 label objects")
 
-    def set_text(self, text, font_size = None, font = None, color = None):
+    def setText(self, text, font_size = None, font = None, color = None):
         self.text = text
         if font_size is None:
             if self.font_size is None:
@@ -91,6 +91,8 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
         else:
             self.color = NormalizeColorFormat(color)
         self._set_text()
+        
+    set_text = setText #deprecated function name
 
     def _set_text(self):
         if self.text is not None:

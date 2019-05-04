@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import operator
+
 from kaiengine.gconfig import FULL_MISC_PATH
 from kaiengine.interface import ScreenElement
 
+from .containers import Container
 from .labels import LabelElement
 
 
-class Button(ScreenElement):
+class Button(Container):
     
     default_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "brown_button.bordered"])
     default_pressed_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "brown_button_pressed.bordered"])
@@ -16,6 +19,10 @@ class Button(ScreenElement):
     
     def __init__(self, text = None, font = None, font_size = None, sprite_path = None, width = None, height = None, *args, **kwargs):
         super().__init__(sprite_path, **kwargs)
+        
+        #defaults
+        self.border = (4,4)
+        
         self._highlight_id = self.addChild(ScreenElement(self.default_highlight_graphic))
         highlight = self.getHighlight()
         highlight.setSpriteShow(False)
@@ -80,18 +87,30 @@ class Button(ScreenElement):
         self.setUnpressed()
         self.removeHighlight()
     
-    #container stuff
+    #text stuff
     
     def setText(self, *args, **kwargs):
         self.getLabel().setText(*args, **kwargs)
+        parent = self.getParent()
+        if parent:
+            parent.delayUpdatePositions()
         
     def setFont(self, *args, **kwargs):
         self.getLabel().setFont(*args, **kwargs)
+        parent = self.getParent()
+        if parent:
+            parent.delayUpdatePositions()
         
     #overwritten stuff
     
+    def updateContainerPositions(self):
+        super().updateContainerPositions()
+        label = self.getLabel()
+        self.setDimensions(*map(max, self.getDimensions(), map(operator.add, label.getDimensions(), map(operator.mul, self.getBorder(), (2,2)))))
+        self._updateHighlight()
+    
     def getAnchorPoint(self):
-        extents = self.getExtents()
+        extents = self.getExtents() #set to middle of button
         return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
     
     def setSpriteCenter(self, *args, **kwargs):

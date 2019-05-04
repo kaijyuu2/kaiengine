@@ -147,7 +147,7 @@ class EventInterface(IdentifiedObject, SleepInterface):
         startedsleeping = super().sleep(*args, **kwargs)
         if startedsleeping:
             self._sleeplessKeys = self._sleeplessKeys.union(ignored_keys)
-            self._removeAllListeners(ignored_keys) #don't remove them from local dictionaries, in case we wake up later
+            self._removeAllListeners() #don't remove them from local dictionaries, in case we wake up later
         return startedsleeping
 
     def wakeUp(self, *args, **kwargs):

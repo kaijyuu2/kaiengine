@@ -4,6 +4,7 @@ from .paths import *
 
 #fonts
 PFENNIG_FONT = "pfennig.ttf"
+KAI_MONO3_DARK_FONT = "kaimono3dark.gfont2"
 
 #images
 WHITE_PIXEL_FILENAME = "whitepixel.png"
