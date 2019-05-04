@@ -18,7 +18,7 @@ def createBindingRelayer(event_type, hold_func):
             pass
         else:
             hold_func(kai_key)
-            customEvent(bind, *args, **kwargs)
+            return customEvent(bind, *args, **kwargs)
     return relayBinding
 
 def _fireHeldKeyEvents():

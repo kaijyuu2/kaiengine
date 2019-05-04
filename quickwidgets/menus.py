@@ -10,6 +10,7 @@ from kaiengine.interface import ScreenElement
 from .containers import VerticalContainer, HorizontalContainer, GridContainer
 from .buttons import LabelButton
 
+#interlink
 
 class MenuTemplate(ScreenElement):
     
@@ -46,6 +47,12 @@ class MenuTemplate(ScreenElement):
         if self._first_button:
             self.setFocus(ID)
             self._first_button = False
+    
+    #input stuff
+            
+    def mouseover(self, *args, **kwargs):
+        if not self.isInputLocked():
+            self.setSelfFocused()
     
     #overwritten stuff
     

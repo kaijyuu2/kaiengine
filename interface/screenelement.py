@@ -49,7 +49,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             except KeyError:
                 pass
         if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
-            self.addMouseMoveListener(self._mouseMove)
+            self.addMouseMoveListener(self._mouseMove, priority = self.getEventListenerPriority)
         
     @property
     def position(self):
@@ -166,13 +166,20 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         except AttributeError:
             return True #top level element always focused
         
+    def isFullyFocused(self):
+        if self.isFocused():
+            parent = self.getParent()
+            if parent:
+                return parent.isFullyFocused()
+            return True
+        return False
+        
     def hasFocusedChild(self):
         return self._focused_child_id != None
     
     def callEventFunc(self, key, *args, **kwargs):
         if self.hasEventFunc(key):
-            returnval = self._funcs[key](*args, **kwargs)
-            return returnval if returnval != None else True
+            return self._funcs[key](*args, **kwargs)
         return False
             
     def hasEventFunc(self, key):
@@ -186,49 +193,49 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         return lambda: customEvent(key, *args, **kwargs)
     
     def _activateConfirm(self, x = None, y = None):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
                 return self.callEventFunc(CONFIRM_KEY)
         return False
     
     def _activateConfirmHold(self, x = None, y = None):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             if not (x is not None and not self.checkPointWithinElement(x,y)): #weird pattern to avoid unnecessary evalution of second condition
                 return self.callEventFunc(CONFIRMHOLD_KEY)
         return False
         
     def _activateCancel(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(CANCEL_KEY)
         return False
     
     def _activateCancelHold(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(CANCELHOLD_KEY)
         return False
         
     def _moveUp(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVEUP_KEY)
         return False
     
     def _moveUpHold(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVEUPHOLD_KEY)
         return False
         
     def _moveDown(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVEDOWN_KEY)
         return False
     
     def _moveDownHold(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVEDOWNHOLD_KEY)
         return False
         
     def _moveLeft(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVELEFT_KEY)
         return False
     
@@ -238,12 +245,12 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         return False
         
     def _moveRight(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVERIGHT_KEY)
         return False
     
     def _moveRightHold(self):
-        if self.focus and not self.isInputLocked():
+        if self.isFullyFocused() and not self.isInputLocked():
             return self.callEventFunc(MOVERIGHTHOLD_KEY)
         return False
     
