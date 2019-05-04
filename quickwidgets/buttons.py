@@ -9,29 +9,26 @@ from .containers import Container
 from .labels import LabelElement
 
 
-class Button(Container):
+class BaseButton(Container):
     
     default_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "brown_button.bordered"])
     default_pressed_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "brown_button_pressed.bordered"])
     default_highlight_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "hover.png"])
     default_width = 80
     default_height = 24
+    default_border = (4,4)
     
-    def __init__(self, text = None, font = None, font_size = None, sprite_path = None, width = None, height = None, *args, **kwargs):
+    def __init__(self, sprite_path = None, width = None, height = None, *args, **kwargs):
         super().__init__(sprite_path, **kwargs)
         
         #defaults
-        self.border = (4,4)
         
         self._highlight_id = self.addChild(ScreenElement(self.default_highlight_graphic))
         highlight = self.getHighlight()
         highlight.setSpriteShow(False)
         highlight.setSpriteCenter(True,True)
         highlight.setSpriteFollowCamera(True)
-        self._label_id = self.addChild(LabelElement(text, font, font_size))
-        label = self.getLabel()
-        label.setSpriteCenter(True, True)
-        label.setSpriteFollowCamera(True)
+        self._central_widget_id = None
         if sprite_path is None:
             self.setSprite(self.default_graphic)
         if width is None:
@@ -41,17 +38,18 @@ class Button(Container):
         
         self.setSpriteFollowCamera(True)
         
-    def getLabel(self):
-        return self.getChild(self._label_id)
-    
     def getHighlight(self):
         return self.getChild(self._highlight_id)
     
     def addHighlight(self):
-        self.getHighlight().setSpriteShow(True)
+        highlight = self.getHighlight()
+        if highlight:
+            highlight.setSpriteShow(True)
     
     def removeHighlight(self):
-        self.getHighlight().setSpriteShow(False)
+        highlight = self.getHighlight()
+        if highlight:
+            highlight.setSpriteShow(False)
     
     def setPressedDown(self):
         self.setSprite(self.default_pressed_graphic)
@@ -60,7 +58,19 @@ class Button(Container):
         self.setSprite(self.default_graphic)
         
     def _updateHighlight(self):
-        self.getHighlight().setDimensions(*self.getDimensions())
+        highlight = self.getHighlight()
+        if highlight:
+            highlight.setDimensions(*self.getDimensions())
+        
+    def setCentralWidget(self, widget):
+        self._central_widget_id = self.addChild(widget)
+        cw = self.getCentralWidget()
+        cw.setSpriteCenter(True, True)
+        cw.setSpriteFollowCamera(True)
+        return self._central_widget_id
+        
+    def getCentralWidget(self):
+        return self.getChild(self._central_widget_id)
         
     #event stuff
     
@@ -86,27 +96,14 @@ class Button(Container):
     def losefocus(self):
         self.setUnpressed()
         self.removeHighlight()
-    
-    #text stuff
-    
-    def setText(self, *args, **kwargs):
-        self.getLabel().setText(*args, **kwargs)
-        parent = self.getParent()
-        if parent:
-            parent.delayUpdatePositions()
-        
-    def setFont(self, *args, **kwargs):
-        self.getLabel().setFont(*args, **kwargs)
-        parent = self.getParent()
-        if parent:
-            parent.delayUpdatePositions()
         
     #overwritten stuff
     
     def updateContainerPositions(self):
         super().updateContainerPositions()
-        label = self.getLabel()
-        self.setDimensions(*map(max, self.getDimensions(), map(operator.add, label.getDimensions(), map(operator.mul, self.getBorder(), (2,2)))))
+        central_widget = self.getCentralWidget()
+        if central_widget:
+            self.setDimensions(*map(max, self.getDimensions(), map(operator.add, central_widget.getDimensions(), map(operator.mul, self.getBorder(), (2,2)))))
         self._updateHighlight()
     
     def getAnchorPoint(self):
@@ -129,3 +126,43 @@ class Button(Container):
         super().setHeight(*args, **kwargs)
         self._updateHighlight()
         
+
+class LabelButton(BaseButton):
+    def __init__(self, text = None, font = None, font_size = None,*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.setCentralWidget(LabelElement(text, font, font_size))
+        
+    #add alias for convenience/being explicit
+    getLabel = BaseButton.getCentralWidget
+    
+    def setText(self, *args, **kwargs):
+        self.getLabel().setText(*args, **kwargs)
+        parent = self.getParent()
+        if parent:
+            parent.delayUpdatePositions()
+        
+    def setFont(self, *args, **kwargs):
+        self.getLabel().setFont(*args, **kwargs)
+        parent = self.getParent()
+        if parent:
+            parent.delayUpdatePositions()
+            
+            
+class GraphicButton(BaseButton):
+    
+    default_graphic = None
+    default_pressed_graphic = None
+    #default_highlight_graphic = None
+    
+    def __init__(self, *args, central_graphic = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setCentralWidget(ScreenElement())
+        if central_graphic:
+            self.setButtonGraphic(central_graphic)
+            
+    def setButtonGraphic(self, val):
+        cw = self.getCentralWidget()
+        if cw:
+            cw.setSpriteGraphic(val)
+    

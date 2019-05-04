@@ -28,5 +28,12 @@ class IdentifiedObject(object):
         super().__init__(*args, **kwargs)
         self.id = generateUniqueID(self.__class__.__name__)
         
+    def combineID(self, *args):
+        '''consistently combine multiple ids for a unique ID'''
+        returnstr = self.id[:]
+        for arg in args:
+            returnstr += str(arg)
+        return returnstr
+        
 
 GenerateUniqueID = generateUniqueID #deprecated function name

@@ -240,6 +240,8 @@ class SpriteBordered(graphicobject.GraphicObject):
         self.border_width = 0
         self.border_height = 0
 
+    def getDimensions(self):
+        return (self.getWidth(), self.getHeight())
 
     def getLeftSide(self):
         return self.sprites[LEFT].getLeftSide()

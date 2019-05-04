@@ -385,8 +385,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         return childid
         
     def removeAllChildren(self):
-        for child in self.getAllChildren():
-            child.destroy()
+        for child in list(self.getAllChildren()):
+            self.removeChild(child)
         self._children.clear()
     
     def getAllChildren(self):
@@ -424,14 +424,20 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             child._applyPosition()
             
     def lockInput(self, key = DEFAULT_INPUT_LOCK):
+        self._lockInput(self.combineID(key))
+        
+    def _lockInput(self, key):
         self._lock_input.add(key)
         for child in self.getAllChildren():
-            child.lockInput(key)
+            child._lockInput(key)
         
     def unlockInput(self, key = DEFAULT_INPUT_LOCK):
+        self._unlockInput(self.combineID(key))
+        
+    def _unlockInput(self, key):
         self._lock_input.discard(key)
         for child in self.getAllChildren():
-            child.unlockInput(key)
+            child._unlockInput(key)
         
     def isInputLocked(self):
         return bool(self._lock_input)

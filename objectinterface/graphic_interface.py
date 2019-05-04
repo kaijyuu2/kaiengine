@@ -90,7 +90,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
                     newsprite = createGlowSprite(newspritepath)
             self.setSpriteDirect(newsprite, reset_properties)
         else:
-            self.removeSprite()
+            self.removeSpriteKeepProp()
 
     def setSpriteDirect(self, newsprite, reset_properties = False):
         self.removeAllSpriteListeners()
@@ -240,7 +240,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
         else:
             if x == None: x = self._dimensions[0]
             if y == None: y = self._dimensions[1]
-        self._dimensions = [x,y]
+        self._dimensions = (x,y)
         self._updateDimensions()
         
     def setSpriteWidth(self, newval):
@@ -307,21 +307,23 @@ class GraphicInterface(PositionInterface, SleepInterface):
         return self.sprite.getCenterPosition()
 
     def getSpriteLayer(self):
-        if self.sprite:
-            return self.sprite.layer
-        return 0
+        return self._layer
 
     def getSpriteFlip(self):
         return self._flip[:]
 
     def getSpriteWidth(self):
+        if self._dimensions != None:
+            return self._dimensions[0]
         if self.sprite:
-            return self.sprite.width
+            return self.sprite.getWidth()
         return 0
 
     def getSpriteHeight(self):
+        if self._dimensions != None:
+            return self._dimensions[1]
         if self.sprite:
-            return self.sprite.height
+            return self.sprite.getHeight()
         return 0
 
     def getSpriteColor(self):
@@ -331,43 +333,46 @@ class GraphicInterface(PositionInterface, SleepInterface):
         return self._alpha
 
     def getSpriteDimensions(self):
-        return self.sprite.get_dimensions()
+        if self._dimensions != None:
+            return self._dimensions
+        if self.sprite:
+            return self.sprite.getDimensions()
+        return (0,0)
     
     def getSpriteExtents(self):
-        return self.sprite.getExtents()
+        if self.sprite:
+            return self.sprite.getExtents()
+        return self._getDefaultExtents()
     
     def getSpriteExtentsMinusCamera(self):
-        return self.sprite.getExtentsMinusCamera()
+        if self.sprite:
+            return self.sprite.getExtentsMinusCamera()
+        return self._getDefaultExtents()
+    
+    def _getDefaultExtents(self):
+        pos = self.getPos()
+        dimensions = self.getSpriteDimensions()
+        return (pos[0], pos[0] + dimensions[0], pos[1], pos[1] + dimensions[1])
 
     def getSpriteLeftSide(self):
-        try:
-            return self.sprite.getLeftSide()
-        except AttributeError:
-            return self.getPos()
+        extents = self.getSpriteExtentsMinusCamera()
+        return (extents[0], (extents[2] + extents[3])/2)
 
     def getSpriteRightSide(self):
-        try:
-            return self.sprite.getRightSide()
-        except AttributeError:
-            return self.getPos()
+        extents = self.getSpriteExtentsMinusCamera()
+        return (extents[1], (extents[2] + extents[3])/2)
 
     def getSpriteTopSide(self):
-        try:
-            return self.sprite.getTopSide()
-        except AttributeError:
-            return self.getPos()
+        extents = self.getSpriteExtentsMinusCamera()
+        return ((extents[0] + extents[1])/2, extents[3])
 
     def getSpriteBottomSide(self):
-        try:
-            return self.sprite.getBottomSide()
-        except AttributeError:
-            return self.getPos()
-
+        extents = self.getSpriteExtentsMinusCamera()
+        return ((extents[0] + extents[1])/2, extents[2])
+    
     def getBottomLeftCorner(self):
-        try:
-            return self.sprite.getBottomLeftCorner()
-        except AttributeError:
-            return self.getPos()
+        extents = self.getSpriteExtentsMinusCamera()
+        return (extents[0], extents[2])
 
     def _updateSprite(self):
         if self.sprite:

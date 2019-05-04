@@ -315,12 +315,20 @@ class GraphicObject(BaseObject, IdentifiedObject):
         debugMessage("remove_image function not defined for " + self.getFilename())
 
 
-    def get_dimensions(self):
+    def getDimensions(self):
         try:
             return self.width, self.height
         except:
             debugMessage("width and/or height not defined for " + self.getFilename())
-            return [0,0]
+            return (0,0)
+        
+    get_dimensions = getDimensions #deprecated function name
+    
+    def getWidth(self):
+        return self.width
+    
+    def getHeight(self):
+        return self.height
 
     def get_effective_dimensions(self):
         try:

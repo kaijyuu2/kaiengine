@@ -5,9 +5,12 @@ import operator
 from kaiengine.interface import ScreenElement
 
 class Container(ScreenElement):
+    
+    default_border = (0,0)
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.border = (0,0)
+        self.border = self.default_border
         self.spacing = None
         self.strict_spacing = False
         self._update_positions = False
@@ -174,14 +177,58 @@ class GridContainer(Container):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._child_pos_dict = {}
+        self._child_id_dict = {}
+        self._grid_sizes = [0,0,0,0]
         self.spacing = (0,0)
         
+        
+    def _move(self, xstep, ystep):
+        x, y = self.getChildKey(self.getFocusedChild())
+        x += xstep
+        y += ystep
+        while not (x, y) in self._child_pos_dict:
+            x += xstep
+            y += ystep
+            if x < self._grid_sizes[0]:
+                x = self._grid_sizes[1]
+            elif x > self._grid_sizes[1]:
+                x = self._grid_sizes[0]
+            if y < self._grid_sizes[2]:
+                y = self._grid_sizes[3]
+            elif y > self._grid_sizes[3]:
+                y = self._grid_sizes[2]
+        self.setFocus(self.getChildByKey((x, y)))
+        
+    #input stuff
+        
+    def moveleft(self):
+        if self.hasFocusedChild():
+            self._move(-1, 0)
+            return True
+        
+    def moveright(self):
+        if self.hasFocusedChild():
+            self._move(1, 0)
+            return True
+        
+    def moveup(self):
+        if self.hasFocusedChild():
+            self._move(0, 1)
+            return True
+        
+    def movedown(self):
+        if self.hasFocusedChild():
+            self._move(0, -1)
+            return True
             
     #overwritten stuff
     
     def getChildKey(self, childid):
         childid = self.getChild(childid).id
-        return self._child_pos_dict[childid]
+        return self._child_id_dict[childid]
+                                    
+    def getChildByKey(self, child_key):
+        return self.getChild(self._child_pos_dict[child_key])
     
     def setSpacing(self, x = None, y = None):
         if x is None: x = self.getSpacing()[0]
@@ -193,8 +240,8 @@ class GridContainer(Container):
         maxwidth = {}
         maxheight = {}
         totalelements = [0,0]
-        for childid, pos in self._child_pos_dict.items():
-            totalelements = map(max, totalelements, map(operator.add, pos, (1,1)))
+        for pos, childid in self._child_pos_dict.items():
+            totalelements = list(map(max, totalelements, map(operator.add, pos, (1,1))))
             if not self.getStrictSpacing():
                 child = self.getChild(childid)
                 maxwidth[pos[0]] = max(maxwidth.get(pos[0], 0), child.getWidth())
@@ -211,20 +258,26 @@ class GridContainer(Container):
             spacing = self.getSpacing()[1] if i != 0 else 0
             totalheight[i] = totalheight.get(i - 1, self.getBorder()[1]) + maxheight.get(i - 1, 0) + spacing
             totalmaxheight += maxheight.get(i, 0) + spacing
-        for childid, pos in self._child_pos_dict.items():
+        for pos, childid in self._child_pos_dict.items():
             self.getChild(childid).setElementPosition(totalwidth.get(pos[0], 0), totalheight.get(pos[1], 0))
         self.setDimensions(totalmaxwidth + self.getBorder()[0], totalmaxheight + self.getBorder()[1])
             
     
-    def addChild(self, child, pos_tuple, *args, **kwargs):
+    def addChild(self, pos_tuple, child, *args, **kwargs):
         newchild = super().addChild(child, *args, **kwargs)
-        self._child_pos_dict[newchild.id] = tuple(pos_tuple)
+        self._child_pos_dict[tuple(pos_tuple)] = newchild.id
+        self._child_id_dict[newchild.id] = tuple(pos_tuple)
+        self._grid_sizes[0] = min(self._grid_sizes[0], pos_tuple[0])
+        self._grid_sizes[1] = max(self._grid_sizes[1], pos_tuple[0])
+        self._grid_sizes[2] = min(self._grid_sizes[2], pos_tuple[1])
+        self._grid_sizes[3] = max(self._grid_sizes[3], pos_tuple[1])
         self.delayUpdatePositions()
         return newchild
     
     def removeChild(self, *args, **kwargs):
         childid = super().removeChild(*args, **kwargs)
-        self._child_pos_dict.pop(childid, None)
+        pos = self._child_id_dict.pop(childid, None)
+        self._child_pos_dict.pop(pos, None)
         self.delayUpdatePositions()
         return childid
     

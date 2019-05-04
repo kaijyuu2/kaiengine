@@ -8,15 +8,16 @@ from kaiengine.display import getWindowDimensionsScaled
 from kaiengine.interface import ScreenElement
 
 from .containers import VerticalContainer, HorizontalContainer, GridContainer
-from .buttons import Button
+from .buttons import LabelButton
 
 
 class MenuTemplate(ScreenElement):
     
     #not to be used without a container 
     
-    button_type = Button
+    button_type = LabelButton
     default_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "menu0.bordered"])
+    default_border = (8,8)
     
     def __init__(self, sprite_path = None, button_type = None, **kwargs):
         if sprite_path is None:
@@ -28,21 +29,23 @@ class MenuTemplate(ScreenElement):
         self._buttons = set()
         
         #defaults
-        self.border = (8,8)
         self.setSpriteCenter(True, True)
         self.setSpriteFollowCamera(True)
         self.setPos(*map(operator.truediv, getWindowDimensionsScaled(), (2,2)))
         
     def addButton(self, *args, **kwargs):
         ID = self.addChild(self.button_type(*args, **kwargs))
-        if self._first_button:
-            self.setFocus(ID)
-            self._first_button = False
+        self._updateFirstButton(ID)
         self._buttons.add(ID)
         return ID
     
     def getAllButtons(self):
         return [self.getChild(ID) for ID in self._buttons]
+    
+    def _updateFirstButton(self, ID):
+        if self._first_button:
+            self.setFocus(ID)
+            self._first_button = False
     
     #overwritten stuff
     
@@ -88,4 +91,10 @@ class HorizontalMenu(MenuTemplate, HorizontalContainer):
     pass
 
 class GridMenu(MenuTemplate, GridContainer):
-    pass
+    
+    #overwritten stuff
+    def addButton(self, pos_tuple, *args, **kwargs):
+        ID = self.addChild(pos_tuple, self.button_type(*args, **kwargs))
+        self._updateFirstButton(ID)
+        self._buttons.add(ID)
+        return ID
