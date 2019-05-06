@@ -91,8 +91,26 @@ FILEPATH = "_filepath" #list format
 #error string to check against to determine if a property in an object instance is undefined
 PROP_UNDEFINED = "_PROPERTY_UNDEFINED_"
 
+#enums
+DIRECTION_UP = "up"
+DIRECTION_DOWN = "down"
+DIRECTION_RIGHT = "right"
+DIRECTION_LEFT = "left"
 
-FADE_LAYER = 900001
+DIRECTION_FLIP_LOOKUP = {DIRECTION_UP: DIRECTION_DOWN,
+                       DIRECTION_DOWN: DIRECTION_UP,
+                       DIRECTION_LEFT: DIRECTION_RIGHT,
+                       DIRECTION_RIGHT: DIRECTION_LEFT}
+
+POSITION_TOP_LEFT = "top_left"
+POSITION_TOP = "top"
+POSITION_TOP_RIGHT = "top_right"
+POSITION_LEFT = "left"
+POSITION_CENTER = "center"
+POSITION_RIGHT = "right"
+POSITION_BOTTOM_LEFT = "bottom_left"
+POSITION_BOTTOM = "bottom"
+POSITION_BOTTOM_RIGHT = "bottom_right"
 
 
 #unusual default for when None or -1 isn't appropriate

@@ -19,8 +19,11 @@ class EventInterface(IdentifiedObject, SleepInterface):
     def callIDEvent(self, event_key, *args, **kwargs):
         customEvent(self.getEventID(event_key), self.id, *args, **kwargs)
 
-    def getEventID(self, event_key):
-        return self.id + event_key
+    def getEventID(self, key = ""):
+        return self._getEventID(self.id, key)
+        
+    def _getEventID(self, own_id, key):
+        return str(own_id) + "_" + str(key) + "_EVENT"
 
     def addQueryListener(self, key, method):
         self.removeQueryListener(self, key)

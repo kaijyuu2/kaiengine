@@ -109,19 +109,6 @@ class _LinearContainer(Container):
     
 class VerticalContainer(_LinearContainer):
     
-    #input stuff
-    
-    def moveup(self):
-        if self.hasFocusedChild():
-            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) - 1) % self.getLength()))
-            return True
-        
-    def movedown(self):
-        if self.hasFocusedChild():
-            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) + 1) % self.getLength()))
-            return True
-            
-    
     #overwritten stuff
     
     def updateContainerPositions(self):
@@ -141,18 +128,6 @@ class VerticalContainer(_LinearContainer):
         self.setDimensions(maxwidth + self.getBorder()[0] * 2, totalheight + self.getBorder()[1])
         
 class HorizontalContainer(_LinearContainer):
-    
-    #input stuff
-    
-    def moveleft(self):
-        if self.hasFocusedChild():
-            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) - 1) % self.getLength()))
-            return True
-        
-    def moveright(self):
-        if self.hasFocusedChild():
-            self.setFocus(self.getChildByKey((self.getChildKey(self.getFocusedChild()) + 1) % self.getLength()))
-            return True
     
     #overwritten stuff
     
@@ -181,46 +156,9 @@ class GridContainer(Container):
         self._grid_sizes = [0,0,0,0]
         self.spacing = (0,0)
         
+    def getGridSizes(self):
+        return tuple(self._grid_sizes)
         
-    def _move(self, xstep, ystep):
-        x, y = self.getChildKey(self.getFocusedChild())
-        x += xstep
-        y += ystep
-        while not (x, y) in self._child_pos_dict:
-            x += xstep
-            y += ystep
-            if x < self._grid_sizes[0]:
-                x = self._grid_sizes[1]
-            elif x > self._grid_sizes[1]:
-                x = self._grid_sizes[0]
-            if y < self._grid_sizes[2]:
-                y = self._grid_sizes[3]
-            elif y > self._grid_sizes[3]:
-                y = self._grid_sizes[2]
-        self.setFocus(self.getChildByKey((x, y)))
-        
-    #input stuff
-        
-    def moveleft(self):
-        if self.hasFocusedChild():
-            self._move(-1, 0)
-            return True
-        
-    def moveright(self):
-        if self.hasFocusedChild():
-            self._move(1, 0)
-            return True
-        
-    def moveup(self):
-        if self.hasFocusedChild():
-            self._move(0, 1)
-            return True
-        
-    def movedown(self):
-        if self.hasFocusedChild():
-            self._move(0, -1)
-            return True
-            
     #overwritten stuff
     
     def getChildKey(self, childid):

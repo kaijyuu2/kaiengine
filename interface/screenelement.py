@@ -17,8 +17,8 @@ DEFAULT_INPUT_LOCK = "_DEFAULT_INPUT_LOCK"
 
 class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     
-    _keybind_map = copy.deepcopy(KEYBIND_MAP)
-    _other_event_keys = copy.copy(OTHER_EVENT_KEYS)
+    keybind_map = copy.deepcopy(KEYBIND_MAP)
+    other_event_keys = copy.copy(OTHER_EVENT_KEYS)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,7 +31,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._mouse_over = False
         self._element_position = (0,0)
         self._lock_input = set()
-        for string in list(self._keybind_map.keys()) + list(self._other_event_keys):
+        for string in list(self.keybind_map.keys()) + list(self.other_event_keys):
             try:
                 self._funcs[string] = getattr(self, string)
             except AttributeError:
@@ -185,9 +185,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def hasEventFunc(self, key):
         return key in self._funcs
     
-    def getEventKey(self, key = ""):
-        return str(self.id) + "_" + str(key) + "_EVENT"
-    
     def getEventCaller(self, key, *args, **kwargs):
         #convenience function for delaying a custom event
         return lambda: customEvent(key, *args, **kwargs)
@@ -231,7 +228,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self.callEventFunc(LOSEFOCUS_KEY)
             
     def addFocusListeners(self):
-        for key, input_keys in self._keybind_map.items():
+        for key, input_keys in self.keybind_map.items():
             for input_key in input_keys:
                 self._addFocusListener(key, input_key)
             
@@ -277,6 +274,30 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         
     def getExtents(self):
         return self.getSpriteExtentsMinusCamera()
+    
+    def getLeftSide(self):
+        extents = self.getExtents()
+        return (extents[0], (extents[2] + extents[3])/2)
+    
+    def getRightSide(self):
+        extents = self.getExtents()
+        return (extents[1], (extents[2] + extents[3])/2)
+    
+    def getBottomSide(self):
+        extents = self.getExtents()
+        return ((extents[0] + extents[1])/2, extents[2])
+    
+    def getTopSide(self):
+        extents = self.getExtents()
+        return ((extents[0] + extents[1])/2, extents[3])
+    
+    def getBottomLeftCorner(self):
+        extents = self.getExtents()
+        return (extents[0], extents[2])
+    
+    def getCenterPosition(self):
+        extents = self.getExtents()
+        return ((extents[0] + extents[1])/2, (extents[2] + extents[3])/2)
 
     def setPosition(self, *args, **kwargs):
         '''alias for setPos'''
