@@ -2,7 +2,7 @@
 
 '''used for ttfs and other non-graphic fonts that create a dynamic texture'''
 
-import os
+import os, operator
 
 from kaiengine import sGraphics
 from kaiengine import fonts
@@ -185,16 +185,9 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
                 yoffset += offset[Yi]
         return (self.pos[Xi] + xoffset - center_xoffset, self.pos[Yi] + yoffset - center_yoffset + height/2)
 
-
-    def getRightSide(self, *args, **kwargs):
-        return self.getRightSide(*args, **kwargs)
-
     def getRightSide(self):
         pos = self.getLeftSide()
         return (pos[0] + self.width * self.get_effective_size()[0], pos[1])
-
-    def getBottomSide(self, *args, **kwargs):
-        return self.getBottomSide(*args, **kwargs)
 
     def getBottomSide(self):
         effective_size = self.get_effective_size()
@@ -215,9 +208,6 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
                 xoffset += offset[Xi]
                 yoffset += offset[Yi]
         return (self.pos[Xi] + xoffset - center_xoffset + width/2, self.pos[Yi] + yoffset - center_yoffset)
-
-    def getTopSide(self, *args, **kwargs):
-        return self.getTopSide(*args, **kwargs)
 
     def getTopSide(self):
         pos = self.getBottomSide()

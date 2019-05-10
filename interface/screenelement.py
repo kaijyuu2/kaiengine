@@ -191,17 +191,18 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     
     def _mouseMove(self, x, y, dx, dy):
         returnval = False
-        inside = self.checkPointWithinElement(x, y)
-        if not self._mouse_over and inside:
-            returnval = self.callEventFunc(MOUSEENTER_KEY)
-        if inside:
-            self._mouse_over = True
-            if not returnval:
-                returnval = self.callEventFunc(MOUSEOVER_KEY, x, y, dx, dy)
-        else:
-            if not returnval and self._mouse_over:
-                returnval = self.callEventFunc(MOUSELEAVE_KEY)
-            self._mouse_over = False
+        if not self.isInputLocked():
+            inside = self.checkPointWithinElement(x, y)
+            if not self._mouse_over and inside:
+                returnval = self.callEventFunc(MOUSEENTER_KEY)
+            if inside:
+                self._mouse_over = True
+                if not returnval:
+                    returnval = self.callEventFunc(MOUSEOVER_KEY, x, y, dx, dy)
+            else:
+                if not returnval and self._mouse_over:
+                    returnval = self.callEventFunc(MOUSELEAVE_KEY)
+                self._mouse_over = False
         return returnval
     
     def isMousedOver(self):

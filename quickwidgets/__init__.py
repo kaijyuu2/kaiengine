@@ -4,3 +4,4 @@ from .containers import VerticalContainer, HorizontalContainer, GridContainer, C
 from .menus import MenuTemplate, VerticalMenu, HorizontalMenu, GridMenu
 from .toplevelelements import Scene, SplashScreen
 from .buttons import LabelButton, BaseButton, GraphicButton
+from .labels import LabelElement

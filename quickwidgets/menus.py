@@ -32,6 +32,7 @@ class MenuTemplate(ScreenElement):
     button_type = LabelButton
     default_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "menu0.bordered"])
     default_border = (8,8)
+    focus_first_button = True
     
     def __init__(self, sprite_path = None, button_type = None, **kwargs):
         if sprite_path is None:
@@ -50,18 +51,27 @@ class MenuTemplate(ScreenElement):
         
         self.addQueryListener(self.getEventID(MENU_LOOKUP_KEY), lambda: self)
         
+    def setButtonType(self, newtype):
+        #will NOT regenerate old buttons!
+        self.button_type = newtype
+        
     def addButton(self, *args, **kwargs):
         ID = self.addChild(self.button_type(*args, **kwargs))
         self._updateFirstButton(ID)
         self._buttons.add(ID)
         return ID
     
+    def getButton(self, *args, **kwargs):
+        #alias for getChildByKey
+        return self.getChildByKey(*args, **kwargs)
+    
     def getAllButtons(self):
         return [self.getChild(ID) for ID in self._buttons]
     
     def _updateFirstButton(self, ID):
         if self._first_button:
-            self.setFocus(ID)
+            if self.focus_first_button:
+                self.setFocus(ID)
             self._first_button = False
             
     def interlinkMenu(self, direction, othermenuid):
