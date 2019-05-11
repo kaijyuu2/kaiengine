@@ -390,6 +390,15 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         
     def isInputLocked(self):
         return bool(self._lock_input)
+    
+    def tellParentToUpdate(self):
+        parent = self.getParent()
+        if parent:
+            parent.tellParentToUpdate()
+            parent.updateElement()
+                
+    def updateElement(self):
+        pass
 
     #overwritten stuff
     def setPos(self, *args, **kwargs):

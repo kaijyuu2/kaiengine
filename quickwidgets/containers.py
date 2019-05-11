@@ -2,6 +2,7 @@
 
 import operator
 
+from kaiengine.timer import DelayedEventException
 from kaiengine.interface import ScreenElement
 
 class Container(ScreenElement):
@@ -37,7 +38,10 @@ class Container(ScreenElement):
     
     def delayUpdatePositions(self):
         if not self._update_positions:
-            self._update_positions = self.delay(self.updateContainerPositions)
+            try:
+                self._update_positions = self.delay(self.updateContainerPositions, self.getLayer)
+            except DelayedEventException:
+                pass
             
     def updateContainerPositions(self):
         self._update_positions = False
@@ -63,6 +67,10 @@ class Container(ScreenElement):
     def setDimensions(self, *args, **kwargs):
         super().setDimensions(*args, **kwargs)
         self._applyChildrenPositions()
+        
+    def updateElement(self):
+        super().updateElement()
+        self.delayUpdatePositions()
 
 class _LinearContainer(Container):
     def __init__(self, *args, **kwargs):

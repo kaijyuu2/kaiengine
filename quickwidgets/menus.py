@@ -100,11 +100,8 @@ class MenuTemplate(ScreenElement):
             pass
         
     def clearAllInterlinks(self):
-        for direction, menuset in self._menu_interlinks.items():
-            for menuid in menuset:
-                menuref = self.queryMenuByID(menuid)
-                if menuref:
-                    menuref._clearInterlink(DIRECTION_FLIP_LOOKUP[direction], self.id)
+        for direction, menuref in self.getAllInterlinkedMenus():
+            menuref._clearInterlink(DIRECTION_FLIP_LOOKUP[direction], self.id)
         self._menu_interlinks.clear()
             
             
@@ -124,13 +121,22 @@ class MenuTemplate(ScreenElement):
                             mindistance = distance
                             mindistance_menu_ref = menu_ref
                             mindistance_button_id = button.id
-            if mindistance_menu_ref:
+            if mindistance_menu_ref: #TODO: make this suck less
                 self.clearFocus()
                 self.getParent().clearFocus()
                 mindistance_menu_ref.setFocus(mindistance_button_id)
                 mindistance_menu_ref.setSelfFocused()
                 return True
         return False
+    
+    def getAllInterlinkedMenus(self):
+        menulist = []
+        for direction, menuset in self._menu_interlinks.items():
+            for menuid in menuset:
+                menuref = self.queryMenuByID(menuid)
+                if menuref:
+                    menulist.append((direction, menuref))
+        return menulist
     
     def queryMenuByID(self, menu_id):
         try:
@@ -147,6 +153,13 @@ class MenuTemplate(ScreenElement):
             self.setSelfFocused()
     
     #overwritten stuff
+    
+    def setFocus(self, *args, **kwargs):
+        super().setFocus(*args, **kwargs)
+        if self.hasFocusedChild():
+            for direction, menuref in self.getAllInterlinkedMenus():
+                menuref.clearFocus()
+            
     
     def removeChild(self, *args, **kwargs):
         ID = super().removeChild(*args, **kwargs)

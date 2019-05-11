@@ -339,6 +339,9 @@ class GraphicInterface(PositionInterface, SleepInterface):
             return self.sprite.getDimensions()
         return (0,0)
     
+    def resetDimensions(self):
+        self._dimensions = None
+    
     def getSpriteExtents(self):
         if self.sprite:
             return self.sprite.getExtents()

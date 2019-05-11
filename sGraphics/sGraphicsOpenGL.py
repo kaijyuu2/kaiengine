@@ -618,6 +618,9 @@ class sSprite(object):
         return self.width, self.height
     
     get_dimensions = getDimensions #deprecated method name
+    
+    def getOriginalDimensions(self):
+        return self.original_width, self.original_height
 
     def get_effective_dimensions(self):
         return self.width * self.get_effective_size()[0], self.height * self.get_effective_size()[1]

@@ -16,10 +16,16 @@ class LabelElement(ScreenElement):
         if text:
             self.setText(text, font_size = font_size)
             
-        
+    def setDimensions(self, *args, **kwargs):
+        super().setDimensions(*args, **kwargs)
+            
     def setText(self, *args, **kwargs):
         self.getSprite().setText(*args, **kwargs)
+        self.resetDimensions() #to make the text appear the correct size
+        self.tellParentToUpdate()
         
     def setFont(self, *args, **kwargs):
         self.getSprite().setFont(*args, **kwargs)
+        self.resetDimensions() #to make the text appear the correct size
+        self.tellParentToUpdate()
         

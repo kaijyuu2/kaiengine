@@ -52,10 +52,12 @@ class BaseButton(Container):
             highlight.setSpriteShow(False)
     
     def setPressedDown(self):
-        self.setSprite(self.default_pressed_graphic)
+        if self.default_pressed_graphic:
+            self.setSprite(self.default_pressed_graphic)
         
     def setUnpressed(self):
-        self.setSprite(self.default_graphic)
+        if self.default_pressed_graphic:
+            self.setSprite(self.default_graphic)
         
     def _updateHighlight(self):
         highlight = self.getHighlight()
@@ -113,18 +115,22 @@ class BaseButton(Container):
     def setSpriteCenter(self, *args, **kwargs):
         super().setSpriteCenter(*args, **kwargs)
         self._applyChildrenPositions()
+        self.tellParentToUpdate()
         
     def _applyChildrenPositions(self):
         super()._applyChildrenPositions()
         self._updateHighlight()
+        self.tellParentToUpdate()
         
     def setWidth(self, *args, **kwargs):
         super().setWidth(*args, **kwargs)
         self._updateHighlight()
+        self.tellParentToUpdate()
         
     def setHeight(self, *args, **kwargs):
         super().setHeight(*args, **kwargs)
         self._updateHighlight()
+        self.tellParentToUpdate()
         
 
 class LabelButton(BaseButton):
