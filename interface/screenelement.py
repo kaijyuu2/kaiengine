@@ -20,7 +20,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     keybind_map = copy.deepcopy(KEYBIND_MAP)
     other_event_keys = copy.copy(OTHER_EVENT_KEYS)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, children = (), **kwargs):
         super().__init__(*args, **kwargs)
         self._children = {}
         self._funcs = {}
@@ -50,6 +50,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 pass
         if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
             self.addMouseMoveListener(self._mouseMove, priority = self.getEventListenerPriority)
+            
+        for child in children: #add starting children
+            self.addChild(child)
         
     @property
     def position(self):
