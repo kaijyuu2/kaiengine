@@ -7,9 +7,11 @@ from kaiengine.gconfig import FULL_MISC_PATH, DIRECTION_UP, DIRECTION_DOWN, DIRE
 from kaiengine.display import getWindowDimensionsScaled
 from kaiengine.interface import ScreenElement
 from kaiengine.event import callQuery
+from kaiengine.utilityFuncs import dictUnion
 
 from .containers import VerticalContainer, HorizontalContainer, GridContainer
 from .buttons import LabelButton
+from .stylesheetkeys import DEFAULT_GRAPHIC, DEFAULT_BORDER
 
 MOVE_OFFSETS = {DIRECTION_UP: (0,1),
                 DIRECTION_DOWN: (0,-1),
@@ -30,13 +32,14 @@ class MenuTemplate(ScreenElement):
     other_event_keys = ScreenElement.other_event_keys + (INTERLINK_EVENT_LEFT, INTERLINK_EVENT_RIGHT, INTERLINK_EVENT_UP, INTERLINK_EVENT_DOWN)
     
     button_type = LabelButton
-    default_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "menu0.bordered"])
-    default_border = (8,8)
     focus_first_button = True
+    
+    stylesheet = dictUnion(ScreenElement.stylesheet, {DEFAULT_GRAPHIC: tuple(FULL_MISC_PATH + ["menugraphics", "menu0.bordered"]),
+                                                      DEFAULT_BORDER: (8,8)})
     
     def __init__(self, sprite_path = None, button_type = None, **kwargs):
         if sprite_path is None:
-            sprite_path = self.default_graphic
+            sprite_path = self.stylesheet.get(DEFAULT_GRAPHIC, None)
         super().__init__(sprite_path, **kwargs)
         if button_type is not None:
             self.button_type = button_type

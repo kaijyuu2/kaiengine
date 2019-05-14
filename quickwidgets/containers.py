@@ -4,14 +4,17 @@ import operator
 
 from kaiengine.timer import DelayedEventException
 from kaiengine.interface import ScreenElement
+from kaiengine.utilityFuncs import dictUnion
+
+from .stylesheetkeys import DEFAULT_BORDER
 
 class Container(ScreenElement):
     
-    default_border = (0,0)
+    stylesheet = dictUnion(ScreenElement.stylesheet, {DEFAULT_BORDER: (0,0)})
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.border = self.default_border
+        self.border = self.stylesheet.get(DEFAULT_BORDER, (0,0))
         self.spacing = None
         self.strict_spacing = False
         self._update_positions = False

@@ -75,3 +75,9 @@ def truncNumbers(val, digitnum = 5, add_spaces = False, locale = None): # 5 digi
         val = " "*(digitnum - len(val)) + val
     return val
 
+
+def dictUnion(*dicts): #later dictionaries will preferentially use their keys over early dictionaries
+    keyvalpairs = []
+    for dictionary in dicts:
+        keyvalpairs += list(dictionary.items())
+    return dict(keyvalpairs)

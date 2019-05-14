@@ -4,37 +4,38 @@ import operator
 
 from kaiengine.gconfig import FULL_MISC_PATH
 from kaiengine.interface import ScreenElement
+from kaiengine.utilityFuncs import dictUnion
 
 from .containers import Container
 from .labels import LabelElement
-
+from .stylesheetkeys import DEFAULT_GRAPHIC, DEFAULT_PRESSED_GRAPHIC, DEFAULT_HIGHLIGHT_GRAPHIC, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_BORDER
 
 class BaseButton(Container):
     
-    default_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "brown_button.bordered"])
-    default_pressed_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "brown_button_pressed.bordered"])
-    default_highlight_graphic = tuple(FULL_MISC_PATH + ["menugraphics", "hover.png"])
-    default_width = 80
-    default_height = 24
-    default_border = (4,4)
+    stylesheet = dictUnion(Container.stylesheet, {DEFAULT_GRAPHIC: tuple(FULL_MISC_PATH + ["menugraphics", "brown_button.bordered"]),
+                                                  DEFAULT_PRESSED_GRAPHIC: tuple(FULL_MISC_PATH + ["menugraphics", "brown_button_pressed.bordered"]),
+                                                  DEFAULT_HIGHLIGHT_GRAPHIC: tuple(FULL_MISC_PATH + ["menugraphics", "hover.png"]),
+                                                  DEFAULT_WIDTH: 80,
+                                                  DEFAULT_HEIGHT: 24,
+                                                  DEFAULT_BORDER: (4,4)})
     
     def __init__(self, sprite_path = None, width = None, height = None, *args, **kwargs):
         super().__init__(sprite_path, **kwargs)
         
         #defaults
         
-        self._highlight_id = self.addChild(ScreenElement(self.default_highlight_graphic))
+        self._highlight_id = self.addChild(ScreenElement(self.stylesheet.get(DEFAULT_HIGHLIGHT_GRAPHIC, None)))
         highlight = self.getHighlight()
         highlight.setSpriteShow(False)
         highlight.setSpriteCenter(True,True)
         highlight.setSpriteFollowCamera(True)
         self._central_widget_id = None
         if sprite_path is None:
-            self.setSprite(self.default_graphic)
+            self.setSprite(self.stylesheet.get(DEFAULT_GRAPHIC, None))
         if width is None:
-            self.setWidth(self.default_width)
+            self.setWidth(self.stylesheet.get(DEFAULT_WIDTH, 80))
         if height is None:
-            self.setHeight(self.default_height)
+            self.setHeight(self.stylesheet.get(DEFAULT_HEIGHT, 24))
         
         self.setSpriteFollowCamera(True)
         
@@ -52,12 +53,15 @@ class BaseButton(Container):
             highlight.setSpriteShow(False)
     
     def setPressedDown(self):
-        if self.default_pressed_graphic:
-            self.setSprite(self.default_pressed_graphic)
+        graphic = self.stylesheet.get(DEFAULT_PRESSED_GRAPHIC, None)
+        if graphic:
+            self.setSprite(graphic)
         
     def setUnpressed(self):
-        if self.default_pressed_graphic:
-            self.setSprite(self.default_graphic)
+        if self.stylesheet.get(DEFAULT_PRESSED_GRAPHIC, None):
+            graphic = self.stylesheet.get(DEFAULT_GRAPHIC, None)
+            if graphic:
+                self.setSprite(graphic)
         
     def _updateHighlight(self):
         highlight = self.getHighlight()
@@ -157,9 +161,9 @@ class LabelButton(BaseButton):
             
 class GraphicButton(BaseButton):
     
-    default_graphic = None
-    default_pressed_graphic = None
-    #default_highlight_graphic = None
+    
+    stylesheet = dictUnion(BaseButton.stylesheet, {DEFAULT_GRAPHIC: None,
+                                                  DEFAULT_PRESSED_GRAPHIC: None})
     
     def __init__(self, *args, central_graphic = None, **kwargs):
         super().__init__(*args, **kwargs)

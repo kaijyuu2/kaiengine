@@ -9,6 +9,7 @@ from kaiengine.event import MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVEN
 from kaiengine.objectinterface import GraphicInterface, EventInterface, SchedulerInterface
 from kaiengine.weakrefhelper import weakRef, unWeakRef
 from kaiengine.debug import debugMessage
+from kaiengine.utilityFuncs import dictUnion
 from kaiengine.gconfig.default_keybinds import *
 
 from .basiceventkeys import *
@@ -19,8 +20,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     
     keybind_map = copy.deepcopy(KEYBIND_MAP)
     other_event_keys = copy.copy(OTHER_EVENT_KEYS)
+    stylesheet = {}
 
-    def __init__(self, *args, children = (), **kwargs):
+    def __init__(self, *args, children = (), stylesheet = None, **kwargs):
         super().__init__(*args, **kwargs)
         self._children = {}
         self._funcs = {}
@@ -50,6 +52,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 pass
         if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
             self.addMouseMoveListener(self._mouseMove, priority = self.getEventListenerPriority)
+            
+        if stylesheet:
+            self.updateStyleSheet(stylesheet)
             
         for child in children: #add starting children
             self.addChild(child)
@@ -102,6 +107,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     @focus.setter
     def focus(self, *args, **kwargs):
         raise AttributeError("Cannot set focus directly. Set the parent's focused child instead.")
+        
+    def updateStyleSheet(self, sheet):
+        self.stylesheet = dictUnion(self.stylesheet, sheet) #merge them. sheet's keys will be used preferentially
         
     def getLayer(self):
         return self._layer
