@@ -358,7 +358,6 @@ class GraphicInterface(PositionInterface, SleepInterface):
             pos[0] -= dimensions[0]/2
         if self.getSpriteCenter()[1]:
             pos[1] -= dimensions[1]/2
-        print(pos, dimensions, self.getSpriteCenter())
         return (pos[0], pos[0] + dimensions[0], pos[1], pos[1] + dimensions[1])
 
     def getSpriteLeftSide(self):
