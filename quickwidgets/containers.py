@@ -59,6 +59,11 @@ class Container(ScreenElement):
         
     
     #overwritten stuff
+    
+    def getAnchorPoint(self): 
+        #return bottom left corner
+        extents = self.getExtents()
+        return extents[0], extents[2]
         
     def removeAllChildren(self):
         super().removeAllChildren()

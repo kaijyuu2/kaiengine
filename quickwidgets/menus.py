@@ -125,7 +125,7 @@ class MenuTemplate(ScreenElement):
                 self.clearFocus()
                 self.getParent().clearFocus()
                 mindistance_menu_ref.setFocus(mindistance_button_id)
-                mindistance_menu_ref.setSelfFocused()
+                mindistance_menu_ref.setSelfFullyFocused()
                 return True
         return False
     
@@ -150,7 +150,7 @@ class MenuTemplate(ScreenElement):
             
     def mouseover(self, *args, **kwargs):
         if not self.isInputLocked():
-            self.setSelfFocused()
+            self.setSelfFullyFocused()
     
     #overwritten stuff
     
@@ -169,11 +169,6 @@ class MenuTemplate(ScreenElement):
     def removeAllChildren(self, *args, **kwargs):
         super().removeAllChildren(*args, **kwargs)
         self._buttons.clear()
-    
-    def getAnchorPoint(self): 
-        #return bottom left corner
-        extents = self.getExtents()
-        return extents[0], extents[2]
     
     def setSpriteCenter(self, *args, **kwargs):
         super().setSpriteCenter(*args, **kwargs)

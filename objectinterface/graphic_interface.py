@@ -171,7 +171,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
             x = self._center[0]
         if y is None:
             y = self._center[1]
-        self._center = [x,y]
+        self._center = (x,y)
         self._updateSprite()
 
     def setSpriteFlip(self, x = None, y = None):
@@ -300,9 +300,8 @@ class GraphicInterface(PositionInterface, SleepInterface):
         return self.sprite.getScreenPosition(*args, **kwargs)
 
     def getSpriteCenter(self):
-        try: return self.sprite.center[:]
-        except AttributeError: return [False,False]
-
+        return self._center
+    
     def getSpriteGraphicalCenter(self):
         return self.sprite.getCenterPosition()
 
@@ -353,8 +352,13 @@ class GraphicInterface(PositionInterface, SleepInterface):
         return self._getDefaultExtents()
     
     def _getDefaultExtents(self):
-        pos = self.getPos()
+        pos = list(self.getPos())
         dimensions = self.getSpriteDimensions()
+        if self.getSpriteCenter()[0]:
+            pos[0] -= dimensions[0]/2
+        if self.getSpriteCenter()[1]:
+            pos[1] -= dimensions[1]/2
+        print(pos, dimensions, self.getSpriteCenter())
         return (pos[0], pos[0] + dimensions[0], pos[1], pos[1] + dimensions[1])
 
     def getSpriteLeftSide(self):

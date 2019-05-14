@@ -169,6 +169,24 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         except AttributeError:
             return True #top level element always focused
         
+    def setSelfFocused(self):
+        #convenience function
+        parent = self.getParent()
+        if parent:
+            parent.setFocus(self)
+            
+    def setSelfFullyFocused(self):
+        self.setSelfFocused()
+        parent = self.getParent()
+        if parent:
+            parent.setSelfFullyFocused()
+            
+    def clearParentFocus(self):
+        #convenience function
+        parent = self.getParent()
+        if parent:
+            parent.setFocus(None)
+        
     def isFullyFocused(self):
         if self.isFocused():
             parent = self.getParent()
@@ -211,18 +229,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def isMousedOver(self):
         return self._mouse_over
     
-    def setSelfFocused(self):
-        #convenience function
-        parent = self.getParent()
-        if parent:
-            parent.setFocus(self)
-            
-    def clearParentFocus(self):
-        #convenience function
-        parent = self.getParent()
-        if parent:
-            parent.setFocus(None)
-            
     def _gainFocus(self):
         self.addFocusListeners()
         self.callEventFunc(GAINFOCUS_KEY)
