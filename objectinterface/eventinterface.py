@@ -26,9 +26,10 @@ class EventInterface(IdentifiedObject, SleepInterface):
         return str(own_id) + "_" + str(key) + "_EVENT"
 
     def addQueryListener(self, key, method):
-        self.removeQueryListener(self, key)
-        self._query_methods[key] = method
-        addQueryListener(key, method)
+        if not self.destroyed:
+            self.removeQueryListener(self, key)
+            self._query_methods[key] = method
+            addQueryListener(key, method)
 
     def removeQueryListener(self, key, *args, **kwargs):
         try: del self._query_methods[key]
@@ -36,9 +37,10 @@ class EventInterface(IdentifiedObject, SleepInterface):
         removeQueryListener(key, *args, **kwargs)
 
     def addCustomListener(self,key, method, priority = 0):
-        self._event_methods[key].append((method, priority))
-        if not self.sleeping:
-            addCustomListener(key, method, priority)
+        if not self.destroyed:
+            self._event_methods[key].append((method, priority))
+            if not self.sleeping:
+                addCustomListener(key, method, priority)
 
     def removeCustomListener(self, key, method):
         removeCustomListener(key, method)

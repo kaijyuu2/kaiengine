@@ -244,7 +244,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             
     def _addFocusListener(self, key, input_key):
         if self.hasEventFunc(key):
-            self.addCustomListener(input_key, lambda x=None,y=None: self.callEventFunc(key) if self._checkFocusListenerConditions(x,y) else None, priority = self.getEventListenerPriority)
+            newlistener = lambda x=None,y=None: self.callEventFunc(key) if self._checkFocusListenerConditions(x,y) else None
+            self._focus_listeners.add((input_key, newlistener))
+            self.addCustomListener(input_key, newlistener, priority = self.getEventListenerPriority)
             
     def _checkFocusListenerConditions(self, x, y):
         return self.isFullyFocused() and not self.isInputLocked() and not (x is not None and not self.checkPointWithinElement(x,y)) #weird pattern to avoid unnecessary evalution of second condition
