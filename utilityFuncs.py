@@ -5,6 +5,7 @@ from kaiengine.localization import getLocaleUnitLengths, getLocaleUnit, getLocal
 
 from math import floor, log
 from numpy import array, linalg
+from itertools import chain
 
 #a simple mouse tracker
 _mouse_x = 0
@@ -77,7 +78,4 @@ def truncNumbers(val, digitnum = 5, add_spaces = False, locale = None): # 5 digi
 
 
 def dictUnion(*dicts): #later dictionaries will preferentially use their keys over early dictionaries
-    keyvalpairs = []
-    for dictionary in dicts:
-        keyvalpairs += list(dictionary.items())
-    return dict(keyvalpairs)
+    return dict(chain.from_iterable(dictionary.items() for dictionary in dicts))
