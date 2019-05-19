@@ -19,17 +19,7 @@ class Container(ScreenElement):
         self.spacing = None
         self.strict_spacing = False
         self._update_positions = False
-
-
-    def getWidth(self):
-        if not self.containerPositionsUpdated():
-            self.updateContainerPositions()
-        return self.getSpriteWidth() 
-    
-    def getHeight(self):
-        if not self.containerPositionsUpdated():
-            self.updateContainerPositions()
-        return self.getSpriteHeight()
+        self._currently_updating = False
 
     def setBorder(self, x = None, y = None):
         if x is None: x = self.border[0]
@@ -52,15 +42,22 @@ class Container(ScreenElement):
         return self.strict_spacing
 
     def delayUpdatePositions(self):
-        if not self._update_positions:
+        if not self._update_positions and not self._currently_updating:
             try:
                 self._update_positions = self.delay(self.updateContainerPositions, self.getLayer)
             except DelayedEventException:
                 pass
 
     def updateContainerPositions(self):
-        self.undelay(self._update_positions)
-        self._update_positions = False
+        if not self._currently_updating: #prevent infinite loops
+            self.undelay(self._update_positions)
+            self._update_positions = False
+            self._currently_updating = True
+            self._updateContainerPositions()
+            self._currently_updating = False
+        
+    def _updateContainerPositions(self):
+        pass
         
     def containerPositionsUpdated(self):
         return not bool(self._update_positions)
@@ -78,6 +75,21 @@ class Container(ScreenElement):
 
 
     #overwritten stuff
+
+    def getWidth(self):
+        if not self.containerPositionsUpdated():
+            self.updateContainerPositions()
+        return super().getWidth()
+    
+    def getHeight(self):
+        if not self.containerPositionsUpdated():
+            self.updateContainerPositions()
+        return super().getHeight()
+    
+    def getExtents(self):
+        if not self.containerPositionsUpdated():
+            self.updateContainerPositions()
+        return super().getExtents()
 
     def getAnchorPoint(self):
         #return bottom left corner
@@ -144,8 +156,8 @@ class VerticalContainer(_LinearContainer):
     #overwritten stuff
 
 
-    def updateContainerPositions(self):
-        super().updateContainerPositions()
+    def _updateContainerPositions(self):
+        super()._updateContainerPositions()
         maxwidth = 0
         maxheight = 0
         totalheight = self.getBorder()[1]
@@ -164,8 +176,8 @@ class HorizontalContainer(_LinearContainer):
 
     #overwritten stuff
 
-    def updateContainerPositions(self):
-        super().updateContainerPositions()
+    def _updateContainerPositions(self):
+        super()._updateContainerPositions()
         maxwidth = 0
         maxheight = 0
         totalwidth = self.getBorder()[0]
@@ -206,8 +218,8 @@ class GridContainer(Container):
         if y is None: y = self.getSpacing()[1]
         self.spacing = (x,y)
 
-    def updateContainerPositions(self):
-        super().updateContainerPositions()
+    def _updateContainerPositions(self):
+        super()._updateContainerPositions()
         maxwidth = {}
         maxheight = {}
         totalelements = [0,0]
