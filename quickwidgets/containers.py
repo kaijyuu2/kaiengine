@@ -20,11 +20,16 @@ class Container(ScreenElement):
         self.strict_spacing = False
         self._update_positions = False
 
-    def getWidth(self):
-        return self.getSpriteWidth() or dmax([child.width for child in self.children])
 
+    def getWidth(self):
+        if not self.containerPositionsUpdated():
+            self.updateContainerPositions()
+        return self.getSpriteWidth() 
+    
     def getHeight(self):
-        return self.getSpriteHeight() or dmax([child.height for child in self.children])
+        if not self.containerPositionsUpdated():
+            self.updateContainerPositions()
+        return self.getSpriteHeight()
 
     def setBorder(self, x = None, y = None):
         if x is None: x = self.border[0]
@@ -54,7 +59,11 @@ class Container(ScreenElement):
                 pass
 
     def updateContainerPositions(self):
+        self.undelay(self._update_positions)
         self._update_positions = False
+        
+    def containerPositionsUpdated(self):
+        return not bool(self._update_positions)
 
     #template functions
 
@@ -134,8 +143,6 @@ class VerticalContainer(_LinearContainer):
 
     #overwritten stuff
 
-    def getHeight(self):
-        return sum([child.height for child in self.children]) + self.border[1]*2
 
     def updateContainerPositions(self):
         super().updateContainerPositions()
@@ -156,9 +163,6 @@ class VerticalContainer(_LinearContainer):
 class HorizontalContainer(_LinearContainer):
 
     #overwritten stuff
-
-    def getWidth(self):
-        return sum([child.width for child in self.children]) + self.border[0]*2
 
     def updateContainerPositions(self):
         super().updateContainerPositions()
