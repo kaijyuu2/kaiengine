@@ -105,8 +105,8 @@ class BaseButton(Container):
         
     #overwritten stuff
     
-    def updateContainerPositions(self):
-        super().updateContainerPositions()
+    def _updateContainerPositions(self):
+        super()._updateContainerPositions()
         central_widget = self.getCentralWidget()
         if central_widget:
             self.setDimensions(*map(max, self.getDimensions(), map(operator.add, central_widget.getDimensions(), map(operator.mul, self.getBorder(), (2,2)))))

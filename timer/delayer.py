@@ -40,8 +40,8 @@ def undelay(ID):
 def runDelayedEvents():
     global _currently_running_events
     _currently_running_events = True
-    for priority, data in _delayed_events.items():
-        for key, val in data.items():
+    for priority, data in list(_delayed_events.items()): #listified to prevent errors when undelaying things in a delayed action
+        for key, val in list(data.items()):
             listener, args, kwargs, ID = val
             try:
                 listener(*args, **kwargs)

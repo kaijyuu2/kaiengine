@@ -177,7 +177,7 @@ class MenuTemplate(ScreenElement):
         super().setSpriteCenter(*args, **kwargs)
         self._applyChildrenPositions()
         
-    def updateContainerPositions(self, *args, **kwargs):
+    def _updateContainerPositions(self, *args, **kwargs):
         maxwidth = 0
         maxheight = 0
         for button in self.getAllButtons():
@@ -191,7 +191,7 @@ class MenuTemplate(ScreenElement):
             maxheight = max(maxheight, button.getHeight())
         for button in self.getAllButtons():
             button.setDimensions(maxwidth, maxheight)
-        super().updateContainerPositions(*args, **kwargs)
+        super()._updateContainerPositions(*args, **kwargs)
     
     
 class VerticalMenu(MenuTemplate, VerticalContainer):
