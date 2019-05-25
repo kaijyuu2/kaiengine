@@ -29,6 +29,7 @@ class Settings(BaseObject):
                 self.altInit(filepath)
         else:
             self.altInit(filepath)
+        self._altered_values = self.serialize()
 
     def altInit(self, filepath):
         super(Settings, self).__init__()
@@ -49,7 +50,7 @@ class Settings(BaseObject):
 
     def saveToFile(self):
         try:
-            serialized = self.serialize()
+            serialized = self._altered_values
             jsondumps(serialized)
         except Exception as e:
             from kaiengine.debug import debugMessage
@@ -76,6 +77,7 @@ class Settings(BaseObject):
 
     def setValue(self, key, value = True):
         self._prop[key] = value
+        self._altered_values[key] = value
         setattr(self, key, value)
 
 settings = Settings(SETTINGS_FILE_NAME)
