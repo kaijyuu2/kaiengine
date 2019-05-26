@@ -31,6 +31,12 @@ class sDict(dict):
 
     def last_item(self):
         return self[self.last_key()]
+    
+    def firstKey(self):
+        return sorted(self.keys())[0]
+    
+    def firstItem(self):
+        return self[self.firstKey()]
 
     def clear(self):
         super().clear()

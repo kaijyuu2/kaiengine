@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from sortedcontainers import SortedDict
-from kaiengine.uidgen import generateUniqueID
+from kaiengine.uidgen import generateUniqueID, isID
 from kaiengine.sDict import sDict
 
 from .delayedeventexception import DelayedEventException
@@ -31,11 +31,26 @@ def delay(listener, priority = 0, *args, **kwargs):
         raise DelayedEventException("Cannot delay events in a delayed event")
     
 def undelay(ID):
+    if ID != None:
+        if isID(ID):
+            _undelay(ID)
+        else:
+            _undelay(_findIDByListener(ID))
+        
+    
+def _undelay(ID):
     try:
         priority, key = _delayed_events_ids[ID]
         _removeDelayEvent(priority, key)
     except KeyError:
         pass
+    
+def _findIDByListener(listener):
+    for priority, data in _delayed_events.items(): 
+        for key, val in data.items():
+            if val[0] == listener:
+                return val[3]
+    return None
     
 def runDelayedEvents():
     global _currently_running_events

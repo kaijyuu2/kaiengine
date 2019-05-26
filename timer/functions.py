@@ -1,5 +1,7 @@
 
 
+from kaiengine.uidgen import isID
+
 from . import scheduler
 from .framecounter import global_frame_counter
 from .timer import gametimer
@@ -50,7 +52,10 @@ def scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
     return scheduler._scheduleRealtime(listener, time, repeat, *args, **kwargs)
 
 def unschedule(listener):
-    return scheduler._unschedule(listener)
+    if not isID(listener):
+        return scheduler._unschedule(listener)
+    else:
+        return unscheduleWithID(listener)
 
 def unscheduleWithID(*args, **kwargs):
     return scheduler._unscheduleWithID(*args, **kwargs)
@@ -61,14 +66,20 @@ def unscheduleRealtime(*args, **kwargs):
 def unscheduleRealtimeWithID(*args, **kwargs):
     return scheduler._unscheduleRealtimeWithID(*args, **kwargs)
 
-def pauseScheduledListener(*args, **kwargs):
-    scheduler._pauseScheduledListener(*args, **kwargs)
+def pauseScheduledListener(listener, *args, **kwargs):
+    if not isID(listener):
+        scheduler._pauseScheduledListener(*args, **kwargs)
+    else:
+        pauseScheduledListenerWithID(listener, *args, **kwargs)
     
 def pauseScheduledListenerWithID(*args, **kwargs):
     scheduler._pauseScheduledListenerWithID(*args, **kwargs)
 
-def unpauseScheduledListener(*args, **kwargs):
-    scheduler._unpauseScheduledListener(*args, **kwargs)
+def unpauseScheduledListener(listener, *args, **kwargs):
+    if not isID(listener):
+        scheduler._unpauseScheduledListener(*args, **kwargs)
+    else:
+        unpauseScheduledListenerWithID(listener, *args, **kwargs)
 
 def unpauseScheduledListenerWithID(*args, **kwargs):
     scheduler._unpauseScheduledListenerWithID(*args, **kwargs)

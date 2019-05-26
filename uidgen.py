@@ -8,9 +8,12 @@
 
 BASE_UNIQUE_STRING = "_UNIQUE_ID_"
 UNDERSCORE_CHAR = "_"
-DEFAULT_ID = "DEFAULT_TYPE"
+DEFAULT_ID = "GENERIC"
 
 id_counters = {}
+
+class Identification(str): #string for pretty much all intents and purposes. Subclassing so we can differentiate it from other strings
+    pass
 
 def generateUniqueID(identifier = DEFAULT_ID):
     identifier = str(identifier) #be sure it's a string
@@ -18,7 +21,10 @@ def generateUniqueID(identifier = DEFAULT_ID):
         id_counters[identifier] += 1
     except KeyError:
         id_counters[identifier] = 0
-    return BASE_UNIQUE_STRING + identifier + UNDERSCORE_CHAR + str(id_counters[identifier])
+    return Identification(BASE_UNIQUE_STRING + identifier + UNDERSCORE_CHAR + str(id_counters[identifier]))
+
+def isID(identifier):
+    return isinstance(identifier, Identification) 
 
 class IdentifiedObject(object):
 
@@ -33,7 +39,7 @@ class IdentifiedObject(object):
         returnstr = self.id[:]
         for arg in args:
             returnstr += str(arg)
-        return returnstr
+        return Identification(returnstr)
         
 
 GenerateUniqueID = generateUniqueID #deprecated function name
