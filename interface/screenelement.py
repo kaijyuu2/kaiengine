@@ -13,6 +13,7 @@ from kaiengine.utilityFuncs import dictUnion
 from kaiengine.gconfig.default_keybinds import *
 
 from .basiceventkeys import *
+from .stylesheetkeys import *
 
 DEFAULT_INPUT_LOCK = "_DEFAULT_INPUT_LOCK"
 
@@ -22,8 +23,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     other_event_keys = copy.copy(OTHER_EVENT_KEYS)
     stylesheet = {}
 
-    def __init__(self, *args, children = (), stylesheet = None, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, sprite_path = None, children = (), stylesheet = None, **kwargs):
+        super().__init__(**kwargs)
         self._children = {}
         self._funcs = {}
         self._focus_listeners = set()
@@ -55,6 +56,14 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             
         if stylesheet:
             self.updateStyleSheet(stylesheet)
+            
+        width = self.stylesheet.get(DEFAULT_WIDTH, None)
+        if width is not None:
+            self.setWidth(width)
+        height = self.stylesheet.get(DEFAULT_HEIGHT, None)
+        if height is not None:
+            self.setHeight(height)
+        self.setSprite(sprite_path or self.stylesheet.get(DEFAULT_GRAPHIC, None))
             
         for child in children: #add starting children
             self.addChild(child)
@@ -334,6 +343,10 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             self.updateAllLayers()
         return newchild
     
+    def addChildApplyStylesheet(self, newchildtype, *args, **kwargs):
+        stylesheet = kwargs.pop("stylesheet", {})
+        return self.addChild(newchildtype(*args, stylesheet=dictUnion(self.stylesheet, stylesheet), **kwargs))
+    
     def getChild(self, child_id):
         try: return self._children[child_id]
         except (KeyError, TypeError):
@@ -418,6 +431,14 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 
     def updateElement(self):
         pass
+    
+    def getOrderedStylesheetData(self, *args, default = None):
+        for arg in args:
+            try:
+                return self.stylesheet[arg]
+            except KeyError:
+                pass
+        return default
 
     #overwritten stuff
     def setPos(self, *args, **kwargs):

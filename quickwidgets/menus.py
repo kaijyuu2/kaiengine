@@ -11,7 +11,7 @@ from kaiengine.utilityFuncs import dictUnion
 
 from .containers import VerticalContainer, HorizontalContainer, GridContainer
 from .buttons import LabelButton
-from .stylesheetkeys import DEFAULT_GRAPHIC, DEFAULT_BORDER
+from .stylesheetkeys import DEFAULT_GRAPHIC, DEFAULT_BORDER, DEFAULT_MENU_GRAPHIC, DEFAULT_MENU_BORDER, DEFAULT_MENU_WIDTH, DEFAULT_MENU_HEIGHT
 
 MOVE_OFFSETS = {DIRECTION_UP: (0,1),
                 DIRECTION_DOWN: (0,-1),
@@ -34,20 +34,21 @@ class MenuTemplate(ScreenElement):
     button_type = LabelButton
     focus_first_button = True
 
-    stylesheet = dictUnion(ScreenElement.stylesheet, {DEFAULT_GRAPHIC: tuple(FULL_MISC_PATH + ["menugraphics", "menu0.bordered"]),
-                                                      DEFAULT_BORDER: (8,8)})
+    stylesheet = dictUnion(ScreenElement.stylesheet, {})
 
-    def __init__(self, sprite_path = None, button_type = None, stylesheet=None, **kwargs):
-        if stylesheet:
-            self.updateStyleSheet(stylesheet)
-        if sprite_path is None:
-            sprite_path = self.stylesheet.get(DEFAULT_GRAPHIC, None)
-        super().__init__(sprite_path, **kwargs)
+    def __init__(self, sprite_path = None, button_type = None, **kwargs):
+        super().__init__(**kwargs)
+        sprite_path = sprite_path or self.getOrderedStylesheetData(DEFAULT_MENU_GRAPHIC, DEFAULT_GRAPHIC, default=tuple(FULL_MISC_PATH + ["menugraphics", "menu0.bordered"]))
+        if sprite_path:
+            self.setSprite(sprite_path)
         if button_type is not None:
             self.button_type = button_type
         self._first_button = True
         self._buttons = set()
         self._menu_interlinks = {}
+        
+        #overwrites
+        self.border = self.stylesheet.get(DEFAULT_BORDER, None) or self.stylesheet.get(DEFAULT_MENU_BORDER, None) or (8,8)
 
         #defaults
         self.setSpriteCenter(True, True)
@@ -61,7 +62,7 @@ class MenuTemplate(ScreenElement):
         self.button_type = newtype
 
     def addButton(self, *args, **kwargs):
-        ID = self.addChild(self.button_type(*args, **kwargs))
+        ID = self.addChildApplyStylesheet(self.button_type, *args, **kwargs)
         self._updateFirstButton(ID)
         self._buttons.add(ID)
         return ID
