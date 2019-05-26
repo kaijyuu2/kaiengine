@@ -36,6 +36,7 @@ def undelay(ID):
             _undelay(ID)
         else:
             _undelay(_findIDByListener(ID))
+    return ID
         
     
 def _undelay(ID):

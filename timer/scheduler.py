@@ -70,7 +70,7 @@ class TimedEvent(object):
 
 
 class RealtimeEvent(object):
-    def __init__(self, listener, time, repeating, scheduler_time, args, kwargs):
+    def __init__(self, listener, time, repeating, args, kwargs):
         try:
             callablename = listener.__name__
         except AttributeError:
@@ -87,7 +87,7 @@ class RealtimeEvent(object):
         self.time_active = Timer()
         self.pause_timer = Timer()
         self.time_active.Start()
-        self.scheduler_time = scheduler_time
+        self.scheduler_time = 0
         self._destroyed = False
         self._repeat_started = False
 
@@ -116,19 +116,25 @@ class RealtimeEvent(object):
     def __del__(self):
         self.destroy()
 
-realtime_events = {}
+realtime_events = {} #contains the realtime events, indexed by event id
+realtime_events_listener_map = {} #indexed by listener, contains event ids in sDict
 
 def _scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
+    newevent = RealtimeEvent(listener, time, repeat, args, kwargs)
+    _scheduleRealtimeWithEvent(newevent)
+    
+def _scheduleRealtimeWithEvent(newevent, *args, **kwargs):
     scheduler = getGameScheduler()
-    newevent = RealtimeEvent(listener, time, repeat, scheduler.time(), args, kwargs)
-    handle = scheduler.call_later(time, functools.partial(_realtimeEventRun, newevent, *args, **kwargs))
+    handle = scheduler.call_later(newevent.time, functools.partial(_realtimeEventRun, newevent, *args, **kwargs))
+    realtime_events[newevent.eventid] = newevent
+    newevent.handle = handle
     try:
-        key = realtime_events[listener].append(newevent)
+        key = realtime_events_listener_map[newevent.listener].append(newevent.eventid)
     except KeyError:
-        realtime_events[listener] = sDict()
-        key = realtime_events[listener].append(newevent)
-    realtime_events[listener][key].key = key
-    realtime_events[listener][key].handle = handle
+        realtime_events_listener_map[newevent.listener] = sDict()
+        key = realtime_events_listener_map[newevent.listener].append(newevent.eventid)
+    newevent.key = key
+    newevent.scheduler_time = scheduler.time()
     return newevent.eventid
 
 def _realtimeEventRun(event, *args, **kwargs):
@@ -140,80 +146,79 @@ def _realtimeEventRun(event, *args, **kwargs):
         debugMessage("Something broke with a scheduled realtime listener; deleting it.")
         traceback.print_exc()
         event.repeating = False #stop it from repeating
-    _cleanupRealtimeScheduledEvent(event.listener, event.key)
-    if not event._destroyed and event.repeating:
-        _scheduleRealtime(event.listener, event.time, event.repeating, *args, **kwargs)
+    _cleanupRealtimeScheduledEvent(event.eventid)
+    if not event._destroyed:
+        if event.repeating:
+            _scheduleRealtimeWithEvent(event, *args, **kwargs)
+        else:
+            _destroyRealtimeEvent(event.eventid)
         
 def _unscheduleRealtime(listener):
-    eventid = None
     try:
-        key = min(realtime_events[listener].keys())
-        eventid = realtime_events[listener][key].eventid
-        _cleanupRealtimeScheduledEvent(listener, key)
-    except (KeyError, ValueError):
+        ID = realtime_events_listener_map[listener].pop(realtime_events_listener_map[listener].firstKey(), None)
+        if ID is not None:
+            return _unscheduleRealtimeByID(ID)
+        else: #assist in leak prevention
+            if not realtime_events_listener_map[listener]:
+                del realtime_events_listener_map[listener]
+    except KeyError:
         pass
-    return eventid
+    return None
+    
 
-def _unscheduleRealtimeByID(listener, eventid):
+def _unscheduleRealtimeByID(eventid):
+    _cleanupRealtimeScheduledEvent(eventid)
     try:
-        for key, event in realtime_events[listener].items():
-            if event.eventid == eventid:
-                _cleanupRealtimeScheduledEvent(listener, key)
-                break
-    except (KeyError, ValueError):
+        _destroyRealtimeEvent(eventid)
+    except KeyError:
         pass
     return eventid
     
-def _cleanupRealtimeScheduledEvent(listener, key):
+def _cleanupRealtimeScheduledEvent(eventid):
     try:
-        if realtime_events[listener][key].handle:
-            realtime_events[listener][key].handle.cancel()
-        del realtime_events[listener][key] #deliberately do not call destroy method so that repeating ones work. I know this is hacky; I'm sorry
-        if not realtime_events[listener]:
-            del realtime_events[listener]
+        event = realtime_events[eventid]
+        try:
+            realtime_events_listener_map[event.listener].pop(event.key, None)
+            if not realtime_events_listener_map[event.listener]:
+                del realtime_events_listener_map[event.listener]
+        except KeyError:
+            pass
+        if event.handle:
+            event.handle.cancel()
+    except KeyError:
+        pass
+    
+def _destroyRealtimeEvent(eventid):
+    realtime_events[eventid].destroy()
+    del realtime_events[eventid]
+
+def _pauseRealtimeListener(listener, *args, **kwargs):
+    try:
+        _pauseRealtimeListenerWithID(realtime_events_listener_map[listener], *args, **kwargs)
+    except KeyError:
+        pass
+        
+def _pauseRealtimeListenerWithID(eventid, *args, **kwargs):
+    try:
+        realtime_events[eventid].pauseEvent(*args, **kwargs)
     except KeyError:
         pass
 
-def _realtimeRunOnce(time, event, *args, **kwargs): #this is used so we can catch the call and delete the event
-    try:
-        run = not event._destroyed
-    except AttributeError:
-        run = False
-    if run: #only run if not unscheduled
-        event.listener(time, *args, **kwargs)
-    if event:
-        _cleanupRealtimeScheduledEvent(event.listener, event.key)
-
-def _pauseRealtimeListener(listener, *args, **kwargs):
-    for key in sorted(realtime_events.keys()):
-        if not realtime_events[key].paused:
-            realtime_events[key].pauseEvent(*args, **kwargs)
-            break
-        
-def _pauseRealtimeListenerWithID(listener, eventid, *args, **kwargs):
-    for key, event in realtime_events.items():
-        if event.eventid == eventid:
-            realtime_events[key].pauseEvent(*args, **kwargs)
-            break
-
 def _unpauseRealtimeListener(listener, *args, **kwargs):
-    for key in sorted(realtime_events.keys()):
-        if realtime_events[key].paused:
-            event = realtime_events[key]
-            pause_time = event.unpauseEvent(*args, **kwargs)
-            if not event.paused:
-                event.scheduler_time += pause_time
-                getGameScheduler().call_later(event.time - event.time_active.getTime(), functools.partial(_realtimeEventRun, event, *event.args, **event.kwargs))
-            break
+    try:
+        _unpauseRealtimeListenerWithID(realtime_events_listener_map[listener], *args, **kwargs)
+    except KeyError:
+        pass
         
-def _unpauseRealtimeListenerWithID(listener, eventid, *args, **kwargs):
-    for event in realtime_events.values():
-        if event.eventid == eventid:
-            pause_time = event.unpauseEvent(*args, **kwargs)
-            if not event.paused:
-                event.scheduler_time += pause_time
-                getGameScheduler().call_later(event.time - event.time_active.getTime(), functools.partial(_realtimeEventRun, event, *event.args, **event.kwargs))
-            break
+def _unpauseRealtimeListenerWithID(eventid, *args, **kwargs):
+    try:
+        event = realtime_events[eventid]
+        pause_time = event.unpauseEvent(*args, **kwargs)
+        if not event.paused:
+            event.scheduler_time += pause_time
+            getGameScheduler().call_later(event.time - event.time_active.getTime(), functools.partial(_realtimeEventRun, event, *event.args, **event.kwargs))
+    except KeyError:
+        pass
 
 scheduled_events = {} #contains event, indexed by eventid
 scheduled_events_time_map = {} #contains unordered eventid set, indexed by time

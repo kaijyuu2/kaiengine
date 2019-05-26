@@ -60,15 +60,18 @@ def unschedule(listener):
 def unscheduleWithID(*args, **kwargs):
     return scheduler._unscheduleWithID(*args, **kwargs)
 
-def unscheduleRealtime(*args, **kwargs):
-    return scheduler._unscheduleRealtime(*args, **kwargs)
+def unscheduleRealtime(listener, *args, **kwargs):
+    if not isID(listener):
+        return scheduler._unscheduleRealtime(listener, *args, **kwargs)
+    else:
+        return unscheduleRealtimeWithID(listener, *args, **kwargs)
 
 def unscheduleRealtimeWithID(*args, **kwargs):
     return scheduler._unscheduleRealtimeWithID(*args, **kwargs)
 
 def pauseScheduledListener(listener, *args, **kwargs):
     if not isID(listener):
-        scheduler._pauseScheduledListener(*args, **kwargs)
+        scheduler._pauseScheduledListener(listener, *args, **kwargs)
     else:
         pauseScheduledListenerWithID(listener, *args, **kwargs)
     
@@ -77,21 +80,27 @@ def pauseScheduledListenerWithID(*args, **kwargs):
 
 def unpauseScheduledListener(listener, *args, **kwargs):
     if not isID(listener):
-        scheduler._unpauseScheduledListener(*args, **kwargs)
+        scheduler._unpauseScheduledListener(listener, *args, **kwargs)
     else:
         unpauseScheduledListenerWithID(listener, *args, **kwargs)
 
 def unpauseScheduledListenerWithID(*args, **kwargs):
     scheduler._unpauseScheduledListenerWithID(*args, **kwargs)
 
-def pauseRealtimeListener(*args, **kwargs):
-    scheduler._pauseRealtimeListener(*args, **kwargs)
+def pauseRealtimeListener(listener, *args, **kwargs):
+    if not isID(listener):
+        scheduler._pauseRealtimeListener(listener, *args, **kwargs)
+    else:
+        pauseRealtimeListenerWithID(listener, *args, **kwargs)
     
 def pauseRealtimeListenerWithID(*args, **kwargs):
     scheduler._pauseRealtimeListenerWithID(*args, **kwargs)
 
-def unpauseRealtimeListener(*args, **kwargs):
-    scheduler._unpauseRealtimeListener(*args, **kwargs)
+def unpauseRealtimeListener(listener, *args, **kwargs):
+    if not isID(listener):
+        scheduler._unpauseRealtimeListener(listener, *args, **kwargs)
+    else:
+        unpauseRealtimeListenerWithID(listener, *args, **kwargs)
     
 def unpauseRealtimeListenerWithID(*args, **kwargs):
     scheduler._unpauseRealtimeListenerWithID(*args, **kwargs)
