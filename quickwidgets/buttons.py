@@ -20,7 +20,7 @@ class BaseButton(Container):
         
         #defaults
         
-        self._highlight_id = self.addChild(ScreenElement(self.stylesheet.get(DEFAULT_HIGHLIGHT_GRAPHIC, tuple(FULL_MISC_PATH + ["menugraphics", "hover.png"])), stylesheet=self.stylesheet))
+        self._highlight_id = self.addChildApplyStylesheet(ScreenElement, self.stylesheet.get(DEFAULT_HIGHLIGHT_GRAPHIC, tuple(FULL_MISC_PATH + ["menugraphics", "hover.png"])))
         highlight = self.getHighlight()
         highlight.setSpriteShow(False)
         highlight.setSpriteCenter(True,True)
@@ -147,7 +147,7 @@ class LabelButton(BaseButton):
     def __init__(self, text = None, font = None, font_size = None,*args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        self.setCentralWidget(LabelElement(text, font, font_size))
+        self.setCentralWidget(LabelElement(text, font, font_size, parent_stylesheet=self.stylesheet))
         
     #add alias for convenience/being explicit
     getLabel = BaseButton.getCentralWidget
@@ -176,7 +176,7 @@ class GraphicButton(BaseButton):
         self.pressed_graphic = None #overwrite these
         self.unpressed_graphic = None #overwrite these
         
-        self.setCentralWidget(ScreenElement(stylesheet=self.stylesheet))
+        self.setCentralWidget(ScreenElement(parent_stylesheet=self.stylesheet))
         if central_graphic:
             self.setButtonGraphic(central_graphic)
             

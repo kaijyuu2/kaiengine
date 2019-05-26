@@ -23,7 +23,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     other_event_keys = copy.copy(OTHER_EVENT_KEYS)
     stylesheet = {}
 
-    def __init__(self, sprite_path = None, children = (), stylesheet = None, **kwargs):
+    def __init__(self, sprite_path = None, children = (), stylesheet = None, parent_stylesheet = None, **kwargs):
         super().__init__(**kwargs)
         self._children = {}
         self._funcs = {}
@@ -54,6 +54,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
             self.addMouseMoveListener(self._mouseMove, priority = self.getEventListenerPriority)
             
+        if parent_stylesheet:
+            self.stylesheet = dictUnion(parent_stylesheet, self.stylesheet)
         if stylesheet:
             self.updateStyleSheet(stylesheet)
             
@@ -344,8 +346,8 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         return newchild
     
     def addChildApplyStylesheet(self, newchildtype, *args, **kwargs):
-        stylesheet = kwargs.pop("stylesheet", {})
-        return self.addChild(newchildtype(*args, stylesheet=dictUnion(self.stylesheet, stylesheet), **kwargs))
+        parent_stylesheet = kwargs.pop("parent_stylesheet", {})
+        return self.addChild(newchildtype(*args, parent_stylesheet=dictUnion(self.stylesheet, parent_stylesheet), **kwargs))
     
     def getChild(self, child_id):
         try: return self._children[child_id]
