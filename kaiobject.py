@@ -1,52 +1,35 @@
+# -*- coding: utf-8 -*-
 
+import os, copy, importlib
 
-"""game object type that includes stuff for loading/etc"""
+from kaiengine.propertygetter import PropertyGetter
+from kaiengine.resource import toStringPath
+from kaiengine.load import loadGenericObj
+from kaiengine.destroyinterface import DestroyInterface
+from kaiengine.uidgen import generateUniqueID
 
-from .propertygetter import PropertyGetter
-from .destroyinterface import DestroyInterface
-from . import load
-import copy
-from .gconfig import *
-
+from kaiengine.gconfig import PATH, EXTENSION, FILENAME, FILE_EXTENSION, FILEPATH, FAILED_LOAD_KEY, ADDED_CLASS_TYPE
+from kaiengine.gconfig import CLASS_TYPE, DEFAULT_CLASS_TYPE, PYTHON_EXTENSION, PROP_UNDEFINED, DEFAULT_KWARG
 
 SPECIAL_KEYS = [PATH, EXTENSION, CLASS_TYPE, FILENAME, FILE_EXTENSION,
             FILEPATH, FAILED_LOAD_KEY, ADDED_CLASS_TYPE] #don't put these in the serialized dictionary
 
+_class_types_dict = {}
 
-class BaseObject(DestroyInterface):
+
+class KaiObject(DestroyInterface):
 
     #default attributes. Should really be set by the child classes
     vars()[PATH] = [] #for any dynamic child classes
     vars()[EXTENSION] = None #file extension for dynamic child classes
 
-    def __init__(self, filepath = None, *args, **kwargs):
-        super(BaseObject, self).__init__(*args, **kwargs)
+    def __init__(self, *args, properties_dict = None, **kwargs):
+        super().__init__(*args, **kwargs)
         self._prop = {}
-        self.loadProp(filepath)
+        if properties_dict:
+            self.loadProp(properties_dict)
 
-    def loadProp(self, filepath):
-        from .resource import ResourceUnavailableError
-        file_failed_to_load = False
-        if filepath is not None:
-            try: #check if already loaded
-                filepath.keys() #is if this is a dict
-            except AttributeError:
-                if not (type(filepath) is list or type(filepath) is tuple): #check if it's just the filename or a full path
-                    filepath = self._path + [filepath] #make it a full path if not one already
-                try:
-                    new_properties = load.loadGenericObj(filepath, self._extension)
-                except ResourceUnavailableError:
-                    new_properties = {}
-                    file_failed_to_load = True
-            else:
-                new_properties = filepath
-        else:
-            new_properties = {}
-        self.setupProperties(new_properties)
-        if file_failed_to_load:
-            raise ResourceUnavailableError("Properties file not found: " + str(filepath))
-
-    def setupProperties(self, new_properties):
+    def loadProp(self, properties_dict):
         #for when the object is first loaded
         extra_prop = {}
         for classtype in reversed(type(self).mro()):
@@ -57,7 +40,7 @@ class BaseObject(DestroyInterface):
         extra_prop = copy.deepcopy(extra_prop) #copy any nested dicts/lists/etc
         for key, val in extra_prop.items():
             self.addProperty(key, val)
-        self.applyProperties(new_properties, extra_prop)
+        self.applyProperties(properties_dict, extra_prop)
 
     def applyProperties(self, new_properties, extra_prop = None):
         #if you want to apply a new dict of properties later (also used in loading)
@@ -124,3 +107,25 @@ class BaseObject(DestroyInterface):
             new_prop.pop(key, None)
         return new_prop
 
+def createObject(filepath, *args, default_type = KaiObject, **kwargs):
+    filepath = toStringPath(filepath)
+    prop = loadGenericObj(filepath)
+    try:
+        class_name = prop.pop(CLASS_TYPE)
+        if class_name != DEFAULT_CLASS_TYPE:
+            class_path = os.path.join(os.path.dirname(filepath), class_name + PYTHON_EXTENSION)
+            try:
+                class_type = _class_types_dict[class_path]
+            except KeyError:
+                spec = importlib.util.spec_from_file_location(generateUniqueID(os.path.splitext(os.path.basename(filepath)))[0], class_path)
+                newmod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(newmod)
+                class_type = newmod.MainClass
+                _class_types_dict[class_path] = class_type
+        else:
+            raise KeyError #hack to avoid duplicated code
+    except KeyError:
+        class_type = default_type
+    return class_type(*args, properties_dict = prop, **kwargs)
+    
+        
