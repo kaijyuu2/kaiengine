@@ -6,11 +6,13 @@
 #pass something convertable to a string to add it to the generated ID,
 #if you want to store data in it for debugging/etc
 
+
 BASE_UNIQUE_STRING = "_UNIQUE_ID_"
 UNDERSCORE_CHAR = "_"
 DEFAULT_ID = "GENERIC"
 
 id_counters = {}
+
 
 class Identification(str): #string for pretty much all intents and purposes. Subclassing so we can differentiate it from other strings
     pass
@@ -26,7 +28,7 @@ def generateUniqueID(identifier = DEFAULT_ID):
 def isID(identifier):
     return isinstance(identifier, Identification) 
 
-class IdentifiedObject(object):
+class IdentifiedObject():
 
     '''Provide child objects with unique IDs.'''
 

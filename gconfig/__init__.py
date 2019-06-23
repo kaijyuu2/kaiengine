@@ -58,8 +58,6 @@ ANIMATION_IDLE = "IDLE"
 #filename for default ani in a folder
 DEFAULT_FOLDER_ANI = "_DEFAULT"
 
-#for looking up sprite graphics, should include folder and the like
-GPATH = "_gpath"
 #key for graphic_interface children to determine if they use glow sprites or not
 GRAPHIC_INTERFACE_GLOWABLE = "_glowable"
 

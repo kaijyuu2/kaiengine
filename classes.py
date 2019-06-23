@@ -64,11 +64,3 @@ class directory_dict(dict):
 def getCustGraphicObjects(directory = GRAPHIC_OBJECTS_DIR):
     from . import graphicobject
     return findClasses(getClassDict(directory), directory, graphicobject.GraphicObject)
-
-def getCustTilemapScenes(directory = TILEMAP_SCENE_DIR):
-    from .scene import TilemapScene
-    return findClasses(getClassDict(directory), directory, TilemapScene)
-
-def getCustActors(directory = ACTOR_DIR):
-    from .actor import Actor
-    return findClasses(getClassDict(directory), directory, Actor)

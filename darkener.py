@@ -8,7 +8,7 @@ from kaiengine.gconfig import *
 
 class Darkener(GraphicInterface, SchedulerInterface):
 
-    vars()[GPATH] = FULL_MISC_PATH
+    graphic_path = FULL_MISC_PATH
 
     def __init__(self, color = COLOR_BLACK, *args, **kwargs):
         super(Darkener, self).__init__(*args, **kwargs)

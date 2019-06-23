@@ -11,7 +11,7 @@ GI_SLEEP_KEY = "_GRAPHIC_INTERFACE_SLEEP_KEY"
 
 class GraphicInterface(PositionInterface, SleepInterface):
 
-    vars()[GPATH] = None
+    graphic_path = None
     vars()[GRAPHIC_INTERFACE_GLOWABLE] = False
 
     def __init__(self, sprite_path = None, *args, **kwargs):
@@ -292,8 +292,8 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def getGraphicPath(self, filename):
         '''return a formated graphic path in string format'''
-        if self._gpath:
-            return combineStringPaths(toStringPath(self._gpath), toStringPath(filename))
+        if self.graphic_path:
+            return combineStringPaths(toStringPath(self.graphic_path), toStringPath(filename))
         return filename
 
     def getSpriteScreenPosition(self, *args, **kwargs):

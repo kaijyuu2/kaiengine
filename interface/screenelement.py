@@ -345,8 +345,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             self.updateAllLayers()
         return newchild
     
-    def addChildApplyStylesheet(self, newchildtype, *args, **kwargs):
-        parent_stylesheet = kwargs.pop("parent_stylesheet", {})
+    def addChildApplyStylesheet(self, newchildtype, *args, parent_stylesheet = {}, **kwargs):
         return self.addChild(newchildtype(*args, parent_stylesheet=dictUnion(self.stylesheet, parent_stylesheet), **kwargs))
     
     def getChild(self, child_id):

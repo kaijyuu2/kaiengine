@@ -11,7 +11,7 @@ class Actor(GraphicInterface, MovementInterfaceFrames, SchedulerInterface):
 
     #basic default properties
 
-    vars()[GPATH] = copy.copy(ACTOR_GRAPHICS_FULL_PATH)
+    graphic_path = copy.copy(ACTOR_GRAPHICS_FULL_PATH)
 
     #other default properties
 

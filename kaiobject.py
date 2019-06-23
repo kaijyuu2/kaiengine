@@ -3,10 +3,9 @@
 import os, copy, importlib
 
 from kaiengine.propertygetter import PropertyGetter
-from kaiengine.resource import toStringPath
+from kaiengine.resource import toStringPath, toListPath
 from kaiengine.load import loadGenericObj
 from kaiengine.destroyinterface import DestroyInterface
-from kaiengine.uidgen import generateUniqueID
 
 from kaiengine.gconfig import PATH, EXTENSION, FILENAME, FILE_EXTENSION, FILEPATH, FAILED_LOAD_KEY, ADDED_CLASS_TYPE
 from kaiengine.gconfig import CLASS_TYPE, DEFAULT_CLASS_TYPE, PYTHON_EXTENSION, PROP_UNDEFINED, DEFAULT_KWARG
@@ -117,7 +116,9 @@ def createObject(filepath, *args, default_type = KaiObject, **kwargs):
             try:
                 class_type = _class_types_dict[class_path]
             except KeyError:
-                spec = importlib.util.spec_from_file_location(generateUniqueID(os.path.splitext(os.path.basename(filepath)))[0], class_path)
+                if prop.get(ADDED_CLASS_TYPE, False) and not os.path.isfile(class_path): #check if auto generated class type doesn't exist
+                    raise KeyError #hack to avoid duplicated code
+                spec = importlib.util.spec_from_file_location(".".join(toListPath(os.path.splitext(class_path)[0])), class_path)
                 newmod = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(newmod)
                 class_type = newmod.MainClass
@@ -127,5 +128,21 @@ def createObject(filepath, *args, default_type = KaiObject, **kwargs):
     except KeyError:
         class_type = default_type
     return class_type(*args, properties_dict = prop, **kwargs)
+
+def createObjectWithData(obj_filename, obj_filedir, obj_ext, default_type, *args, **kwargs): #for making wrappers
+    path = toStringPath(toListPath(obj_filedir) + toListPath(obj_filename))
+    if obj_ext not in path:
+        path += obj_ext
+    if default_type is not None:
+        kwargs["default_type"] = default_type
+    return createObject(path, *args, **kwargs)
     
-        
+'''
+example wrapper function
+
+def createMap(filename, *args, **kwargs):
+    return createObjectWithData(filename, MAPS_PATH, MAP_EXTENSION, MapObject, *args, **kwargs)
+    
+serves similar purpose to old BaseObject construction functions, if full filepaths and/or default types want to be inferred
+createObject alone is sufficient if full paths and default class types are provided
+'''

@@ -4,7 +4,7 @@ from kaiengine.debug import debugMessage
 
 '''Interface object for the destroy method'''
 
-class DestroyInterface(object):
+class DestroyInterface():
     def __init__(self, *args, **kwargs):
         self._destroyed = False
         try: super().__init__(*args, **kwargs)

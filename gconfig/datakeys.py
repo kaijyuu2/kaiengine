@@ -46,14 +46,6 @@ SCENE_MUSIC_FILENAME = "music"
 SCENE_ACTOR_LIST = "actor_list"
 
 
-#tilemap scenes
-
-TILEMAP_SCENE_TILE_LIST = "tile_list"
-TILEMAP_SCENE_WIDTH = "width"
-TILEMAP_SCENE_HEIGHT = "height"
-TILEMAP_SCENE_TILE_HEIGHT = "tile_height"
-TILEMAP_SCENE_TILE_WIDTH = "tile_width"
-
 #actors
 ACTOR_STARTING_SPRITE = "starting_sprite"
 
