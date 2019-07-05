@@ -124,21 +124,23 @@ class TilemapScene(Scene, KaiObject):
         self.clearMapObjects()
         #TODO: implement
         
-    def updateChildrenLayers(self):
+    def updateChildrenLayers(self, lastlayer = None):
         #should return the highest used layer
-        highest_layer = self.getLayer()
-        baselayer = highest_layer + 1 #first layer is bg
+        if not lastlayer:
+            lastlayer = self.getLayer()
+        baselayer = lastlayer + 1 #first layer is bg
         for layer, data in self.tile_graphics_map.items():
             newlayer = baselayer + layer
             for element_id in data.values():
                 self.getChild(element_id).setLayer(newlayer)
-            highest_layer = max(highest_layer, newlayer)
+            lastlayer = max(lastlayer, newlayer)
         for layer, data in self.objects_map.items():
             newlayer = baselayer + layer
             for element_id in data:
                 self.getChild(element_id).setLayer(newlayer)
-            highest_layer = max(highest_layer, newlayer)
-        return highest_layer
+            lastlayer = max(lastlayer, newlayer)
+        lastlayer = super().updateChildrenLayers(lastlayer) #include scene's code
+        return lastlayer
         
         
     def clearMapTiles(self):

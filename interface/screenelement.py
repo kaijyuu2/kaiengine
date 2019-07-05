@@ -131,9 +131,10 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self.setSpriteLayer(self._layer)
         return self.updateChildrenLayers()
         
-    def updateChildrenLayers(self):
+    def updateChildrenLayers(self, lastlayer = None):
         #should return the highest used layer
-        lastlayer = self.getLayer()
+        if not lastlayer:
+            lastlayer = self.getLayer()
         for child in self.getAllChildren():
             lastlayer = child.setLayer(lastlayer + 1)
         return lastlayer

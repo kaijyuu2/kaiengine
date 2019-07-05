@@ -104,9 +104,11 @@ class Scene(ScreenElement):
         
     #overwritten stuff
 
-    def updateChildrenLayers(self):
+    def updateChildrenLayers(self, lastlayer = None):
         #should return the highest used layer
-        lastlayer = super().updateChildrenLayers() + 1
+        if not lastlayer:
+            lastlayer = super().updateChildrenLayers()
+        lastlayer += 1
         self.getDarkener().setLayer(lastlayer) #ensure darkener on top
         return lastlayer
     
