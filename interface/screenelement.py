@@ -34,6 +34,7 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._mouse_over = False
         self._element_position = (0,0)
         self._lock_input = set()
+        self._hide_lock = set()
         for string in list(self.keybind_map.keys()) + list(self.other_event_keys):
             try:
                 self._funcs[string] = getattr(self, string)
@@ -441,6 +442,25 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
             except KeyError:
                 pass
         return default
+    
+    def hideElement(self, key = None):
+        if key is None:
+            key = self.id
+        self._hide_lock.add(key)
+        for child in self.getAllChildren():
+            child.hideElement(key)
+        self._updateHideElement()
+        
+    def showElement(self, key = None):
+        if key is None:
+            key = self.id
+        self._hide_lock.discard(key)
+        for child in self.getAllChildren():
+            child.showElement(key)
+        self._updateHideElement()
+        
+    def _updateHideElement(self):
+        self.setSpriteShow(not self._hide_lock)
 
     #overwritten stuff
     def setPos(self, *args, **kwargs):
