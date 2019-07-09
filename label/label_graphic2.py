@@ -43,24 +43,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
     @property
     def bottom_left_corner(self):
         """returns the bottom left corner of the sprite, no matter where that might be"""
-        effective_size = self.get_effective_size()
-        width = self.width * effective_size[Xi]
-        height = self.height * effective_size[Yi]
-        if self.center[Xi]:
-            center_xoffset = width / 2
-        else:
-            center_xoffset = 0
-        if self.center[Yi]:
-            center_yoffset = height / 2
-        else:
-            center_yoffset = 0
-        xoffset = self.offset[Xi] * effective_size[Xi]
-        yoffset = self.offset[Yi] * effective_size[Yi]
-        for key, offset in list(self.other_offsets.items()):
-            if key != CAMERA_KEY:
-                xoffset += offset[Xi]
-                yoffset += offset[Yi]
-        return (self.pos[Xi] + xoffset - center_xoffset, self.pos[Yi] + yoffset - center_yoffset)
+        return self.getBottomLeftCorner()
 
     @property
     def font(self):
@@ -148,90 +131,48 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
             return pos
         else:
             return list(map(operator.sub, pos, camera.getCameraXY()))
+        
+    def getExtentsMinusCamera(self):
+        extents = list(self.getExtents())
+        try:
+            offset = self.other_offsets[CAMERA_KEY]
+            extents[0] -= offset[0]
+            extents[1] -= offset[0]
+            extents[2] -= offset[1]
+            extents[3] -= offset[1]
+        except KeyError:
+            pass
+        return extents
 
     def getCenterPosition(self):
-        effsize = self.get_effective_size()
-        xoffset = 0
-        yoffset = 0
-        for key, offset in self.other_offsets.items():
-            if key != CAMERA_KEY:
-                xoffset += offset[Xi]
-                yoffset += offset[Yi]
-        if not self.center[Xi]:
-            xoffset += (self.width * effsize[Xi])/2
-        if not self.center[Yi]:
-            yoffset += (self.height * effsize[Yi])/2
-        return [self.pos[Xi] + self.offset[Xi] + xoffset,
-            self.pos[Yi] + self.offset[Yi] + yoffset]
-
+        """returns the center of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
+        
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
-        effective_size = self.get_effective_size()
-        width = self.width * effective_size[Xi]
-        height = self.height * effective_size[Yi]
-        if self.center[Xi]:
-            center_xoffset = width / 2
-        else:
-            center_xoffset = 0
-        if self.center[Yi]:
-            center_yoffset = height / 2
-        else:
-            center_yoffset = 0
-        xoffset = self.offset[Xi] * effective_size[Xi]
-        yoffset = self.offset[Yi] * effective_size[Yi]
-        for key, offset in list(self.other_offsets.items()):
-            if key != CAMERA_KEY:
-                xoffset += offset[Xi]
-                yoffset += offset[Yi]
-        return (self.pos[Xi] + xoffset - center_xoffset, self.pos[Yi] + yoffset - center_yoffset + height/2)
+        extents = self.getExtentsMinusCamera()
+        return extents[0], (extents[2] + extents[3])/2
 
     def getRightSide(self):
-        pos = self.getLeftSide()
-        return (pos[0] + self.width * self.get_effective_size()[0], pos[1])
-
-    def getBottomSide(self):
-        effective_size = self.get_effective_size()
-        width = self.width * effective_size[Xi]
-        height = self.height * effective_size[Yi]
-        if self.center[Xi]:
-            center_xoffset = width / 2
-        else:
-            center_xoffset = 0
-        if self.center[Yi]:
-            center_yoffset = height / 2
-        else:
-            center_yoffset = 0
-        xoffset = self.offset[Xi] * effective_size[Xi]
-        yoffset = self.offset[Yi] * effective_size[Yi]
-        for key, offset in list(self.other_offsets.items()):
-            if key != CAMERA_KEY:
-                xoffset += offset[Xi]
-                yoffset += offset[Yi]
-        return (self.pos[Xi] + xoffset - center_xoffset + width/2, self.pos[Yi] + yoffset - center_yoffset)
+        """returns the right side of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return extents[1], (extents[2] + extents[3])/2
 
     def getTopSide(self):
-        pos = self.getBottomSide()
-        return (pos[0], pos[1] + self.height * self.get_effective_size()[1])
+        """returns the Top side of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2,  extents[3]
+
+    def getBottomSide(self):
+        """returns the bottom side of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2,  extents[2]
 
     def getBottomLeftCorner(self):
-        effective_size = self.get_effective_size()
-        width = self.width * effective_size[Xi]
-        height = self.height * effective_size[Yi]
-        if self.center[Xi]:
-            center_xoffset = width / 2
-        else:
-            center_xoffset = 0
-        if self.center[Yi]:
-            center_yoffset = height / 2
-        else:
-            center_yoffset = 0
-        xoffset = self.offset[Xi] * effective_size[Xi]
-        yoffset = self.offset[Yi] * effective_size[Yi]
-        for key, offset in list(self.other_offsets.items()):
-            if key != CAMERA_KEY:
-                xoffset += offset[Xi]
-                yoffset += offset[Yi]
-        return (self.pos[Xi] + xoffset - center_xoffset, self.pos[Yi] + yoffset - center_yoffset)
+        """returns the bottom left corner of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return extents[0], extents[2]
 
     def forceUpdateWithCamera(self):
         self.updateWithCamera(*camera.getCameraXY())

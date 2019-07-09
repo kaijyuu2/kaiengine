@@ -393,35 +393,33 @@ class GraphicObject(BaseObject, IdentifiedObject):
         
     def getCenterPosition(self):
         """returns the center of the sprite, no matter where that might be"""
-        if not self.sprites:
-            return self.pos[:]
-        else:
-            return (self.getTopSide()[0], self.getLeftSide()[1])
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
         
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
-        debugMessage("getLeftSide not defined for " + self.getFilename())
-        return self.pos[:]
+        extents = self.getExtentsMinusCamera()
+        return extents[0], (extents[2] + extents[3])/2
 
     def getRightSide(self):
         """returns the right side of the sprite, no matter where that might be"""
-        debugMessage("getRightSide not defined for " + self.getFilename())
-        return self.pos[:]
+        extents = self.getExtentsMinusCamera()
+        return extents[1], (extents[2] + extents[3])/2
 
     def getTopSide(self):
         """returns the Top side of the sprite, no matter where that might be"""
-        debugMessage("getTopSide not defined for " + self.getFilename())
-        return self.pos[:]
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2,  extents[3]
 
     def getBottomSide(self):
         """returns the bottom side of the sprite, no matter where that might be"""
-        debugMessage("getBottomSide not defined for " + self.getFilename())
-        return self.pos[:]
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2,  extents[2]
 
     def getBottomLeftCorner(self):
         """returns the bottom left corner of the sprite, no matter where that might be"""
-        debugMessage("getBottomLeftCorner not defined for " + self.getFilename())
-        return self.pos[:]
+        extents = self.getExtentsMinusCamera()
+        return extents[0], extents[2]
 
     def add_sprite(self, sprite, key = None):
         try: #check if this is a path or a pre-created sprite

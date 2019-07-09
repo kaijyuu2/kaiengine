@@ -312,37 +312,36 @@ class Label_Graphic(Label_Base, GraphicObject):
         self._update_flip()
         self.update_follow_camera()
         self.update_pos()
-
+        
+    def getCenterPosition(self):
+        """returns the center of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
+        
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
-        if len(self.sprites) == 0:
-            return self.pos[:]
-        return getLeftSide(self.sprites[0])
+        extents = self.getExtentsMinusCamera()
+        return extents[0], (extents[2] + extents[3])/2
 
     def getRightSide(self):
-        if len(self.sprites) == 0:
-            return self.pos[:]
-        return getRightSide(self.sprites.last_item())
+        """returns the right side of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return extents[1], (extents[2] + extents[3])/2
 
     def getTopSide(self):
-        if len(self.sprites) == 0:
-            return self.pos[:]
-        pos = getTopSide(self.sprites[0])
-        x = self.pos[0]
-        effective_width = self.size[0] * self.width
-        if not self.center[0]:
-            x += effective_width/2
-        return (x,pos[1])
+        """returns the Top side of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2,  extents[3]
 
     def getBottomSide(self):
-        if len(self.sprites) == 0:
-            return self.pos[:]
-        return (self.getTopSide()[0], getBottomSide(self.sprites[0])[1])
+        """returns the bottom side of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return (extents[0] + extents[1])/2,  extents[2]
 
     def getBottomLeftCorner(self):
-        if len(self.sprites) == 0:
-            return self.pos[:]
-        return getBottomLeftCorner(self.sprites[0])
+        """returns the bottom left corner of the sprite, no matter where that might be"""
+        extents = self.getExtentsMinusCamera()
+        return extents[0], extents[2]
 
 
     def forceUpdateWithCamera(self):
