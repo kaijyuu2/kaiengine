@@ -5,14 +5,12 @@ from .load import jsonLoad
 from .resource import toStringPath, ResourceUnavailableError, allResourcesOnPath
 from .settings import getValue
 from .debug import debugMessage, checkDebugOn
+from .othernone import OTHER_NONE
 
 import os, copy
 
 localization_data = {}
 localization_text = {}
-
-
-UNLIKELY_DEFAULT = "_DEFAULT_ASDFASDIFNAGINAG" #something that will never be passed to getString as the default
 
 
 def initLocalizationData():
@@ -51,7 +49,7 @@ def getLocaleList():
 
 def getLocaleUnit(index, locale = None):
     if locale is None: locale = getValue(DYNAMIC_SETTINGS_LOCALE)
-    try: 
+    try:
         unitlist = localization_data[locale][STRINGS_LOCALE_UNITS]
         if len(unitlist) <= 0:
             raise KeyError #silly hack
@@ -59,7 +57,7 @@ def getLocaleUnit(index, locale = None):
             index = -1
         return unitlist[index]
     except KeyError: return ""
-    
+
 def getLocaleUnitLengths(locale = None):
     if locale is None: locale = getValue(DYNAMIC_SETTINGS_LOCALE)
     try: return localization_data[locale][STRINGS_LOCALE_UNIT_LENGTHS][:]
@@ -70,25 +68,25 @@ def getLocaleUnitTooBig(locale = None):
     try: return localization_data[locale][STRINGS_LOCALE_UNIT_TOO_BIG]
     except KeyError: return ""
 
-def getString(textkey, ID = None, fallbackID = None, locale = None, fallbacklocale = None, default = UNLIKELY_DEFAULT):
+def getString(textkey, ID = None, fallbackID = None, locale = None, fallbacklocale = None, default = OTHER_NONE):
     locale = locale or getValue(DYNAMIC_SETTINGS_LOCALE)
-    try: 
+    try:
         return _getString(textkey, ID, fallbackID, locale)
     except KeyError:
         try:
             return _getString(textkey, ID, fallbackID, fallbacklocale)
         except KeyError:
-            if default == UNLIKELY_DEFAULT:
+            if default == OTHER_NONE:
                 debugMessage("DEBUG: No translation in {0} or {1} for {2} using given ids of {3} or {4}".format(locale, fallbacklocale, textkey, ID, fallbackID))
                 raise KeyError
             return default
-        
+
 def _getString(textkey, ID, fallbackID, locale):
     try:
         return copy.deepcopy(localization_text[locale][ID][textkey])
     except KeyError:
         return copy.deepcopy(localization_text[locale][fallbackID][textkey])
-        
+
 
 
 _ = getString #alternate name; _ used in a script to dump generated text
