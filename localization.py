@@ -5,7 +5,6 @@ from .load import jsonLoad
 from .resource import toStringPath, ResourceUnavailableError, allResourcesOnPath
 from .settings import getValue
 from .debug import debugMessage, checkDebugOn
-from .othernone import OTHER_NONE
 
 import os, copy
 
@@ -68,7 +67,7 @@ def getLocaleUnitTooBig(locale = None):
     try: return localization_data[locale][STRINGS_LOCALE_UNIT_TOO_BIG]
     except KeyError: return ""
 
-def getString(textkey, ID = None, fallbackID = None, locale = None, fallbacklocale = None, default = OTHER_NONE):
+def getString(textkey, ID = None, fallbackID = None, locale = None, fallbacklocale = None, default = DEFAULT_KWARG):
     locale = locale or getValue(DYNAMIC_SETTINGS_LOCALE)
     try:
         return _getString(textkey, ID, fallbackID, locale)
@@ -76,7 +75,7 @@ def getString(textkey, ID = None, fallbackID = None, locale = None, fallbackloca
         try:
             return _getString(textkey, ID, fallbackID, fallbacklocale)
         except KeyError:
-            if default == OTHER_NONE:
+            if default == DEFAULT_KWARG:
                 debugMessage("DEBUG: No translation in {0} or {1} for {2} using given ids of {3} or {4}".format(locale, fallbacklocale, textkey, ID, fallbackID))
                 raise KeyError
             return default
