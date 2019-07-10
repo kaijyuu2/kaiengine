@@ -2,62 +2,61 @@
 
 """Public API:
 
-playSound(sound_path, cancel_others = False)
+    NOTE: For convenience, functions have aliases with "Sound" or "Music" in place of "Audio" which set the value of channel to "sound" or "music".
+    NOTE: Channel of None makes the function affect all channels.
 
-    Play an audio file once.
-    Does not affect music.
-    Stop other sounds with the same path if cancel_others is True.
+playAudio(file_path, channel = "special", loop = False, start = None, end = None, loop_start = None, fade_in = None, fade_out = None, crossfade = None)
 
-playMusic(musicPath, loop = True, fadeOut = None)
+    Play an audio file from file_path on channel, fading in volume over fade_in seconds.
+    Starts from start seconds (or the beginning of the file) and ends at end seconds (or the end of the file).
+    If looping, playback smoothly continues from loop_start, or start, or the beginning of the file.
+    If not looping, fades out volume over the last fade_out seconds of playback before the end.
+    Playing a sound on the "music" channel stops the current music, if any. The old and new tracks crossfade over crossfade seconds.
 
-    Play an audio file.
-    Loops unless loop is False.
-    If fadeOut is None or not supported, stops other music immediately.
-    (See stopMusic for more on fade support.)
+anyAudioPlaying(file_path, channel = None)
 
-playWithIntro(introMusicPath, loopingMusicPath)
+    Check if any audio derived from file_path is currently playing on channel.
 
-    Play a one-time intro audio file, then a looping section as music.
+pauseAudio(channel = None)
 
-anySoundPlaying(sound_path)
+    Stops playback on channel, but remembers the current playback position.
 
-    Check if any sound derived from south_path is currently playing.
+resumeAudio(channel = None)
 
-stopSounds()
+    Resumes playback of paused audio on channel.
 
-    Immediately stop all currently playing sound effects.
+stopAudio(channel = None, fade_out = None)
 
-stopMusic(fade = None)
+    Stops all playback on channel, fading out over fade_out seconds.
 
-    Stop playing the current music, if any.
-    Fade may not be supported on some backends.
-    If fade is None or not supported, music will stop instantly.
-    If fade is supported, music will fade out over that many seconds.
+stopAudioFile(file_path, channel = None, fade_out = None)
 
-preloadSound(sound_path)
-preloadMusic(music_path)
+    Stops playback of any audio derived from file_path on channel, fading out over fade_out seconds.
 
-    Preemptively loads audio file data to reduce seek times.
-    Data is not decoded, so it is safe to call on numerous songs.
+setAudioVolume(channel = None, new_volume = 0.5)
 
-setSoundVolume(newVolume)
-setMusicVolume(newVolume)
+    Set volume of audio on a channel from 0.0 (mute) to 1.0 (maximum).
+    If channel is None, set master volume instead.
+    Channel volumes are multiplicative with master volume.
 
-    Adjust volume of audio on a channel from 0.0 (mute) to 1.0 (maximum).
-
-getSoundVolume()
-getMusicVolume()
+getAudioVolume(channel = None)
 
     Return current channel volume from 0.0 (mute) to 1.0 (maximum).
+    If channel is None, return master volume instead.
 
-toggleSound(val = None)
-toggleMusic(val = None)
+disableAudio(channel = None)
 
-    Toggle whether the channel plays at all.
-    If val is True or False, set playback on or off.
-    If val is None (default), toggle to opposite of current state.
-    Music will reliably be playing in its expected state if toggled on.
-    Sound will not play at all if played when in the off state.
+    Stop playing audio on channel immediately.
+    Play commands for disabled channels will be silently ignored.
+
+enableAudio(channel = None)
+
+    Make channel not be disabled.
+
+toggleAudio(channel = None, enable = True)
+
+    Call disableAudio or enableAudio for channel, depending on enable.
+
 
 """
 
