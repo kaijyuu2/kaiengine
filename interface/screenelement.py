@@ -45,8 +45,9 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                 try:
                     oldfunc = self._funcs[string]
                     def combinedfunc(*args, **kwargs): #create a pseudo super
-                        oldfunc()
-                        newfunc()
+                        rv1 = oldfunc()
+                        rv2 = newfunc()
+                        return rv1 or rv2
                     self._funcs[string] = combinedfunc
                 except KeyError:
                     self._funcs[string] = newfunc
