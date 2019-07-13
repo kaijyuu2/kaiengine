@@ -464,6 +464,12 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     def _updateHideElement(self):
         self.setSpriteShow(not self._hide_lock)
 
+    def requestOwnRemoval(self):
+        try:
+            self.getParent().removeChild(self.id)
+        except AttributeError:
+            debugMessage("Top-level element tried to request own removal:\n  {}\n  {}".format(self.id, str(self)))
+
     #overwritten stuff
     def setPos(self, *args, **kwargs):
         super().setPos(*args, **kwargs)
