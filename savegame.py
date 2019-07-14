@@ -35,7 +35,12 @@ def resetToDefaultSave():
     except JSONDecodeError as e:
         debugMessage(e)
     except ResourceUnavailableError:
-        debugMessage("Failed to load default save. Ignore this if the game isn't supposed to have one.")
+        try:
+            no_default = settings.getValue(DYNAMIC_SETTINGS_NO_DEFAULT_SAVE)
+            if not no_default:
+                raise
+        except:
+            debugMessage("Failed to load default save. Ignore this if the game isn't supposed to have one.")
     except:
         raise
 

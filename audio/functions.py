@@ -14,19 +14,21 @@ func_names = [name for template in ("play{}",
                                     "enable{}",
                                     "toggle{}") for name in [template.format(variant) for variant in ("Audio", "Sound", "Music")]]
 
-def _basicFunc(*args, **kwargs):
-    return None
-
-for name in func_names:
-    globals()[name] = _basicFunc
+try:
+    from . import sdAudio
+    for name in func_names:
+        globals()[name] = getattr(sdAudio, name)
+except Exception as e:
+    debugMessage("WARNING: Couldn't initialize sounddevice audio.")
+    def _nop(*args, **kwargs):
+        return None
+    for name in func_names:
+        globals()[name] = _nop
 
 def initAudio():
     try:
-        from . import sdAudio
+        sdAudio
+    except NameError:
+        pass
+    else:
         sdAudio.initAudio()
-        for name in func_names:
-            globals()[name] = getattr(sdAudio, name)
-    except Exception as e:
-        debugMessage("WARNING: Couldn't initialize any audio backend; sound disabled")
-        debugMessage(e)
-
