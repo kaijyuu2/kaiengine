@@ -6,6 +6,7 @@ import numpy
 import sounddevice
 import soundfile
 
+from kaiengine.debug import debugMessage
 from kaiengine.resource import loadResource, ResourceUnavailableError
 from kaiengine.timer import getGameScheduler, scheduleRealtime
 
@@ -19,20 +20,37 @@ def _garbage_collect(*args):
 def initAudio():
     scheduleRealtime(_garbage_collect, AUDIO_GARBAGE_COLLECTION_INTERVAL, repeat=True)
 
-async def _play_data(data, event_loop):
+async def _play_data(data, event_loop, *, loop, start, end, loop_start, fade_in, fade_out, crossfade, start_paused):
+    length = end or len(data)
     event = asyncio.Event()
-    index = 0
+    index = start
 
-    def callback(outdata, frame_count, time_info, status):
-        nonlocal index
-        remainder = len(data) - index
-        if remainder == 0:
-            event_loop.call_soon_threadsafe(event.set)
-            raise sounddevice.CallbackStop
-        valid_frames = min(frame_count, remainder)
-        outdata[:valid_frames] = data[index:index+valid_frames]
-        outdata[valid_frames:] = 0
-        index += valid_frames
+    if loop:
+        def callback(outdata, frame_count, time_info, status):
+            nonlocal index
+            remainder = length - index
+            valid_frames = min(frame_count, remainder)
+            outdata[:valid_frames] = data[index:index+valid_frames]
+            if frame_count > remainder:
+                index = loop_start
+                overshoot = frame_count - remainder
+                outdata[valid_frames:valid_frames+overshoot] = data[index:index+overshoot]
+                outdata[valid_frames+overshoot:] = 0
+                index += overshoot
+            else:
+                outdata[valid_frames:] = 0
+                index += valid_frames
+    else:
+        def callback(outdata, frame_count, time_info, status):
+            nonlocal index
+            remainder = length - index
+            if remainder == 0:
+                event_loop.call_soon_threadsafe(event.set)
+                raise sounddevice.CallbackStop
+            valid_frames = min(frame_count, remainder)
+            outdata[:valid_frames] = data[index:index+valid_frames]
+            outdata[valid_frames:] = 0
+            index += valid_frames
 
     stream = sounddevice.OutputStream(callback=callback, dtype=data.dtype, channels=data.shape[1])
     with stream:
@@ -42,12 +60,12 @@ def _load_from_file(file_handle):
     data, sample_rate = soundfile.read(file_handle, dtype='float32')
     return (data, sample_rate)
 
-async def _play_from_file(file_handle, event_loop):
+async def _play_from_file(file_handle, event_loop, **kwargs):
     with concurrent.futures.ThreadPoolExecutor() as pool:
         data, sample_rate = await event_loop.run_in_executor(pool, _load_from_file, file_handle)
-    await _play_data(data, event_loop)
+    await _play_data(data, event_loop, **kwargs)
 
-def playAudio(file_path, channel = "special", loop = False, start = None, end = None, loop_start = None, fade_in = None, fade_out = None, crossfade = None, start_paused = False):
+def playAudio(file_path = None, channel = "special", loop = False, start = 0, end = None, loop_start = 0, fade_in = None, fade_out = None, crossfade = None, start_paused = False):
     try:
         file_handle = loadResource(file_path)
     except ResourceUnavailableError as e:
@@ -55,7 +73,10 @@ def playAudio(file_path, channel = "special", loop = False, start = None, end = 
         debugMessage("Couldn't load resource: " + file_path)
     else:
         event_loop = getGameScheduler()
-        _currently_playing.append(asyncio.create_task(_play_from_file(file_handle, event_loop)))
+        _currently_playing.append(asyncio.create_task(_play_from_file(file_handle, event_loop, loop=loop,
+                                                                      start=start, end=end, loop_start=loop_start,
+                                                                      fade_in=fade_in, fade_out=fade_out,
+                                                                      crossfade=crossfade, start_paused=start_paused)))
 
 def anyAudioPlaying(*args, **kwargs):
     return None
