@@ -68,5 +68,5 @@ def _callQuery(key, *args, **kwargs):
         returnval[0] = newval #capture returnval
     _addListener(newkey, query_callback, 0)
     _callEvent(key, newkey, *args, **kwargs)
-    _removeListener(newkey, query_callback)
+    _clearListeners(newkey)
     return returnval[0]
