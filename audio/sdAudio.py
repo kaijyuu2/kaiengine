@@ -47,7 +47,7 @@ async def _play_from_file(file_handle, event_loop):
         data, sample_rate = await event_loop.run_in_executor(pool, _load_from_file, file_handle)
     await _play_data(data, event_loop)
 
-def playAudio(file_path, channel = "special", loop = False, start = None, end = None, loop_start = None, fade_in = None, fade_out = None, crossfade = None):
+def playAudio(file_path, channel = "special", loop = False, start = None, end = None, loop_start = None, fade_in = None, fade_out = None, crossfade = None, start_paused = False):
     try:
         file_handle = loadResource(file_path)
     except ResourceUnavailableError as e:
