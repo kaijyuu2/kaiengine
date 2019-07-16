@@ -14,6 +14,8 @@ class sDict(dict):
             self.update(oldDict)
 
     def append(self, newValue):
+        if len(self.sorted_keys) > 250:
+            self.purify()
         self[self.counter] = newValue
         self.sorted_keys.append(self.counter)
         self.counter += 1
@@ -31,12 +33,15 @@ class sDict(dict):
 
     def last_item(self):
         return self[self.last_key()]
-    
+
     def firstKey(self):
         return sorted(self.keys())[0]
-    
+
     def firstItem(self):
         return self[self.firstKey()]
+
+    def purify(self):
+        self.sorted_keys = sorted([key for key in self.keys()])
 
     def clear(self):
         super().clear()
