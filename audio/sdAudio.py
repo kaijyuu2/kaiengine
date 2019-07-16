@@ -60,12 +60,15 @@ def _load_from_file(file_handle):
     data, sample_rate = soundfile.read(file_handle, dtype='float32')
     return (data, sample_rate)
 
-async def _play_from_file(file_handle, event_loop, **kwargs):
-    with concurrent.futures.ThreadPoolExecutor() as pool:
-        data, sample_rate = await event_loop.run_in_executor(pool, _load_from_file, file_handle)
+async def _play_from_file(file_handle, event_loop, thread_loading = True, **kwargs):
+    if thread_loading:
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            data, sample_rate = await event_loop.run_in_executor(pool, _load_from_file, file_handle)
+    else:
+        data, sample_rate = soundfile.read(file_handle, dtype='float32')
     await _play_data(data, event_loop, **kwargs)
 
-def playAudio(file_path = None, channel = "special", loop = False, start = 0, end = None, loop_start = 0, fade_in = None, fade_out = None, crossfade = None, start_paused = False):
+def playAudio(file_path = None, channel = "special", thread_loading = True, loop = False, start = 0, end = None, loop_start = 0, fade_in = None, fade_out = None, crossfade = None, start_paused = False):
     try:
         file_handle = loadResource(file_path)
     except ResourceUnavailableError as e:
@@ -73,7 +76,7 @@ def playAudio(file_path = None, channel = "special", loop = False, start = 0, en
         debugMessage("Couldn't load resource: " + file_path)
     else:
         event_loop = getGameScheduler()
-        _currently_playing.append(asyncio.create_task(_play_from_file(file_handle, event_loop, loop=loop,
+        _currently_playing.append(asyncio.create_task(_play_from_file(file_handle, event_loop, thread_loading=thread_loading, loop=loop,
                                                                       start=start, end=end, loop_start=loop_start,
                                                                       fade_in=fade_in, fade_out=fade_out,
                                                                       crossfade=crossfade, start_paused=start_paused)))

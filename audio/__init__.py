@@ -5,7 +5,7 @@
     NOTE: For convenience, functions have aliases with "Sound" or "Music" in place of "Audio" which set the value of channel to "sound" or "music".
     NOTE: Channel of None makes the function affect all channels.
 
-playAudio(file_path = None, channel = "special", loop = False, start = 0, end = None, loop_start = 0, fade_in = None, fade_out = None, crossfade = None, start_paused = False)
+playAudio(file_path = None, channel = "special", thread_loading = True, loop = False, start = 0, end = None, loop_start = 0, fade_in = None, fade_out = None, crossfade = None, start_paused = False)
 
     Play an audio file from file_path on channel, fading in volume over fade_in seconds.
     Starts from start seconds (or the beginning of the file) and ends at end seconds (or the end of the file).
