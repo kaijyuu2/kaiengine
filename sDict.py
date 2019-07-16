@@ -2,22 +2,22 @@
 # special dict object
 
 class sDict(dict):
-    def __init__(self, oldDict = None):
+    def __init__(self, old_dict = None):
         super().__init__()
         self.counter = 0
-        self.sorted_keys = []
-        if oldDict:
+        if old_dict:
             try:
-                self.counter = oldDict.counter
-            except:
+                self.counter = old_dict.counter
+            except AttributeError:
                 pass
-            self.update(oldDict)
+            self.update(old_dict)
+
+    @property
+    def sorted_keys(self):
+        return sorted(self.keys())
 
     def append(self, newValue):
-        if len(self.sorted_keys) > 250:
-            self.purify()
         self[self.counter] = newValue
-        self.sorted_keys.append(self.counter)
         self.counter += 1
         return self.counter - 1
 
@@ -39,9 +39,6 @@ class sDict(dict):
 
     def firstItem(self):
         return self[self.firstKey()]
-
-    def purify(self):
-        self.sorted_keys = sorted([key for key in self.keys()])
 
     def clear(self):
         super().clear()
