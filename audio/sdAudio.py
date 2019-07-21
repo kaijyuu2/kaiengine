@@ -52,7 +52,7 @@ async def _play_data(data, event_loop, *, loop, start, end, loop_start, fade_in,
             outdata[valid_frames:] = 0
             index += valid_frames
 
-    stream = sounddevice.OutputStream(callback=callback, dtype=data.dtype, channels=data.shape[1])
+    stream = sounddevice.OutputStream(callback=callback, dtype=data.dtype, channels=data.shape[1], latency="low")
     with stream:
         await event.wait()
         await asyncio.sleep(1)
