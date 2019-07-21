@@ -20,6 +20,7 @@ try:
         globals()[name] = getattr(sdAudio, name)
 except Exception as e:
     debugMessage("WARNING: Couldn't initialize sounddevice audio.")
+    debugMessage(e)
     def _nop(*args, **kwargs):
         return None
     for name in func_names:
