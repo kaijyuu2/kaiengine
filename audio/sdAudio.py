@@ -55,6 +55,7 @@ async def _play_data(data, event_loop, *, loop, start, end, loop_start, fade_in,
     stream = sounddevice.OutputStream(callback=callback, dtype=data.dtype, channels=data.shape[1])
     with stream:
         await event.wait()
+        await asyncio.sleep(1)
 
 def _load_from_file(file_handle):
     data, sample_rate = soundfile.read(file_handle, dtype='float32')
