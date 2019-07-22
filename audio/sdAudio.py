@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from kaiengine.gconfig import *
+
 import asyncio
 import concurrent
 import numpy
@@ -8,6 +10,7 @@ import soundfile
 
 from kaiengine.debug import debugMessage
 from kaiengine.resource import loadResource, ResourceUnavailableError
+from kaiengine.settings import settings
 from kaiengine.timer import getGameScheduler, scheduleRealtime
 
 _currently_playing = []
@@ -52,7 +55,7 @@ async def _play_data(data, event_loop, *, loop, start, end, loop_start, fade_in,
             outdata[valid_frames:] = 0
             index += valid_frames
 
-    stream = sounddevice.OutputStream(callback=callback, dtype=data.dtype, channels=data.shape[1], latency="low")
+    stream = sounddevice.OutputStream(callback=callback, dtype=data.dtype, channels=data.shape[1], latency=settings.getValue(DYNAMIC_SETTINGS_AUDIO_LATENCY))
     with stream:
         await event.wait()
         await asyncio.sleep(1)
