@@ -55,10 +55,6 @@ class GraphicInterface(PositionInterface, SleepInterface):
                 self.sprite.removeAniListener(key, listener)
         self._sprite_listener_keys = []
 
-    def setGraphicPath(self, newpath):
-        """pass a path in list format to update it"""
-        self._gpath = toListPath(newpath)
-
     def setSpriteDefaults(self):
         self._layer = 0
         self._center = [False,False]
@@ -242,10 +238,10 @@ class GraphicInterface(PositionInterface, SleepInterface):
             if y == None: y = self._dimensions[1]
         self._dimensions = (x,y)
         self._updateDimensions()
-        
+
     def setSpriteWidth(self, newval):
         self.setSpriteDimensions(newval)
-        
+
     def setSpriteHeight(self, newval):
         self.setSpriteDimensions(y=newval)
 
@@ -301,7 +297,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
 
     def getSpriteCenter(self):
         return self._center
-    
+
     def getSpriteGraphicalCenter(self):
         return self.sprite.getCenterPosition()
 
@@ -337,20 +333,20 @@ class GraphicInterface(PositionInterface, SleepInterface):
         if self.sprite:
             return self.sprite.getDimensions()
         return (0,0)
-    
+
     def resetDimensions(self):
         self._dimensions = None
-    
+
     def getSpriteExtents(self):
         if self.sprite:
             return self.sprite.getExtents()
         return self._getDefaultExtents()
-    
+
     def getSpriteExtentsMinusCamera(self):
         if self.sprite:
             return self.sprite.getExtentsMinusCamera()
         return self._getDefaultExtents()
-    
+
     def _getDefaultExtents(self):
         pos = list(self.getPos())
         dimensions = self.getSpriteDimensions()
@@ -375,7 +371,7 @@ class GraphicInterface(PositionInterface, SleepInterface):
     def getSpriteBottomSide(self):
         extents = self.getSpriteExtentsMinusCamera()
         return ((extents[0] + extents[1])/2, extents[2])
-    
+
     def getBottomLeftCorner(self):
         extents = self.getSpriteExtentsMinusCamera()
         return (extents[0], extents[2])
