@@ -19,14 +19,16 @@ class BaseButton(Container):
         super().__init__(sprite_path, **kwargs)
 
         #defaults
+        self._central_widget_id = None
 
         self._highlight_id = self.addChildApplyStylesheet(ScreenElement, self.stylesheet.get(DEFAULT_HIGHLIGHT_GRAPHIC, tuple(FULL_MISC_PATH + ["menugraphics", "hover.png"])))
         highlight = self.getHighlight()
         highlight.setSpriteShow(False)
         highlight.setSpriteCenter(True,True)
         highlight.setSpriteFollowCamera(True)
-        self._central_widget_id = None
         sprite_path = sprite_path or self.getOrderedStylesheetData(DEFAULT_BUTTON_GRAPHIC, DEFAULT_GRAPHIC, default=tuple(FULL_MISC_PATH + ["menugraphics", "brown_button.bordered"]))
+        if sprite_path is not None:
+            self.setSprite(sprite_path)
         if width is None:
             width = self.getOrderedStylesheetData(DEFAULT_BUTTON_WIDTH, DEFAULT_WIDTH, default=80)
         if width is not None:
@@ -172,6 +174,20 @@ class LabelButton(BaseButton):
         parent = self.getParent()
         if parent:
             parent.delayUpdatePositions()
+
+    #overwritten
+
+    def updateChildrenLayers(self, lastlayer = None):
+        base_layer = lastlayer or self.getLayer()
+        for child in self.getAllChildren():
+            child.setLayer(base_layer)
+        label = self.getLabel()
+        if label:
+            label.setLayer(base_layer + 1)
+        highlight = self.getHighlight()
+        if highlight:
+            highlight.setLayer(base_layer + 2)
+        return base_layer + 2
 
 
 class GraphicButton(BaseButton):
