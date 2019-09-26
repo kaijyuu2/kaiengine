@@ -10,7 +10,7 @@ def initializeFontDriver():
     from . import fontdriver
     global FontDriverObj
     FontDriverObj = fontdriver.FontDriver()
-    
+
 def initializeFonts():
     from kaiengine import load
     fontslist = load.load_font_paths()

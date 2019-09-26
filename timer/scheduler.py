@@ -61,7 +61,7 @@ class TimedEvent(object):
         self.listener = None
         self._unscheduled = True
         self.delete_me = True
-        
+
     def destroy(self):
         self.unschedule()
 
@@ -112,7 +112,7 @@ class RealtimeEvent(object):
         self._destroyed = True
         if self.handle:
             self.handle.cancel()
-            
+
     def __del__(self):
         self.destroy()
 
@@ -122,7 +122,7 @@ realtime_events_listener_map = {} #indexed by listener, contains event ids in sD
 def _scheduleRealtime(listener, time, repeat = False, *args, **kwargs):
     newevent = RealtimeEvent(listener, time, repeat, args, kwargs)
     _scheduleRealtimeWithEvent(newevent)
-    
+
 def _scheduleRealtimeWithEvent(newevent, *args, **kwargs):
     scheduler = getGameScheduler()
     handle = scheduler.call_later(newevent.time, functools.partial(_realtimeEventRun, newevent, *args, **kwargs))
@@ -152,7 +152,7 @@ def _realtimeEventRun(event, *args, **kwargs):
             _scheduleRealtimeWithEvent(event, *args, **kwargs)
         else:
             _destroyRealtimeEvent(event.eventid)
-        
+
 def _unscheduleRealtime(listener):
     try:
         ID = realtime_events_listener_map[listener].pop(realtime_events_listener_map[listener].firstKey(), None)
@@ -164,7 +164,7 @@ def _unscheduleRealtime(listener):
     except KeyError:
         pass
     return None
-    
+
 
 def _unscheduleRealtimeByID(eventid):
     _cleanupRealtimeScheduledEvent(eventid)
@@ -173,7 +173,7 @@ def _unscheduleRealtimeByID(eventid):
     except KeyError:
         pass
     return eventid
-    
+
 def _cleanupRealtimeScheduledEvent(eventid):
     try:
         event = realtime_events[eventid]
@@ -187,7 +187,7 @@ def _cleanupRealtimeScheduledEvent(eventid):
             event.handle.cancel()
     except KeyError:
         pass
-    
+
 def _destroyRealtimeEvent(eventid):
     realtime_events[eventid].destroy()
     del realtime_events[eventid]
@@ -197,7 +197,7 @@ def _pauseRealtimeListener(listener, *args, **kwargs):
         _pauseRealtimeListenerWithID(realtime_events_listener_map[listener], *args, **kwargs)
     except KeyError:
         pass
-        
+
 def _pauseRealtimeListenerWithID(eventid, *args, **kwargs):
     try:
         realtime_events[eventid].pauseEvent(*args, **kwargs)
@@ -209,7 +209,7 @@ def _unpauseRealtimeListener(listener, *args, **kwargs):
         _unpauseRealtimeListenerWithID(realtime_events_listener_map[listener], *args, **kwargs)
     except KeyError:
         pass
-        
+
 def _unpauseRealtimeListenerWithID(eventid, *args, **kwargs):
     try:
         event = realtime_events[eventid]
@@ -236,7 +236,7 @@ def _scheduleAppendEvent(event):
     newtime = checkCurrentFrame() + event.time
     _scheduleAddToQueue(event, newtime)
     try: key = scheduled_events_listener_map[event.listener].append(event.eventid)
-    except KeyError: 
+    except KeyError:
         scheduled_events_listener_map[event.listener] = sDict()
         key = scheduled_events_listener_map[event.listener].append(event.eventid)
     scheduled_events_listener_map[event.listener].pop(event.key, None) #get rid of old if it exists
@@ -255,7 +255,7 @@ def _pauseScheduledListener(listener, *args, **kwargs):
         _pauseScheduledListenerWithID(ID, *args, **kwargs)
     except (KeyError, IndexError):
         pass
-    
+
 def _pauseScheduledListenerWithID(ID, *args, **kwargs):
     from .functions import checkCurrentFrame #avoiding circular import
     try:
@@ -264,7 +264,7 @@ def _pauseScheduledListenerWithID(ID, *args, **kwargs):
         scheduled_events_time_map[time].discard(ID)
     except KeyError:
         pass
-    
+
 
 def _unpauseScheduledListener(listener, *args, **kwargs):
     try:
@@ -272,7 +272,7 @@ def _unpauseScheduledListener(listener, *args, **kwargs):
         _unpauseScheduledListenerWithID(ID, *args, **kwargs)
     except (KeyError, IndexError):
         pass
-    
+
 def _unpauseScheduledListenerWithID(ID, *args, **kwargs):
     try:
         event = scheduled_events[ID]
@@ -282,21 +282,21 @@ def _unpauseScheduledListenerWithID(ID, *args, **kwargs):
             _scheduleAddToQueue(event, event.pause_time + checkCurrentFrame())
     except KeyError:
         pass
-    
+
 
 def _unschedule(listener):
     try:
         ID = scheduled_events_listener_map[listener].firstItem()
         if ID not in scheduled_events: #additional leak check in case of error
             scheduled_events_listener_map[listener].pop(scheduled_events_listener_map[listener].firstKey(), None)
-            if not scheduled_events_listener_map[listener]: 
+            if not scheduled_events_listener_map[listener]:
                 del scheduled_events_listener_map[listener]
             return ID
         else:
             return _unscheduleWithID(ID)
     except (KeyError, IndexError):
         return None
-    
+
 def _unscheduleWithID(ID):
     #do our best to prevent any possible leaks in case of error
     event = scheduled_events.pop(ID, None)
@@ -314,7 +314,7 @@ def _unscheduleWithID(ID):
     except KeyError:
         pass
     return ID
-    
+
 
 def _checkSchedule(currentFrame):
     try:

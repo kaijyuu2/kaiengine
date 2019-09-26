@@ -6,10 +6,10 @@
 class OtherNone():
     def __eq__(self, other):
         return isinstance(other, OtherNone)
-    
+
     def __copy__(self):
         return self
-    
+
     def __deepcopy__(self, memo):
         return self
 

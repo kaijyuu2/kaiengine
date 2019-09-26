@@ -74,7 +74,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
         else:
             self.color = NormalizeColorFormat(color)
         self._set_text()
-        
+
     set_text = setText #deprecated function name
 
     def _set_text(self):
@@ -121,7 +121,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
             return extension == GRAPHIC_FONT_2_EXTENSION or extension == GRAPHIC_FONT_3_EXTENSION
         except AttributeError: #end of game error suppression
             return True
-        
+
     def getScreenPosition(self, centered = False):
         if centered:
             pos = self.getCenterPosition()
@@ -131,7 +131,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
             return pos
         else:
             return list(map(operator.sub, pos, camera.getCameraXY()))
-        
+
     def getExtentsMinusCamera(self):
         extents = list(self.getExtents())
         try:
@@ -148,7 +148,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
         """returns the center of the sprite, no matter where that might be"""
         extents = self.getExtentsMinusCamera()
         return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
-        
+
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
         extents = self.getExtentsMinusCamera()
@@ -185,7 +185,7 @@ class LabelGraphic2(Label_Base, sGraphics.sSprite):
             self.remove_offset(CAMERA_KEY)
         except ObjectDestroyedError:
             pass
-        
+
     def getScreenPosition(self):
         if self.follow_camera:
             return self.getPos()

@@ -188,9 +188,3 @@ def loadGenericObj(filepath, extension = None):
 
 def load_graphicobject(filepath):
     return load_game_object(filepath, GRAPHIC_OBJECT_EXTENSION, FULL_GRAPHIC_OBJECTS_PATH)
-
-
-
-
-
-

@@ -15,7 +15,7 @@ def setMousePosition(x, y, *args, **kwargs):
     global _mouse_x, _mouse_y
     _mouse_x = x
     _mouse_y = y
-    
+
 def getMousePosition():
     '''Returns the current mouse position'''
     return (_mouse_x, _mouse_y)

@@ -86,7 +86,7 @@ class SpriteBordered(graphicobject.GraphicObject):
         if self._tiled != newvalue:
             self._tiled = newvalue
             self.update_dimensions()
-            
+
     @property
     def offset(self):
         return self._offset

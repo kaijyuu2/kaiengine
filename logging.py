@@ -23,7 +23,7 @@ def initLogger(*args, **kwargs):
 def _initLogger(filepath = None, extra_text = None):
     global logger_init_completed
     if not filepath: filepath = DEFAULT_FILEPATH
-    try: 
+    try:
         logging.basicConfig(filename = filepath, level = logging.INFO)
         logger_init_completed = True
         logStringInfo(REGULAR_SPACER)
@@ -33,14 +33,14 @@ def _initLogger(filepath = None, extra_text = None):
             logStringInfo(extra_text)
     except PermissionError:
         print("Logger couldn't start; write permissions denied")
-        
+
 def logStringWarning(string):
     if logger_init_completed:
         logging.warning(string)
-    
+
 def logStringDebug(string):
     logString(string)
-        
+
 def logString(string):
     logStringWarning(string)
 
@@ -51,7 +51,6 @@ def logStringInfo(string):
 def logToConsole(string):
     logString(string)
     print(string)
-    
+
 def getLogDateTimeString():
     return DATE_TIME
-    

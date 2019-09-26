@@ -559,7 +559,7 @@ class Sprite(IdentifiedObject, sGraphics.sSprite):
 
     def update_opacity(self):
         self.alpha = self.fade_opacity * self.ani_opacity
-        
+
     def getExtentsMinusCamera(self):
         extents = list(self.getExtents())
         try:
@@ -610,7 +610,7 @@ class Sprite(IdentifiedObject, sGraphics.sSprite):
         self.updateWithCamera(*camera.getCameraXY())
 
     def updateWithCamera(self, x, y):
-        self.change_offset(CAMERA_KEY, x, y) 
+        self.change_offset(CAMERA_KEY, x, y)
 
     def stopUpdatingWithCamera(self):
         self.remove_offset(CAMERA_KEY)

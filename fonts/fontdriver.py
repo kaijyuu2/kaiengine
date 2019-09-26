@@ -95,7 +95,7 @@ class GraphicFont3(Font):
                     self.antialiasing = AA_NEAREST
             self.glyph_size = prop.get(GFONT3_SIZE, [1,1])
             self.default_char_pos = prop.get(GFONT3_DEFAULT_CHAR_POS, (0,0))
-            
+
 
     def load_graphics(self):
         if self.font_folder is None:

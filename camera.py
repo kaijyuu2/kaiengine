@@ -330,5 +330,3 @@ class camera(object):
                     self.removeCameraSprite(key)
             self._oldx = x
             self._oldy = y
-
-

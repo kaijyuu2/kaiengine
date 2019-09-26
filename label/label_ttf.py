@@ -40,7 +40,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
     @follow_camera.setter
     def follow_camera(self, val):
         self.setFollowCamera(val)
-        
+
 
     @property
     def bottom_left_corner(self):
@@ -266,7 +266,7 @@ class Label_TTF(Label_Base, sGraphics.sSprite):
             self.remove_offset(CAMERA_KEY)
         except ObjectDestroyedError:
             pass
-        
+
     def getScreenPosition(self):
         if self.follow_camera:
             return self.getPos()

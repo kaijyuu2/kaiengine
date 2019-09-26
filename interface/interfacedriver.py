@@ -7,7 +7,7 @@ INTERFACE_DRIVER_SLEEP_KEY = "_INTERFACE_DRIVER_SLEEP_NOT_TOP_LEVEL"
 
 
 _topElements = []
-        
+
 def pushTopElement(newelement):
     if len(_topElements) > 0:
         newlayer = _topElements[-1].getMaxLayer() + 1
@@ -18,9 +18,9 @@ def pushTopElement(newelement):
     newelement.setLayer(newlayer)
     newelement._gainFocus()
     return newelement
-    
+
 def popTopElement():
-    try: 
+    try:
         oldelement = _topElements.pop()
         oldelement.destroy()
         try:
@@ -29,9 +29,8 @@ def popTopElement():
             pass
     except IndexError:
         pass
-    
+
 def closeAllElements():
     for element in _topElements:
         element.destroy()
     _topElements.clear()
-    

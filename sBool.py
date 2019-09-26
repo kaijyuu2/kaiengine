@@ -11,10 +11,10 @@ class sBool(object):
         self.counter = 0
         self.force = force
         self.initial_val = val
-        
+
         if val is True:
             self.counter = 1
-            
+
     def set(self, val):
         if val:
             self.counter += 1
@@ -26,10 +26,10 @@ class sBool(object):
         elif self.force is False:
             if self.counter > 1:
                 self.counter = 1
-                
+
     def check(self):
         return self.counter > 0
-                
+
     def reset(self, val = None):
         if val is None:
             val = self.initial_val
@@ -39,5 +39,3 @@ class sBool(object):
             self.counter = 1
         else:
             self.counter = 0
-            
-        

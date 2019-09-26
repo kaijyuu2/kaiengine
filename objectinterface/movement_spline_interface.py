@@ -10,7 +10,7 @@ from kaiengine import settings
 import math
 
 MI_SPLINE_PAUSE_KEY = "_DEFAULT_MOVEMENT_INTERFACE_SPLINE_PAUSE_KEY"
-MIS_SLEEP_PAUSE_KEY = "_MOVEMENT_INTERFACE_SPLINE_SLEEP_PAUSE_KEY" 
+MIS_SLEEP_PAUSE_KEY = "_MOVEMENT_INTERFACE_SPLINE_SLEEP_PAUSE_KEY"
 
 def getSplinePos(perc_time, start_pos, start_mag, end_pos, end_mag):
     start_pos = float(start_pos)
@@ -133,11 +133,11 @@ class _MovementSplineInterfaceBase(PositionInterface, SchedulerInterface):
         pass
 
     #this this overwrites
-    
+
     def sleep(self, *args, **kwargs):
         super().sleep(*args, **kwargs)
         self.pauseSpline(MIS_SLEEP_PAUSE_KEY)
-        
+
     def wakeUp(self, *args, **kwargs):
         super().wakeUp(*args, **kwargs)
         if not self.sleeping:

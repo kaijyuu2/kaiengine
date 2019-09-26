@@ -146,7 +146,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
     @size.setter
     def size(self, *args, **kwargs):
         self.setSize(*args, **kwargs)
-        
+
     def update_size(self):
         for sprite in self.sprites.values():
             sprite.size = self.size
@@ -241,7 +241,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
 
     def getPos(self):
         return self._pos
-    
+
     def setOffset(self, x = None, y = None):
         debugMessage("setOffset function not defined for " + self.getFilename())
 
@@ -262,7 +262,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
 
     def set_texture_dimensions(self, xLeft = None, xRight = None, yBottom = None, yTop = None):
         debugMessage("set_texture_dimensions function not defined for " + self.getFilename())
-        
+
     def getSize(self, key = DEFAULT_SIZE_KEY):
         return self._size.get(key, (1.0,1.0))
 
@@ -272,7 +272,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
         if y is None:
             y = self.getSize(key)[Yi]
         self._size[key] = (x,y)
-        
+
     def get_effective_size(self):
         returnval = [1.0,1.0]
         for size in self._size.values():
@@ -321,12 +321,12 @@ class GraphicObject(BaseObject, IdentifiedObject):
         except:
             debugMessage("width and/or height not defined for " + self.getFilename())
             return (0,0)
-        
+
     get_dimensions = getDimensions #deprecated function name
-    
+
     def getWidth(self):
         return self.width
-    
+
     def getHeight(self):
         return self.height
 
@@ -336,7 +336,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
         except:
             debugMessage("effective width and/or height not defined for " + self.getFilename())
             return [0,0]
-        
+
     def getExtents(self):
         effective_size = self.get_effective_size()
         width = self.width * effective_size[Xi]
@@ -366,7 +366,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
                 self.other_offsets[key] = [0,0]
         return xleft, xright, ybottom, ytop
 
-        
+
     def getExtentsMinusCamera(self):
         extents = list(self.getExtents())
         try:
@@ -379,7 +379,7 @@ class GraphicObject(BaseObject, IdentifiedObject):
             pass
         return extents
 
-        
+
     def getScreenPosition(self, centered = False):
         if centered:
             pos = self.getCenterPosition()
@@ -390,12 +390,12 @@ class GraphicObject(BaseObject, IdentifiedObject):
         else:
             return list(map(operator.sub, pos, camera.getCameraXY()))
 
-        
+
     def getCenterPosition(self):
         """returns the center of the sprite, no matter where that might be"""
         extents = self.getExtentsMinusCamera()
         return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
-        
+
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
         extents = self.getExtentsMinusCamera()

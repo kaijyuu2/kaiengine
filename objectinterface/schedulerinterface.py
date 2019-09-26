@@ -31,7 +31,7 @@ class SchedulerInterface(SleepInterface):
 
     def pauseScheduledListener(self, *args, **kwargs):
         pauseScheduledListener(*args, **kwargs)
-        
+
     def pauseScheduledListenerWithID(self, *args, **kwargs):
         pauseScheduledListenerWithID(*args, **kwargs)
 
@@ -41,7 +41,7 @@ class SchedulerInterface(SleepInterface):
 
     def unpauseScheduledListener(self, listener, *args, **kwargs):
         unpauseScheduledListener(listener, *args, **kwargs)
-        
+
     def unpauseScheduledListenerWithID(self, *args, **kwargs):
         unpauseScheduledListenerWithID(*args, **kwargs)
 
@@ -67,7 +67,7 @@ class SchedulerInterface(SleepInterface):
 
     def pauseRealtimeListener(self, *args, **kwargs):
         pauseRealtimeListener(*args, **kwargs)
-        
+
     def pauseRealtimeListenerWithID(self, *args, **kwargs):
         pauseRealtimeListenerWithID(*args, **kwargs)
 
@@ -77,7 +77,7 @@ class SchedulerInterface(SleepInterface):
 
     def unpauseRealtimeListener(self, *args, **kwargs):
         unpauseRealtimeListener(*args, **kwargs)
-        
+
     def unpauseRealtimeListenerWithID(self, *args, **kwargs):
         unpauseRealtimeListenerWithID(*args, **kwargs)
 
@@ -93,47 +93,47 @@ class SchedulerInterface(SleepInterface):
                 self.unscheduleRealtime(key)
         self._scheduled_method_keys.clear()
         self._scheduled_realtime_method_keys.clear()
-        
+
     def waitForCondition(self, func, condition, *args, **kwargs):
         return self.schedule(self._waitForCondition, 1, True, func, condition, *args, **kwargs)
-        
+
     def _waitForCondition(self, func, condition, *args, **kwargs):
         if condition():
             func(*args, **kwargs)
             return True
-        
+
     def delay(self, listener, priority = 0, *args, **kwargs):
         if not self.destroyed:
             ID = delay(listener, priority, *args, **kwargs)
             self._delayed_methods.add(ID)
             return ID
         return None
-    
+
     def undelay(self, ID):
         ID = undelay(ID)
         self._delayed_methods.discard(ID)
-        
+
     def undelayAll(self):
         for ID in self._delayed_methods:
             undelay(ID)
         self._delayed_methods.clear()
-        
+
     #overwritten stuff
-    
+
     def sleep(self, *args, **kwargs):
         startedsleeping = super().sleep(*args, **kwargs)
         if startedsleeping:
             self.pauseAllScheduledListeners(SI_SLEEP_KEY)
             self.pauseAllRealtimeListeners(SI_SLEEP_KEY)
         return startedsleeping
-        
+
     def wakeUp(self, *args, **kwargs):
         previouslysleeping = super().wakeUp(*args, **kwargs)
         if previouslysleeping:
             self.unpauseAllScheduledListeners(SI_SLEEP_KEY)
             self.unpauseAllRealtimeListeners(SI_SLEEP_KEY)
         return previouslysleeping
-    
+
 
     def destroy(self, *args, **kwargs):
         super().destroy(*args, **kwargs)

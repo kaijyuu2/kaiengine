@@ -46,7 +46,7 @@ class MenuTemplate(ScreenElement):
         self._first_button = True
         self._buttons = set()
         self._menu_interlinks = {}
-        
+
         #overwrites
         self.border = self.stylesheet.get(DEFAULT_BORDER, None) or self.stylesheet.get(DEFAULT_MENU_BORDER, None) or (8,8)
 

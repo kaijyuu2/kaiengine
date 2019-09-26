@@ -39,7 +39,7 @@ def startHeld(kai_key):
     if len(_held_keys) == 0:
         schedule(_fireHeldKeyEvents, 1, True)
     _held_keys.add(kai_key)
-    
+
 def endHeld(kai_key):
     _held_keys.discard(kai_key)
     if len(_held_keys) == 0:
@@ -47,7 +47,7 @@ def endHeld(kai_key):
 
 relayPress = createBindingRelayer(INPUT_EVENT_TYPE_PRESS, startHeld)
 relayRelease = createBindingRelayer(INPUT_EVENT_TYPE_RELEASE, endHeld)
-    
+
 
 addKeyPressListener(relayPress)
 addKeyReleaseListener(relayRelease)
@@ -57,4 +57,3 @@ addMouseReleaseListener(relayRelease)
 
 #addJoybuttonPressListener(relayPress) #TODO: handle the 'joystick' argument issue
 #addJoybuttonReleaseListener(relayRelease)
-

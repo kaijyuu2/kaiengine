@@ -17,28 +17,28 @@ ACTOR_SPRITE = "sprite"
 FADE_TIME = 60 #one second
 
 class Scene(BaseObject, GraphicInterface, EventInterface, SchedulerInterface):
-    
+
     default_prop = {SCENE_BG_FILENAME: None,
                     SCENE_MUSIC_FILENAME: None,
                     SCENE_ACTOR_LIST: []}
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.darkener = None
-        
+
         self.actor_factory = createActor
-        
+
         self.actors = sDict()
-        
+
         self.schedule(self.updateActorPriority, 1, True)
-        
+
     def secondaryInit(self):
         '''secondary initialization after scene has been registered'''
         self.setSpriteShow(True)
         self.darkener = Darkener()
         self.playSceneMusic()
         self.loadActors()
-        
+
     def updateActorPriority(self):
         '''sort actors by y position and give priority to ones that are lower on the screen'''
         actors = sorted(list(self.actors.values()), key=lambda x: x.getPos()[1], reverse=True) #sort by y pos
@@ -47,10 +47,10 @@ class Scene(BaseObject, GraphicInterface, EventInterface, SchedulerInterface):
 
     def setActorFactory(self, factory):
         self.actor_factory = factory
-        
+
     def getActorFactory(self, actordata = None): #data passed in case this is overwritten
         return self.actor_factory
-        
+
     def loadActors(self):
         for actordict in self.actor_list:
             try:
@@ -66,7 +66,7 @@ class Scene(BaseObject, GraphicInterface, EventInterface, SchedulerInterface):
                 debugMessage("Failed to create map actor!")
                 debugMessage(e)
                 debugMessage(actordict)
-                
+
     def addActor(self, actor):
         """Must have already created actor object"""
         self.actors.append(actor)
@@ -118,11 +118,11 @@ class Scene(BaseObject, GraphicInterface, EventInterface, SchedulerInterface):
     def getAllActors(self):
         return list(self.actors.values())
 
-        
+
     def playSceneMusic(self):
         if self.music is not None:
             playMusic(self.music)
-            
+
     def sceneFadeOut(self, time = FADE_TIME, *args, **kwargs):
         if not self.sleeping:
             self.darkener.fadeOut(time)
@@ -148,9 +148,9 @@ class Scene(BaseObject, GraphicInterface, EventInterface, SchedulerInterface):
             if self.checkDoneFading():
                 self.unschedule(self._waitForFade)
                 method(*args, **kwargs)
-            
-            
-            
+
+
+
     def destroy(self):
         super().destroy()
         self.removeAllActors()

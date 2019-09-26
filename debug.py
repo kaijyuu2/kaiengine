@@ -24,7 +24,7 @@ def debugMessage(string):
         _getLogFunction()(string)
     except:
         _getLogFunction()("THIS TERMINAL AND/OR PYTHON INSTALL SUCKS AND CANNOT PRINT UNICODE (was trying to print a debug message and failed)")
-        
+
 
 def debugLooseMessage(string):
     if checkDebugOn() and settings.getValue(DYNAMIC_SETTINGS_LOOSE_WARNING, True):

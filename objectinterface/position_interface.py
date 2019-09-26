@@ -10,13 +10,13 @@ def _interpretPositionArgs(*args, **kwargs):
     if kwargs:
         try: args[0] = kwargs["x"]
         except KeyError: pass
-        try: 
+        try:
             newy = kwargs["y"]
             args = args + [None]*(2 - len(args))
             args[1] = newy
-        except KeyError: 
+        except KeyError:
             pass
-        try: 
+        try:
             newz = kwargs["z"]
             args = args + [None]*(3 - len(args))
             args[2] = newz
@@ -35,8 +35,8 @@ class PositionInterface(DestroyInterface):
     @pos.setter
     def pos(self, val):
         self.setPos(val)
-        
-        
+
+
     def setPos(self, *args, **kwargs):
         newargs = _interpretPositionArgs(*args, **kwargs)
         for i, arg in enumerate(newargs):
@@ -46,7 +46,7 @@ class PositionInterface(DestroyInterface):
                 except IndexError:
                     newargs[i] = 0
         newargs = newargs + self._pos[len(newargs):]
-        self._pos = Coordinate(newargs) 
+        self._pos = Coordinate(newargs)
 
     def movePos(self, *args, **kwargs):
         newargs = _interpretPositionArgs(*args, **kwargs)
@@ -57,4 +57,3 @@ class PositionInterface(DestroyInterface):
 
     def getPos(self):
         return self._pos
-

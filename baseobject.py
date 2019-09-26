@@ -123,4 +123,3 @@ class BaseObject(DestroyInterface):
         for key in SPECIAL_KEYS:
             new_prop.pop(key, None)
         return new_prop
-

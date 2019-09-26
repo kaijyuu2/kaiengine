@@ -22,7 +22,7 @@ class Actor(GraphicInterface, MovementInterfaceFrames, SchedulerInterface):
         super().__init__(filename, *args, **kwargs)
         self._actor_index = -1
         self.baselayer = DEFAULT_ACTOR_LAYER #for graphical layering; is generally used in scenes to order actor layers
-        
+
         if self.starting_sprite is not None:
             self.setSprite(self.starting_sprite) #set default sprite
 
@@ -30,13 +30,13 @@ class Actor(GraphicInterface, MovementInterfaceFrames, SchedulerInterface):
         self.baselayer = layer
 
     def getBaseLayer(self):
-        return self.baselayer 
+        return self.baselayer
 
     def getActorIndex(self):
         return self._actor_index
 
     #overwritten stuff
-    
+
     def getGraphicPath(self, filepath):
         '''overwrites something from GraphicInterface'''
         if filepath != DEFAULT_INVALID_GRAPHIC:

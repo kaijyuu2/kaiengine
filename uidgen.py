@@ -26,7 +26,7 @@ def generateUniqueID(identifier = DEFAULT_ID):
     return Identification(BASE_UNIQUE_STRING + identifier + UNDERSCORE_CHAR + str(id_counters[identifier]))
 
 def isID(identifier):
-    return isinstance(identifier, Identification) 
+    return isinstance(identifier, Identification)
 
 class IdentifiedObject():
 
@@ -35,13 +35,13 @@ class IdentifiedObject():
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.id = generateUniqueID(self.__class__.__name__)
-        
+
     def combineID(self, *args):
         '''consistently combine multiple ids for a unique ID'''
         returnstr = self.id[:]
         for arg in args:
             returnstr += str(arg)
         return Identification(returnstr)
-        
+
 
 GenerateUniqueID = generateUniqueID #deprecated function name

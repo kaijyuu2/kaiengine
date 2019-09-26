@@ -136,13 +136,13 @@ def createObjectWithData(obj_filename, obj_filedir, obj_ext, default_type, *args
     if default_type is not None:
         kwargs["default_type"] = default_type
     return createObject(path, *args, **kwargs)
-    
+
 '''
 example wrapper function
 
 def createMap(filename, *args, **kwargs):
     return createObjectWithData(filename, MAPS_PATH, MAP_EXTENSION, MapObject, *args, **kwargs)
-    
+
 serves similar purpose to old BaseObject construction functions, if full filepaths and/or default types want to be inferred
 createObject alone is sufficient if full paths and default class types are provided
 '''

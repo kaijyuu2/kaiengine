@@ -38,25 +38,25 @@ DEFAULT_MAPTILE_GRAPHIC_PATH = (RESOURCE_PATH, GRAPHICS_PATH)
 
 
 class MapTileData(IdentifiedObject, DestroyInterface):
-    
+
     def __init__(self, *args, maptile_data, **kwargs):
         super().__init__(*args, **kwargs)
         self.maptile_position = maptile_data[MAPTILE_POS]
-        
+
 class MapTileGraphic(ScreenElement):
     graphic_path = copy.copy(DEFAULT_MAPTILE_GRAPHIC_PATH)
-    
+
     def __init__(self, *args, maptile_data, **kwargs):
         super().__init__(*args, **kwargs)
         self.maptile_position = maptile_data[MAPTILE_POS]
-        
+
         if MAPTILE_SPRITE in maptile_data:
             self.setSprite(maptile_data[MAPTILE_SPRITE])
             self.setSpriteFlip(maptile_data.get(MAPTILE_SPRITE_XFLIP, False), maptile_data.get(MAPTILE_SPRITE_YFLIP, False))
-    
+
 
 class TilemapScene(Scene, KaiObject):
-    
+
     default_prop = {TILEMAP_SCENE_TILE_DATA_LIST: [],
                     TILEMAP_SCENE_TILE_GRAPHIC_DICT: {},
                     TILEMAP_SCENE_MAP_OBJECT_DICT: {},
@@ -64,40 +64,40 @@ class TilemapScene(Scene, KaiObject):
                     TILEMAP_SCENE_HEIGHT: 1,
                     TILEMAP_SCENE_TILE_HEIGHT: 16,
                     TILEMAP_SCENE_TILE_WIDTH: 16}
-    
+
     map_tile_data_type = MapTileData
     map_tile_graphic_type = MapTileGraphic
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.tile_graphics_map = defaultdict(dict) #contains screen element ids
         self.objects_map = defaultdict(list) #contains screen element ids
         self.tile_data_map = {} #does not contain screen element ids, contains tile data objects. tile data objects are not screen elements
-        
+
         self.loadTilemap()
         self.loadObjects()
-        
-        
-    
+
+
+
     def getMapTileDataType(self, tiledata = None):
         return self.map_tile_data_type
-    
+
     def setMapTileDataType(self, newtype):
         self.map_tile_data_type = newtype
-        
+
     def getMapTileGraphicType(self, tiledata = None):
         return self.map_tile_graphic_type
-    
+
     def setMapTileGraphicType(self, newtype):
         self.map_tile_graphic_type = newtype
-    
+
     def getMapTileWidth(self):
         return self.tile_width
-    
+
     def getMapTileHeight(self):
         return self.tile_height
-    
-    
+
+
     def loadTilemap(self):
         self.clearMapTiles()
         for tile in self.tile_data_list:
@@ -118,12 +118,12 @@ class TilemapScene(Scene, KaiObject):
                 except KeyError:
                     debugMessage("Map tile graphic lacked position.")
                     debugMessage(str(tile))
-                
-                    
+
+
     def loadObjects(self):
         self.clearMapObjects()
         #TODO: implement
-        
+
     def updateChildrenLayers(self, lastlayer = None):
         #should return the highest used layer
         if not lastlayer:
@@ -141,8 +141,8 @@ class TilemapScene(Scene, KaiObject):
             lastlayer = max(lastlayer, newlayer)
         lastlayer = super().updateChildrenLayers(lastlayer) #include scene's code
         return lastlayer
-        
-        
+
+
     def clearMapTiles(self):
         for tile in self.tile_data_map.values():
             tile.destroy()
@@ -154,24 +154,24 @@ class TilemapScene(Scene, KaiObject):
                     pass
         self.tile_data_map.clear()
         self.tile_graphics_map.clear()
-        
+
     def clearMapObjects(self):
         for layerdata in self.objects_map.values():
             for obj in layerdata:
                 obj.destroy()
         self.objects_map.clear()
-        
+
     def createMapTileData(self, *args, maptile_data, **kwargs):
         return self.getMapTileDataType(maptile_data)(*args, maptile_data = maptile_data, *kwargs)
-    
+
     def createMapTileGraphic(self, *args, maptile_data, **kwargs):
         return self.getMapTileGraphicType(maptile_data)(*args, maptile_data = maptile_data, **kwargs)
-        
+
     def destroy(self):
         super().destroy()
         self.clearMapTiles()
         self.clearMapObjects()
         self.map_tile_type = None
-        
+
 def createTilemapScene(filename, *args, **kwargs):
     return createObjectWithData(filename, DEFAULT_TILEMAP_SCENE_PATH, TILEMAP_SCENE_EXTENSION, TilemapScene, *args, **kwargs)

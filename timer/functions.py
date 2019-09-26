@@ -74,7 +74,7 @@ def pauseScheduledListener(listener, *args, **kwargs):
         scheduler._pauseScheduledListener(listener, *args, **kwargs)
     else:
         pauseScheduledListenerWithID(listener, *args, **kwargs)
-    
+
 def pauseScheduledListenerWithID(*args, **kwargs):
     scheduler._pauseScheduledListenerWithID(*args, **kwargs)
 
@@ -92,7 +92,7 @@ def pauseRealtimeListener(listener, *args, **kwargs):
         scheduler._pauseRealtimeListener(listener, *args, **kwargs)
     else:
         pauseRealtimeListenerWithID(listener, *args, **kwargs)
-    
+
 def pauseRealtimeListenerWithID(*args, **kwargs):
     scheduler._pauseRealtimeListenerWithID(*args, **kwargs)
 
@@ -101,10 +101,10 @@ def unpauseRealtimeListener(listener, *args, **kwargs):
         scheduler._unpauseRealtimeListener(listener, *args, **kwargs)
     else:
         unpauseRealtimeListenerWithID(listener, *args, **kwargs)
-    
+
 def unpauseRealtimeListenerWithID(*args, **kwargs):
     scheduler._unpauseRealtimeListenerWithID(*args, **kwargs)
-    
+
 
 def clearSchedule():
     """clears entire frame based schedule (not realtime)

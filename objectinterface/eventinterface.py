@@ -21,7 +21,7 @@ class EventInterface(IdentifiedObject, SleepInterface):
 
     def getEventID(self, key = ""):
         return self._getEventID(self.id, key)
-        
+
     def _getEventID(self, own_id, key):
         return str(own_id) + "_" + str(key) + "_EVENT"
 

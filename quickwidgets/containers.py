@@ -55,10 +55,10 @@ class Container(ScreenElement):
             self._currently_updating = True
             self._updateContainerPositions()
             self._currently_updating = False
-        
+
     def _updateContainerPositions(self):
         pass
-        
+
     def containerPositionsUpdated(self):
         return not bool(self._update_positions)
 
@@ -80,12 +80,12 @@ class Container(ScreenElement):
         if not self.containerPositionsUpdated():
             self.updateContainerPositions()
         return super().getWidth()
-    
+
     def getHeight(self):
         if not self.containerPositionsUpdated():
             self.updateContainerPositions()
         return super().getHeight()
-    
+
     def getExtents(self):
         if not self.containerPositionsUpdated():
             self.updateContainerPositions()
@@ -263,4 +263,3 @@ class GridContainer(Container):
         self._child_pos_dict.pop(pos, None)
         self.delayUpdatePositions()
         return childid
-

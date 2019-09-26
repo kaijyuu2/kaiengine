@@ -29,7 +29,7 @@ def delay(listener, priority = 0, *args, **kwargs):
         return newid
     else:
         raise DelayedEventException("Cannot delay events in a delayed event")
-    
+
 def undelay(ID):
     if ID != None:
         if isID(ID):
@@ -37,22 +37,22 @@ def undelay(ID):
         else:
             _undelay(_findIDByListener(ID))
     return ID
-        
-    
+
+
 def _undelay(ID):
     try:
         priority, key = _delayed_events_ids[ID]
         _removeDelayEvent(priority, key)
     except KeyError:
         pass
-    
+
 def _findIDByListener(listener):
-    for priority, data in _delayed_events.items(): 
+    for priority, data in _delayed_events.items():
         for key, val in data.items():
             if val[0] == listener:
                 return val[3]
     return None
-    
+
 def runDelayedEvents():
     global _currently_running_events
     _currently_running_events = True
@@ -68,7 +68,7 @@ def runDelayedEvents():
                 traceback.print_exc()
     _removeAllDelayEvents()
     _currently_running_events = False
-    
+
 def _removeDelayEvent(priority, key):
     ID = None
     try:
@@ -76,7 +76,7 @@ def _removeDelayEvent(priority, key):
     except KeyError:
         pass
     _delayed_events_ids.pop(ID, None)
-    
+
 def _removeAllDelayEvents():
     _delayed_events.clear()
     _delayed_events_ids.clear()

@@ -504,4 +504,3 @@ def _getRelevantMousePartitions(x_min, y_min, x_max, y_max):
     y_values = [y for y in range(y_min//MOUSE_PARTITION_SIZE_Y, (y_max//MOUSE_PARTITION_SIZE_Y)+1)]
     relevant_keys = [EVENT_MOUSE_MOVE_SECTION[(x, y)] for x in x_values for y in y_values]
     return relevant_keys
-

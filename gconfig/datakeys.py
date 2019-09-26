@@ -54,7 +54,7 @@ ACTOR_STARTING_SPRITE = "starting_sprite"
 #strings keys
 #languages
 LOCALE_ENGLISH = "english"
-LOCALE_JAPANESE = u"æ—¥æœ¬èªž"
+LOCALE_JAPANESE = u"“ú–{Œê"
 
 #data keys
 STRINGS_FONTS_KEY = "fonts"

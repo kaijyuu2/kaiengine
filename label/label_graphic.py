@@ -312,12 +312,12 @@ class Label_Graphic(Label_Base, GraphicObject):
         self._update_flip()
         self.update_follow_camera()
         self.update_pos()
-        
+
     def getCenterPosition(self):
         """returns the center of the sprite, no matter where that might be"""
         extents = self.getExtentsMinusCamera()
         return (extents[0] + extents[1])/2, (extents[2] + extents[3])/2
-        
+
     def getLeftSide(self):
         """returns the left side of the sprite, no matter where that might be"""
         extents = self.getExtentsMinusCamera()
@@ -354,7 +354,7 @@ class Label_Graphic(Label_Base, GraphicObject):
     def stopUpdatingWithCamera(self):
         for sprite in list(self.sprites.values()):
             sprite.remove_offset(CAMERA_KEY)
-            
+
     def getScreenPosition(self):
         if self.follow_camera:
             return self.getPos()
