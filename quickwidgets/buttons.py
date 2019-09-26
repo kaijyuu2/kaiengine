@@ -86,6 +86,11 @@ class BaseButton(Container):
         except KeyError:
             return None
 
+    def showElement(self, key = None):
+        super().showElement(key=key)
+        if not self.focus:
+            self.removeHighlight()
+
     #event stuff
 
     def mouseenter(self):
