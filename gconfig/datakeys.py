@@ -41,7 +41,7 @@ MULTI_SPRITE_SPRITE_LAYER = "layer"
 
 #scenes
 
-SCENE_BG_FILENAME = "bg" 
+SCENE_BG_FILENAME = "bg"
 SCENE_MUSIC_FILENAME = "music"
 SCENE_ACTOR_LIST = "actor_list"
 
@@ -54,7 +54,7 @@ ACTOR_STARTING_SPRITE = "starting_sprite"
 #strings keys
 #languages
 LOCALE_ENGLISH = "english"
-LOCALE_JAPANESE = u"“ú–{Œê"
+LOCALE_JAPANESE = u"æ—¥æœ¬èªž"
 
 #data keys
 STRINGS_FONTS_KEY = "fonts"
