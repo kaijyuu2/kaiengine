@@ -77,7 +77,7 @@ def getString(textkey, ID = None, fallbackID = None, locale = None, fallbackloca
         except KeyError:
             if default == DEFAULT_KWARG:
                 debugMessage("DEBUG: No translation in {0} or {1} for {2} using given ids of {3} or {4}".format(locale, fallbacklocale, textkey, ID, fallbackID))
-                raise KeyError
+                return textkey
             return default
 
 def _getString(textkey, ID, fallbackID, locale):
