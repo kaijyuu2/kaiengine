@@ -327,7 +327,7 @@ class GridMenu(MenuTemplate, GridContainer):
 
     #overwritten stuff
     def addButton(self, pos_tuple, *args, **kwargs):
-        ID = self.addChild(pos_tuple, self.button_type(*args, **kwargs))
+        ID = self.addChildApplyStylesheet(pos_tuple, self.button_type, *args, **kwargs)
         self._updateFirstButton(ID)
         self._buttons.add(ID)
         return ID

@@ -257,6 +257,9 @@ class GridContainer(Container):
         self.delayUpdatePositions()
         return newchild
 
+    def addChildApplyStylesheet(self, pos_tuple, newchildtype, *args, parent_stylesheet = {}, update_layers = True, **kwargs):
+        return self.addChild(pos_tuple, newchildtype(*args, parent_stylesheet=dictUnion(self.stylesheet, parent_stylesheet), **kwargs), update_layers)
+
     def removeChild(self, *args, **kwargs):
         childid = super().removeChild(*args, **kwargs)
         pos = self._child_id_dict.pop(childid, None)
