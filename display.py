@@ -139,7 +139,7 @@ def createGraphic(path, layer = -1, *args, **kwargs):
     if ext == MULTI_SPRITE_EXTENSION:
         return createMultiSprite(path, layer, *args, **kwargs)
     debugMessage("graphic of unsupported format: " + path)
-    if len(ext) is 0:
+    if len(ext) == 0:
         debugMessage("You forgot to include the extension, methinks")
     return None
 
