@@ -150,7 +150,7 @@ class camera(object):
         self.use_scroll_buffer = False
         self.use_camera_boundary = False
         self.scroll_buffer = CAMERA_SCROLL_BUFFER
-        self.allow_camera_movement = sBool.sBool(force = False)
+        self.allow_camera_movement = sBool.sBool(minimum = False)
         self.camera_sprites = sDict()
         self._oldx = self._x
         self._oldy = self._y
