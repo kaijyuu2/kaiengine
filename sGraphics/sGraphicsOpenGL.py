@@ -1654,8 +1654,8 @@ class sWindow(Window, windowVBOInterface):
             loc = glGetUniformLocation(self.shader, uniform_name)
             UNIFORM_FUNC[uniform_type](loc, *self.getUniformArgs(uniform_name, uniform_type))
         glBindVertexArray(self.vao)
+        _layer = glGetUniformLocation(self.shader, "layer")
         for layer in self.sorted_layer_keys:
-            _layer = glGetUniformLocation(self.shader, "layer")
             glUniform1f(_layer, layer)
             for image in self.images[layer].values():
                 glBindTexture(GL_TEXTURE_2D, image[IMAGE_TEXTURE])
