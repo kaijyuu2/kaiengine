@@ -42,8 +42,8 @@ class Container(object):
                 debugMessage("Infinite loop detected in container. " + obj + " key removed.")
         raise AttributeError("Attribute not found: " + name)
 
-    def __setattr__(self,name, value):
-        if name not in dir(self):
+    def __setattr__(self, name, value):
+        if name not in self.__dict__:
             for obj in self._ContainerObjs:
                 if hasattr(getattr(self, obj), name):
                     setattr(getattr(self, obj), name, value)

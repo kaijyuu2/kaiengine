@@ -158,10 +158,6 @@ class GraphicInterface(PositionInterface, SleepInterface):
         self._alpha = a
         self._updateSprite()
 
-    def setSpriteLayer(self, layer):
-        self._layer = layer
-        self._updateSpriteLayer()
-
     def setSpriteCenter(self, x = None, y = None):
         if x is None:
             x = self._center[0]
@@ -399,6 +395,10 @@ class GraphicInterface(PositionInterface, SleepInterface):
     def _updateSpriteLayer(self): #split from update for efficiency reasons
         try: self.sprite.layer = self._layer
         except AttributeError: pass
+        
+    def setSpriteLayer(self, layer, _USL=_updateSpriteLayer): #bind method into kwarg for efficiency reasons
+        self._layer = layer
+        _USL(self)
 
     def _updateDimensions(self):
         try:
