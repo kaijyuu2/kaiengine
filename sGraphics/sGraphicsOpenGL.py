@@ -1643,7 +1643,7 @@ class sWindow(Window, windowVBOInterface):
     def setScreenUniformValue(self, uniform_name, value):
         self.screen_uniform_values[uniform_name] = value
 
-    def _drawToFBO(self):
+    def _drawToFBO(self, _glBindTexture=glBindTexture, _glDrawArrays=glDrawArrays, _glUniform1f=glUniform1f, _glGetUniformLocation=glGetUniformLocation, _getUniformArgs=getUniformArgs):
         glUseProgram(self.shader)
         glBindFramebuffer(GL_FRAMEBUFFER, self.fbo)
         if not self.layers_sorted:
@@ -1651,15 +1651,17 @@ class sWindow(Window, windowVBOInterface):
             self.layers_sorted = True
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for uniform_name, uniform_type in self.uniforms.items():
-            loc = glGetUniformLocation(self.shader, uniform_name)
-            UNIFORM_FUNC[uniform_type](loc, *self.getUniformArgs(uniform_name, uniform_type))
+            loc = _glGetUniformLocation(self.shader, uniform_name)
+            UNIFORM_FUNC[uniform_type](loc, *_getUniformArgs(self, uniform_name, uniform_type))
         glBindVertexArray(self.vao)
         _layer = glGetUniformLocation(self.shader, "layer")
+        _img = None
         for layer in self.sorted_layer_keys:
-            glUniform1f(_layer, layer)
+            _glUniform1f(_layer, layer)
             for image in self.images[layer].values():
-                glBindTexture(GL_TEXTURE_2D, image[IMAGE_TEXTURE])
-                glDrawArrays(GL_TRIANGLES, image[IMAGE_VBO]*VERTEX_PER_TRIANGLE_PER_QUAD, image[IMAGE_COUNT]*VERTEX_PER_TRIANGLE_PER_QUAD)
+                if _img != (_img := image[IMAGE_TEXTURE]):
+                    _glBindTexture(GL_TEXTURE_2D, _img)
+                _glDrawArrays(GL_TRIANGLES, image[IMAGE_VBO]*VERTEX_PER_TRIANGLE_PER_QUAD, image[IMAGE_COUNT]*VERTEX_PER_TRIANGLE_PER_QUAD)
 
     def _drawFBOtoScreen(self):
         glUseProgram(self.post_shader)
