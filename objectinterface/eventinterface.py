@@ -105,6 +105,12 @@ class EventInterface(IdentifiedObject, SleepInterface):
         '''Unregister a mouse move event listener. Does nothing if listener is not actually listening.'''
         self.removeCustomListener(EVENT_MOUSE_MOVE, *args, **kwargs)
 
+    def addSectionalMouseMoveListener(self, *args, **kwargs):
+        '''Register a function as a sectional mouse move event listener.'''
+        #TODO: fix to work properly with this interface
+        #self.addCustomListener(EVENT_MOUSE_MOVE, *args, **kwargs)
+        addSectionalMouseMoveListener(*args, **kwargs)
+
     def addMouseEnterListener(self,*args, **kwargs):
         '''Register a function as a mouse enter window event listener.'''
         self.addCustomListener(EVENT_MOUSE_ENTER, *args, **kwargs)

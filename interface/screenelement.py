@@ -4,8 +4,7 @@
 import copy
 import operator
 
-from kaiengine.event import customEvent
-from kaiengine.event import MOUSE_PARTITION_SIZE_X, MOUSE_PARTITION_SIZE_Y, EVENT_MOUSE_MOVE_SECTION
+from kaiengine.event import customEvent, QUERY_MOUSE_MOVE_SECTION_BOUNDS
 from kaiengine.objectinterface import GraphicInterface, EventInterface, SchedulerInterface
 from kaiengine.weakrefhelper import weakRef, unWeakRef
 from kaiengine.debug import debugMessage
@@ -53,8 +52,10 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
                     self._funcs[string] = newfunc
             except KeyError:
                 pass
+        section_bounds_query_key = QUERY_MOUSE_MOVE_SECTION_BOUNDS + self.id
         if self._funcs.keys() & (MOUSEENTER_KEY, MOUSELEAVE_KEY, MOUSEOVER_KEY): #if we have any of these
-            self.addMouseMoveListener(self._mouseMove, priority = self.getEventListenerPriority)
+            self.addSectionalMouseMoveListener(self._mouseMove, priority = self.getEventListenerPriority, query_key = section_bounds_query_key)
+        self.addQueryListener(section_bounds_query_key, self.getExtents)
 
         if parent_stylesheet:
             self.stylesheet = dictUnion(parent_stylesheet, self.stylesheet)
@@ -102,10 +103,6 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
     @property
     def extents(self):
         return self.getExtents()
-
-    @property
-    def mouse_move_partitions(self):
-        return _getRelevantMousePartitions(*self.extents)
 
     @property
     def parent(self):
@@ -497,10 +494,3 @@ class ScreenElement(GraphicInterface, EventInterface, SchedulerInterface):
         self._funcs.clear()
         self.removeAllChildren()
         self.removeFocusListeners()
-
-
-def _getRelevantMousePartitions(x_min, y_min, x_max, y_max):
-    x_values = [x for x in range(x_min//MOUSE_PARTITION_SIZE_X, (x_max//MOUSE_PARTITION_SIZE_X)+1)]
-    y_values = [y for y in range(y_min//MOUSE_PARTITION_SIZE_Y, (y_max//MOUSE_PARTITION_SIZE_Y)+1)]
-    relevant_keys = [EVENT_MOUSE_MOVE_SECTION[(x, y)] for x in x_values for y in y_values]
-    return relevant_keys

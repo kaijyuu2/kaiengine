@@ -6,6 +6,7 @@ from .eventkeys import *
 from kaiengine.input import standardizedKey
 from kaiengine.utilityFuncs import setMousePosition
 
+_MOUSE_SECTION_CONNECTION_BUFFER = set()
 
 def _initListener(self, event_key, func, priority, lock, sleep_when_unfocused):
     def instantiated(*args, **kwargs):
@@ -145,6 +146,15 @@ def removeMouseMoveListener(listener):
     '''Unregister a mouse move event listener. Does nothing if listener is not actually listening.'''
     eventdriver._removeListener(EVENT_MOUSE_MOVE, listener)
 
+def addSectionalMouseMoveListener(listener, priority=0, query_key=None):
+    '''Queue a function for registration as a sectional mouse move event listener.'''
+    _MOUSE_SECTION_CONNECTION_BUFFER.add((listener, priority, query_key))
+
+def removeSectionalMouseMoveListener(listener):
+    '''Unregister a sectional mouse move event listener.'''
+    #TODO: implement
+    pass
+
 def addMouseEnterListener(listener, priority=0):
     '''Register a function as a mouse enter window event listener.'''
     eventdriver._addListener(EVENT_MOUSE_ENTER, listener, priority)
@@ -224,10 +234,20 @@ def mouseMoveEvent(x,
                    X_BLOCK_SIZE=MOUSE_PARTITION_SIZE_X,
                    Y_BLOCK_SIZE=MOUSE_PARTITION_SIZE_Y,
                    EVENT_MOUSE_MOVE_LOCALREF=EVENT_MOUSE_MOVE,
-                   EVENT_MOUSE_MOVE_SECTION_LOCALREF=EVENT_MOUSE_MOVE_SECTION):
+                   EVENT_MOUSE_MOVE_SECTION_LOCALREF=EVENT_MOUSE_MOVE_SECTION,
+                   BUFFER_LOCALREF=_MOUSE_SECTION_CONNECTION_BUFFER):
     '''Process a mouse motion event. If any listener returns True, halt processing.'''
+    #TODO: allow mixing global move events and sectional move events (currently, priority & returning True don't work as expected)
+    for listener, priority, query_key in BUFFER_LOCALREF:
+        x_min, x_max, y_min, y_max = callQuery(query_key)
+        relevant_keys = [EVENT_MOUSE_MOVE_SECTION_LOCALREF[(x, y)]
+                                                            for x in range(int(x_min//X_BLOCK_SIZE), int((x_max//X_BLOCK_SIZE))+1)
+                                                            for y in range(int(y_min//Y_BLOCK_SIZE), int((y_max//Y_BLOCK_SIZE))+1)]
+        for event_key in relevant_keys:
+            eventdriver._addListener(event_key, listener, priority)
+    BUFFER_LOCALREF.clear()
     eventdriver._callEvent(EVENT_MOUSE_MOVE_LOCALREF, x, y, dx, dy)
-    eventdriver._callEvent(EVENT_MOUSE_MOVE_SECTION_LOCALREF[(x//X_BLOCK_SIZE, y//Y_BLOCK_SIZE)], x, y)
+    eventdriver._callEvent(EVENT_MOUSE_MOVE_SECTION_LOCALREF[(int(x//X_BLOCK_SIZE), int(y//Y_BLOCK_SIZE))], x, y, dx, dy)
 
 def joybuttonPressEvent(joystick, button):
     '''Process a controller press event. If any listener returns True, halt processing.'''
