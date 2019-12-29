@@ -39,6 +39,7 @@ from numpy import array, float32
 import weakref
 import copy
 from math import floor
+import moderngl_window as mglw
 #import traceback
 #import math
 
@@ -1453,7 +1454,10 @@ class windowVBOInterface(object):
 
 
 #TODO: replace pyglet call (Window)
-class sWindow(Window, windowVBOInterface):
+class sWindow(mglw.WindowConfig, windowVBOInterface):
+
+    gl_version = (3, 3)
+
     def __init__(self, width=800, height=600, vsync = VSYNC_DEFAULT, fullscreen=False, fake_fullscreen=False):
         if fake_fullscreen:
             super(sWindow, self).__init__(width=width, height=height, vsync = vsync, resizable=False, style=Window.WINDOW_STYLE_BORDERLESS)

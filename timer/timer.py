@@ -1,9 +1,14 @@
 
 #for controlling time
 
+class Clock():
+
+    def tick(self):
+        #TODO: implement (if needed?)
+        return 1.0/60.0
+
 class MainTimer(object): #main timer everything synchronizes to
     def __init__(self):
-        #TODO: replace pyglet (Clock)
         self.clock = Clock()
         self.clock.tick()
         self.time_elapsed = 0.0
