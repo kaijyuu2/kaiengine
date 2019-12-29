@@ -4,11 +4,7 @@
 
 #things from sgraphics package
 from kaiengine.sGraphics.constants.opengl import * #note: some imports are in the constants file that aren't here. Ex: ctypes
-from kaiengine.sGraphics.shaders.opengl import getShader, getScreenShader
-from kaiengine.sGraphics.shaders.opengl import _createSpriteShader, _createScreenShader
-from kaiengine.sGraphics.shaders.opengl import _swapSpriteShader, _swapScreenShader
-from kaiengine.sGraphics.shaders.opengl import SHADERS_AVAILABLE, OVERLAY_SHADER
-from kaiengine.sGraphics.shaders.opengl import CURRENT_SHADER, CURRENT_SCREEN_SHADER
+from kaiengine.sGraphics.shaders import getShaderProgram
 from kaiengine.sGraphics.cannotresizewindowerror import CannotResizeWindowError
 from kaiengine.sGraphics.invalidscreenshotcoordinateserror import InvalidScreenshotCoordinatesError
 
@@ -49,39 +45,11 @@ MODERNGL_WINDOW_CLASS = moderngl_window.utils.module_loading.import_string('mode
 
 UNIFORM_FUNC = {"float": glUniform1f, "matrix4": glUniformMatrix4fv}
 
-def createBasicSpriteShader(vertex_shader = None, fragment_shader = None, handle="default"):
-    if not SHADERS_AVAILABLE: return
-    if gameWindow is not None:
-        raise RuntimeError("Shaders must be created before graphicsInit!")
-    _createBasicSpriteShader(vertex_shader=vertex_shader, fragment_shader=fragment_shader, handle=handle)
+class TEMP_SHADER_FALLBACK_OBJ():
 
-def createSpriteShader(vertex_shader = None, fragment_shaders = None, handle="default"):
-    if not SHADERS_AVAILABLE: return
-    if gameWindow is not None:
-        raise RuntimeError("Shaders must be created before graphicsInit!")
-    _createSpriteShader(vertex_shader=vertex_shader, fragment_shaders=fragment_shaders, handle=handle)
+    location = 0
 
-def createBasicScreenShader(vertex_shader = None, fragment_shader = None, handle="default"):
-    if not SHADERS_AVAILABLE: return
-    if gameWindow is not None:
-        raise RuntimeError("Shaders must be created before graphicsInit!")
-    _createBasicScreenShader(vertex_shader=vertex_shader, fragment_shader=fragment_shader, handle=handle)
-
-def createScreenShader(vertex_shader = None, fragment_shaders = None, handle="default"):
-    if not SHADERS_AVAILABLE: return
-    if gameWindow is not None:
-        raise RuntimeError("Shaders must be created before graphicsInit!")
-    _createScreenShader(vertex_shader=vertex_shader, fragment_shaders=fragment_shaders, handle=handle)
-
-def swapSpriteShader(handle="default"):
-    if not SHADERS_AVAILABLE: return
-    _swapSpriteShader(handle=handle)
-    gameWindow.setSpriteShader(getShader())
-
-def swapScreenShader(handle="default"):
-    if not SHADERS_AVAILABLE: return
-    _swapScreenShader(handle=handle)
-    gameWindow.setScreenShader(getScreenShader())
+TEMP_SHADER_FALLBACK = TEMP_SHADER_FALLBACK_OBJ()
 
 def graphicsInit(window_x, window_y):
     graphicsInitWindow(CreateWindow(window_x, window_y))
@@ -1058,8 +1026,8 @@ class windowVBOInterface(object):
         self.overlay_vbo = glvbo.VBO(frame_data)
         self.overlay_vbo.bind()
 
-        index_tex = glGetAttribLocation(OVERLAY_SHADER, "tex")
-        index_coord = glGetAttribLocation(OVERLAY_SHADER, "coord")
+        index_tex = self.post_shader.get("tex", TEMP_SHADER_FALLBACK).location
+        index_coord = self.post_shader.get("coord", TEMP_SHADER_FALLBACK).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, 16, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1086,8 +1054,8 @@ class windowVBOInterface(object):
         self.frame_vbo = glvbo.VBO(frame_data)
         self.frame_vbo.bind()
 
-        index_tex = glGetAttribLocation(self.post_shader, "tex")
-        index_coord = glGetAttribLocation(self.post_shader, "coord")
+        index_tex = self.post_shader.get("tex", TEMP_SHADER_FALLBACK).location
+        index_coord = self.post_shader.get("coord", TEMP_SHADER_FALLBACK).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, 16, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1107,8 +1075,8 @@ class windowVBOInterface(object):
         glBindVertexArray(self.fbo_vao)
         self.frame_vbo.bind()
 
-        index_tex = glGetAttribLocation(self.post_shader, "tex")
-        index_coord = glGetAttribLocation(self.post_shader, "coord")
+        index_tex = self.post_shader.get("tex", TEMP_SHADER_FALLBACK).location
+        index_coord = self.post_shader.get("coord", TEMP_SHADER_FALLBACK).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, 16, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1191,54 +1159,34 @@ class windowVBOInterface(object):
         glBindVertexArray(self.vao)
         self.vbo.bind()
 
-        index_tex = glGetAttribLocation(self.shader, "tex")
-        index_coord = glGetAttribLocation(self.shader, "coord")
-        index_color = glGetAttribLocation(self.shader, "color")
-        index_userdata = glGetAttribLocation(self.shader, "userdata")
+        index_tex = self.shader.get("tex", TEMP_SHADER_FALLBACK).location
+        index_coord = self.shader.get("coord", TEMP_SHADER_FALLBACK).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
         glVertexAttribPointer(index_coord, VERTEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, VERTEX_STRIDE_OFFSET)
-        glEnableVertexAttribArray(index_color)
-        glVertexAttribPointer(index_color, COLOR_VALUE_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, COLOR_STRIDE_OFFSET)
-        if index_userdata != -1:
-            glEnableVertexAttribArray(index_userdata)
-            glVertexAttribPointer(index_userdata, USER_DATA_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, USER_DATA_STRIDE_OFFSET)
 
         glBufferData(GL_ARRAY_BUFFER,self.vbo_size*STRIDE_QUAD,array(copy.copy(BASE_VBO_DATA)*self.vbo_size,dtype=float32),GL_DYNAMIC_DRAW)
 
         glBindVertexArray(0)
         glDisableVertexAttribArray(index_tex)
         glDisableVertexAttribArray(index_coord)
-        glDisableVertexAttribArray(index_color)
-        if index_userdata != -1:
-            glDisableVertexAttribArray(index_userdata)
         self.vbo.unbind()
 
     def refresh_sprite_vao_pointers(self):
         glBindVertexArray(self.vao)
         self.vbo.bind()
 
-        index_tex = glGetAttribLocation(self.shader, "tex")
-        index_coord = glGetAttribLocation(self.shader, "coord")
-        index_color = glGetAttribLocation(self.shader, "color")
-        index_userdata = glGetAttribLocation(self.shader, "userdata")
+        index_tex = self.shader.get("tex", TEMP_SHADER_FALLBACK).location
+        index_coord = self.shader.get("coord", TEMP_SHADER_FALLBACK).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
         glVertexAttribPointer(index_coord, VERTEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, VERTEX_STRIDE_OFFSET)
-        glEnableVertexAttribArray(index_color)
-        glVertexAttribPointer(index_color, COLOR_VALUE_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, COLOR_STRIDE_OFFSET)
-        if index_userdata != -1:
-            glEnableVertexAttribArray(index_userdata)
-            glVertexAttribPointer(index_userdata, USER_DATA_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, USER_DATA_STRIDE_OFFSET)
 
         glBindVertexArray(0)
         glDisableVertexAttribArray(index_tex)
         glDisableVertexAttribArray(index_coord)
-        glDisableVertexAttribArray(index_color)
-        if index_userdata != -1:
-            glDisableVertexAttribArray(index_userdata)
         self.vbo.unbind()
 
     def add_image_handler(self, obj, path, texture_id = None, display = True, antialiasing = None):
@@ -1500,8 +1448,8 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         self.updateMatrix()
 
     def shaderInit(self):
-        self.shader = getShader()
-        self.post_shader = getScreenShader()
+        self.shader = getShaderProgram(self.ctx)
+        self.post_shader = getShaderProgram(self.ctx)
 
     def setSpriteShader(self, shader):
         if self.shader == shader: return
@@ -1523,15 +1471,15 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
             self._fbos[handle] = glGenFramebuffers(1)
 
     def fboInit(self):
-        handle = CURRENT_SCREEN_SHADER
+        handle = self.post_shader.glo
         self._fbohandle = handle
         self.makeFBO(handle)
         glBindFramebuffer(GL_FRAMEBUFFER, self.fbo)
         if not self.fbo_texture:
             self.fbo_texture = glGenTextures(1)
-            self._fbo_tex_size = tuple(self.get_size())
+            self._fbo_tex_size = self.size
             glBindTexture(GL_TEXTURE_2D, self.fbo_texture)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.get_size()[0], self.get_size()[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.width, self.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         else:
@@ -1570,7 +1518,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         if not self.overlay_fbo_texture:
             self.overlay_fbo_texture = glGenTextures(1)
             glBindTexture(GL_TEXTURE_2D, self.overlay_fbo_texture)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.get_size()[0], self.get_size()[1], 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.width, self.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         else:
@@ -1709,7 +1657,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
     def _main_draw_function(self):
         #main draw function
         try:
-            windowsize = self.get_size()
+            windowsize = self.size
             if windowsize[Xi] <= 0 or windowsize[Yi] <= 0: #crash prevention on minimize
                 return
             self._drawToFBO()
@@ -1742,7 +1690,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         return (max(widths), max(heights))
 
     def updateMatrix(self):
-        width, height = self.get_size()
+        width, height = self.size
 
         left = floor(self.camera_x + 0.0001) #fix floating point errors causing jittering
         right = left + width
@@ -1758,7 +1706,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
 
     def set_dimensions(self, width, height, skipCheck=False, forceSize=False):
         """redirect this to the pyglet function"""
-        oldSize = self.get_size()
+        oldSize = self.size
         maxWidth, maxHeight = self.get_largest_screen_size()
         if not forceSize and (maxHeight < height or maxWidth < width):
             raise CannotResizeWindowError
@@ -1767,7 +1715,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         if skipCheck:
             self.updateMatrix()
             return
-        if not self.get_size() == (width, height):
+        if not self.size == (width, height):
             self.set_size(*oldSize)
             self.updateMatrix()
             raise CannotResizeWindowError
@@ -1796,8 +1744,7 @@ def loadImageFromBuffer(ix, iy, image_data, antialiasing):
     glPixelStorei(GL_UNPACK_ALIGNMENT,1)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, antialiasing)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, antialiasing)
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, ix, iy, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, array(image_data, 'B'))
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ix, iy, 0, GL_RGBA, GL_UNSIGNED_BYTE, array(image_data, 'B'))
     return [ID, [ix, iy]]
 
 def freeImage(image_ID):

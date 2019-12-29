@@ -22,7 +22,7 @@ def _joyAxisMotion(joystick, axis, value):
 def initJoysticks():
     joysticks.clear()
     #TODO: replace pyglet call (pyglet.input.get_joysticks)
-    joysticks.extend(get_joysticks())
+    #joysticks.extend(get_joysticks())
     for stick in joysticks:
         stick.on_joybutton_press = _joyButtonPress
         stick.on_joybutton_release = _joyButtonRelease

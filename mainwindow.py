@@ -20,7 +20,7 @@ class main_window(sWindow):
     def __init__(self, width=800, height=600, fullscreen=None, fake_fullscreen=None):
         super(main_window, self).__init__(width=width, height=height, vsync=settings.getValue(DYNAMIC_SETTINGS_VSYNC), fullscreen=fullscreen or settings.getValue(DYNAMIC_SETTINGS_FULLSCREEN), fake_fullscreen=fake_fullscreen or settings.getValue(DYNAMIC_SETTINGS_FAKE_FULLSCREEN))
         self._fake_fullscreen = fake_fullscreen
-        self.set_caption(settings.getValue(DYNAMIC_SETTINGS_GAME_CAPTION))
+        #self.set_caption(settings.getValue(DYNAMIC_SETTINGS_GAME_CAPTION))
         self.test_timer = timer.Timer()
 
     def on_close(self):

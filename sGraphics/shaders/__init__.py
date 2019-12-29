@@ -1,3 +1,3 @@
 
 
-from kaiengine.sGraphics.shaders.opengl import *
+from kaiengine.sGraphics.shaders.moderngl import *
