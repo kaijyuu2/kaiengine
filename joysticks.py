@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pyglet
 from kaiengine.event import joybuttonPressEvent, joybuttonReleaseEvent
 
 JOYSTICK_PREFIX = "JOY_"
@@ -22,7 +21,8 @@ def _joyAxisMotion(joystick, axis, value):
 
 def initJoysticks():
     joysticks.clear()
-    joysticks.extend(pyglet.input.get_joysticks())
+    #TODO: replace pyglet call (pyglet.input.get_joysticks)
+    joysticks.extend(get_joysticks())
     for stick in joysticks:
         stick.on_joybutton_press = _joyButtonPress
         stick.on_joybutton_release = _joyButtonRelease

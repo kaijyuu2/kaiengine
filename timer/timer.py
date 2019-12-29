@@ -1,10 +1,9 @@
 
-
-from pyglet.clock import Clock
 #for controlling time
 
 class MainTimer(object): #main timer everything synchronizes to
     def __init__(self):
+        #TODO: replace pyglet (Clock)
         self.clock = Clock()
         self.clock.tick()
         self.time_elapsed = 0.0

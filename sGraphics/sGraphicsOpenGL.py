@@ -34,8 +34,6 @@ from OpenGL.error import GLError
 from OpenGL.arrays import vbo as glvbo
 from PIL import Image
 from numpy import array, float32
-from pyglet.canvas import get_display
-from pyglet.window import Window
 
 #basic python stuff
 import weakref
@@ -144,6 +142,7 @@ def getCameraXY(x, y):
     return None #error
 
 def getScreenResolution(screenIndex=None):
+    #TODO: replace pyglet call (get_display)
     disp = get_display()
     if screenIndex:
         screen = disp.get_screens()[screenIndex]
@@ -1453,7 +1452,7 @@ class windowVBOInterface(object):
         return self.vbo
 
 
-
+#TODO: replace pyglet call (Window)
 class sWindow(Window, windowVBOInterface):
     def __init__(self, width=800, height=600, vsync = VSYNC_DEFAULT, fullscreen=False, fake_fullscreen=False):
         if fake_fullscreen:
@@ -1719,6 +1718,7 @@ class sWindow(Window, windowVBOInterface):
         return self.camera_x, self.camera_y
 
     def get_largest_screen_size(self):
+        #TODO: replace pyglet call (get_display)
         widths, heights = tuple(zip(*[(screen.width, screen.height) for screen in get_display().get_screens()]))
         return (max(widths), max(heights))
 

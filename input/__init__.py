@@ -1,6 +1,6 @@
-from . import pygletkeys
-
-KEYS = pygletkeys.KEYS
+#KEYS = pygletkeys.KEYS
+#TODO: replace pyglet key enumeration
+KEYS = {}
 
 def standardizedKey(raw_key):
     try:

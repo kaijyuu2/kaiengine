@@ -2,7 +2,6 @@
 
 #main window stuff
 from .sGraphics import sWindow
-from pyglet.gl import *
 from PIL import Image
 from . import event
 from .resource import toStringPath
@@ -30,7 +29,7 @@ class main_window(sWindow):
         self.close()
 
     def set_icon(self, *images):
-        from pyglet.image import load
+        #TODO: replace pyglet call (load)
         icons = []
         for image in images:
             try:

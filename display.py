@@ -45,12 +45,6 @@ def setupWindow(fullscreen=None, x = None, y = None, fake_fullscreen=None):
         settings.setValue(DYNAMIC_SETTINGS_GLOBAL_SCALING, multiplier)
         sGraphics.graphicsInitWindow(main_window(x, y, None, fake_fullscreen=True))
 
-        #TODO: fix this absurd shit
-        if platform == "win32":
-            from pyglet.window.win32 import _user32
-            from pyglet.libs.win32.constants import HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE
-            _user32.SetWindowPos(getWindow()._hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE)
-
         #TODO: location to correct one for 2nd monitors, etc
         getWindow().set_location(0, 0)
     else:

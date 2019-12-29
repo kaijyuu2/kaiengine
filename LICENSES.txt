@@ -1,5 +1,5 @@
 Kai Engine (C)2018 Kaijyuu, (C)2018 Doctus
-        
+
 Kai Engine uses or links to these projects under
 the following licenses:
 
@@ -17,8 +17,8 @@ Detailed license information for each project follows.
 
 
 Python License
-==============    
-        
+==============
+
 1. This LICENSE AGREEMENT is between the Python Software Foundation
 ("PSF"), and the Individual or Organization ("Licensee") accessing and
 otherwise using this software ("Python") in source or binary form and
@@ -31,7 +31,7 @@ prepare derivative works, distribute, and otherwise use Python
 alone or in any derivative version, provided, however, that PSF's
 License Agreement and PSF's notice of copyright, i.e., "Copyright (c)
 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights
-Reserved" are retained in Python alone or in any derivative version 
+Reserved" are retained in Python alone or in any derivative version
 prepared by Licensee.
 
 3. In the event Licensee prepares a derivative work that is based on
@@ -73,28 +73,28 @@ NOTE:
 
     THIS SOFTWARE IS NOT FAULT TOLERANT AND SHOULD NOT BE USED IN ANY
     SITUATION ENDANGERING HUMAN LIFE OR PROPERTY.
-    
+
 OpenGL-ctypes License
 
     Copyright (c) 2005-2014, Michael C. Fletcher and Contributors
     All rights reserved.
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
-    
+
         Redistributions of source code must retain the above copyright
         notice, this list of conditions and the following disclaimer.
-    
+
         Redistributions in binary form must reproduce the above
         copyright notice, this list of conditions and the following
         disclaimer in the documentation and/or other materials
         provided with the distribution.
-    
+
         The name of Michael C. Fletcher, or the name of any Contributor,
-        may not be used to endorse or promote products derived from this 
+        may not be used to endorse or promote products derived from this
         software without specific prior written permission.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
     ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -106,7 +106,7 @@ OpenGL-ctypes License
     HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
     STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-    OF THE POSSIBILITY OF SUCH DAMAGE. 
+    OF THE POSSIBILITY OF SUCH DAMAGE.
 
 OpenGL-ctypes includes code from the PyOpenGL 2.x series licensed under
 version 3 of the PyOpenGL License (BSD-style):
@@ -117,7 +117,7 @@ version 3 of the PyOpenGL License (BSD-style):
     James Hugunin, Cambridge MA, USA, Thomas Schwaller, Munich, Germany
     and David Ascher, San Francisco CA, USA.
 
-    Contributors to the PyOpenGL project in addition to those listed 
+    Contributors to the PyOpenGL project in addition to those listed
     above include:
         * David Konerding
         * Soren Renner
@@ -139,7 +139,7 @@ version 3 of the PyOpenGL License (BSD-style):
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
     met:
-    
+
     * Redistributions of source code must retain the above copyright
         notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
@@ -149,7 +149,7 @@ version 3 of the PyOpenGL License (BSD-style):
     * The names of the contributors may not be used to endorse or
         promote products derived from this software without specific prior
         written permission.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
     "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -163,19 +163,19 @@ version 3 of the PyOpenGL License (BSD-style):
     USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
     DAMAGE.
 
-OpenGL-ctypes includes code from the Pyglet project, licensed under the 
+OpenGL-ctypes includes code from the Pyglet project, licensed under the
 Pyglet License (BSD Style):
 
     Copyright (c) 2006-2008 Alex Holkner
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions 
+    modification, are permitted provided that the following conditions
     are met:
-    
+
     * Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
-     * Redistributions in binary form must reproduce the above copyright 
+     * Redistributions in binary form must reproduce the above copyright
        notice, this list of conditions and the following disclaimer in
        the documentation and/or other materials provided with the
        distribution.
@@ -197,8 +197,8 @@ Pyglet License (BSD Style):
     ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 
-OpenGL-ctypes may include source code from the GLE (GL Tubing and Extrusion) library, which is 
-licensed under the license declared in OpenGL/DLLS/gle_COPYING.src if GLE is included in this 
+OpenGL-ctypes may include source code from the GLE (GL Tubing and Extrusion) library, which is
+licensed under the license declared in OpenGL/DLLS/gle_COPYING.src if GLE is included in this
 distribution.  Copyright notice follows:
 
     This software is owned by International Business Machines Corporation
@@ -206,8 +206,8 @@ distribution.  Copyright notice follows:
     licensed, not sold.  IBM retains title to the software, and grants you a
     nonexclusive license for the software.
 
-OpenGL-ctypes may include source code from the GLUT (GL Utility Toolkit) library, which is licensed 
-under the following license/copyright notice (available in OpenGL/DLLS/glut_README.txt if GLUT is 
+OpenGL-ctypes may include source code from the GLUT (GL Utility Toolkit) library, which is licensed
+under the following license/copyright notice (available in OpenGL/DLLS/glut_README.txt if GLUT is
 included in this distribution:
 
     The OpenGL Utility Toolkit distribution for Win32 (Windows NT &
@@ -225,7 +225,7 @@ included in this distribution:
 
     OpenGL (R) is a registered trademark of Silicon Graphics, Inc.
 
-OpenGL-ctypes may include binary distributions of the Tk Togl widget, which is licensed under the 
+OpenGL-ctypes may include binary distributions of the Tk Togl widget, which is licensed under the
 following license/copyright notice (available in OpenGL/Tk/*/LICENSE if Togl is included).
 
     This software is copyrighted by Brian Paul (brian@mesa3d.org),
@@ -263,7 +263,7 @@ Licensed), Copyright (c) 2012 Xu, Yuan <xuyuan.cn@gmail.com>:
     https://github.com/xuyuan/PyOSMesa
     http://opensource.org/licenses/MIT
 
-OpenGL-ctypes uses a table from the Chromium Regal project to provide 
+OpenGL-ctypes uses a table from the Chromium Regal project to provide
 constant:array-size mappings.  Regal is:
 
     Copyright (c) 2011-2012 NVIDIA Corporation
@@ -307,7 +307,7 @@ modification, are permitted provided that the following conditions are met:
 
   * Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright 
+  * Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer in
     the documentation and/or other materials provided with the
     distribution.
@@ -331,8 +331,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 Pillow License
-==============     
-     
+==============
+
 The Python Imaging Library (PIL) is
 
     Copyright c 1997-2011 by Secret Labs AB
@@ -349,8 +349,8 @@ By obtaining, using, and/or copying this software and/or its associated document
 Permission to use, copy, modify, and distribute this software and its associated documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appears in all copies, and that both that copyright notice and this permission notice appear in supporting documentation, and that the name of Secret Labs AB or the author not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission.
 
 SECRET LABS AB AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL SECRET LABS AB OR THE AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-     
-     
+
+
 Numpy License
 =============
 
@@ -366,7 +366,7 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ÅgAS ISÅh AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-        
+
 Sortedcontainers License
 ========================
 
