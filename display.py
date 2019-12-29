@@ -57,7 +57,7 @@ def getWindow():
     return sGraphics.getGameWindow()
 
 def getWindowDimensions():
-    return getWindow().get_size()
+    return getWindow().size
 
 def getWindowDimensionsScaled():
     dim = getWindowDimensions()

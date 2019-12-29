@@ -23,6 +23,10 @@ class main_window(sWindow):
         #self.set_caption(settings.getValue(DYNAMIC_SETTINGS_GAME_CAPTION))
         self.test_timer = timer.Timer()
 
+    def dispatch_events(*args, **kwargs):
+        #TODO: do we need this?
+        pass
+
     def on_close(self):
         #do something on window close here
         event.gameCloseEvent()

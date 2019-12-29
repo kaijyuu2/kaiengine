@@ -22,7 +22,7 @@ from OpenGL.GL import glPixelStorei, glTexImage2D, glDeleteTextures, glDrawArray
 from OpenGL.GL import glReadPixels, glUseProgram, glEnableVertexAttribArray
 from OpenGL.GL import glDisableVertexAttribArray, glVertexAttribPointer
 from OpenGL.GL import glGenVertexArrays, glBindVertexArray, glGetAttribLocation
-from OpenGL.GL import glUniformMatrix4fv, glGetUniformLocation, glUniform1f
+from OpenGL.GL import glUniformMatrix4fv, glUniform1f
 from OpenGL.GL import glBlendFunc, glEnable, glGenFramebuffers, glBindFramebuffer
 from OpenGL.GL import GLenum, glCheckFramebufferStatus, glFramebufferTexture2D
 from OpenGL.GL import glDrawBuffers, glClear, glUniform2f
@@ -1609,18 +1609,18 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
     def setScreenUniformValue(self, uniform_name, value):
         self.screen_uniform_values[uniform_name] = value
 
-    def _drawToFBO(self, _glBindTexture=glBindTexture, _glDrawArrays=glDrawArrays, _glUniform1f=glUniform1f, _glGetUniformLocation=glGetUniformLocation, _getUniformArgs=getUniformArgs):
-        glUseProgram(self.shader)
+    def _drawToFBO(self, _glBindTexture=glBindTexture, _glDrawArrays=glDrawArrays, _glUniform1f=glUniform1f, _getUniformArgs=getUniformArgs):
+        glUseProgram(self.shader.glo)
         glBindFramebuffer(GL_FRAMEBUFFER, self.fbo)
         if not self.layers_sorted:
             self.sorted_layer_keys = sorted(self.images.keys())
             self.layers_sorted = True
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for uniform_name, uniform_type in self.uniforms.items():
-            loc = _glGetUniformLocation(self.shader, uniform_name)
+            loc = self.shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
             UNIFORM_FUNC[uniform_type](loc, *_getUniformArgs(self, uniform_name, uniform_type))
         glBindVertexArray(self.vao)
-        _layer = glGetUniformLocation(self.shader, "layer")
+        _layer = self.shader.get("layer", TEMP_SHADER_FALLBACK).location
         _img = None
         for layer in self.sorted_layer_keys:
             _glUniform1f(_layer, layer)
@@ -1630,17 +1630,17 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
                 _glDrawArrays(GL_TRIANGLES, image[IMAGE_VBO]*VERTEX_PER_TRIANGLE_PER_QUAD, image[IMAGE_COUNT]*VERTEX_PER_TRIANGLE_PER_QUAD)
 
     def _drawFBOtoScreen(self):
-        glUseProgram(self.post_shader)
+        glUseProgram(self.post_shader.glo)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for uniform_name, uniform_type in self.screen_uniforms.items():
-            loc = glGetUniformLocation(self.post_shader, uniform_name)
+            loc = self.post_shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
             UNIFORM_FUNC[uniform_type](loc, *self.getScreenUniformArgs(uniform_name, uniform_type))
-        loc = glGetUniformLocation(self.post_shader, "scaling")
+        loc = self.post_shader.get("scaling", TEMP_SHADER_FALLBACK).location
         glUniform2f(loc, self.global_scaling, self.global_scaling)
-        loc = glGetUniformLocation(self.post_shader, "step")
+        loc = self.post_shader.get("step", TEMP_SHADER_FALLBACK).location
         glUniform2f(loc, *self.step)
-        loc = glGetUniformLocation(self.post_shader, "time")
+        loc = self.post_shader.get("time", TEMP_SHADER_FALLBACK).location
         glUniform1f(loc, self.uniform_values["time"])
         glBindVertexArray(self.fbo_vao)
         glBindTexture(GL_TEXTURE_2D, self.fbo_texture)
