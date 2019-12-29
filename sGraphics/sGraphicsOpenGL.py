@@ -39,11 +39,13 @@ from numpy import array, float32
 import weakref
 import copy
 from math import floor
-import moderngl_window as mglw
+import moderngl_window
 #import traceback
 #import math
 
 gameWindow = None
+
+MODERNGL_WINDOW_CLASS = moderngl_window.utils.module_loading.import_string('moderngl_window.context.glfw.Window')
 
 UNIFORM_FUNC = {"float": glUniform1f, "matrix4": glUniformMatrix4fv}
 
@@ -1452,17 +1454,30 @@ class windowVBOInterface(object):
     def get_vbo(self):
         return self.vbo
 
+'''
+moderngl_window.conf.settings.WINDOW['class'] = MODERNGL_WINDOW_CLASS
+settings.WINDOW['gl_version'] = (4, 1)
 
-#TODO: replace pyglet call (Window)
-class sWindow(mglw.WindowConfig, windowVBOInterface):
+# Creates the window instance and activates its context
+window = moderngl_window.create_window_from_settings()'''
 
-    gl_version = (3, 3)
+'''def create_window_from_settings() -> BaseWindow:
+    """
+    Creates a window using configured values in :py:attr:`moderngl_window.conf.Settings.WINDOW`.
+    This will also activate the window/context.
+    Returns:
+        The Window instance
+    """
+    window_cls = import_string(settings.WINDOW['class'])
+    window = window_cls(**settings.WINDOW)
+
+return window'''
+
+class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
 
     def __init__(self, width=800, height=600, vsync = VSYNC_DEFAULT, fullscreen=False, fake_fullscreen=False):
-        if fake_fullscreen:
-            super(sWindow, self).__init__(width=width, height=height, vsync = vsync, resizable=False, style=Window.WINDOW_STYLE_BORDERLESS)
-        else:
-            super(sWindow, self).__init__(width=width, height=height, vsync = vsync, fullscreen=fullscreen, resizable=False)
+        super().__init__(gl_version=(4, 5), size=(width, height), title="KAIENGINE TEST")
+        moderngl_window.activate_context(window=self)
         self.fbo_texture = None
         self.overlay_fbo_texture = None
         self._fbos = {}

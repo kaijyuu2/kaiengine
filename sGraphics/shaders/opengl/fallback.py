@@ -1,6 +1,6 @@
 
 
-COMPAT_VERT_SHADER = '''#version 110
+COMPAT_VERT_SHADER = '''#version 330
                 attribute vec2 tex;
                 attribute vec2 coord;
                 attribute vec4 color;
@@ -16,7 +16,7 @@ COMPAT_VERT_SHADER = '''#version 110
                     gl_Position = vec4(clampedcoords.x, clampedcoords.y, 0.0, 1.0) * orthom;
                 }'''
 
-COMPAT_SVERT_SHADER = '''#version 110
+COMPAT_SVERT_SHADER = '''#version 330
                 attribute vec2 tex;
                 attribute vec2 coord;
                 uniform vec2 scaling;
@@ -27,7 +27,7 @@ COMPAT_SVERT_SHADER = '''#version 110
                     gl_Position = vec4(coord.x, coord.y, 0.0, 1.0);
                 }'''
 
-COMPAT_FRAG_SHADER = """#version 110
+COMPAT_FRAG_SHADER = """#version 330
     uniform sampler2D texture1;
     uniform float time;
     varying vec2 texcoord;
@@ -37,7 +37,7 @@ COMPAT_FRAG_SHADER = """#version 110
         gl_FragColor = texture2D(texture1, texcoord) * colormod;
     }"""
 
-COMPAT_SFRAG_SHADER = """#version 110
+COMPAT_SFRAG_SHADER = """#version 330
     uniform sampler2D texture1;
     uniform float time;
     uniform vec2 step;
@@ -47,7 +47,7 @@ COMPAT_SFRAG_SHADER = """#version 110
         gl_FragColor = texture2D(texture1, texcoord);
     }"""
 
-COMPAT_OVERTEX_SHADER = '''#version 110
+COMPAT_OVERTEX_SHADER = '''#version 330
                 attribute vec2 tex;
                 attribute vec2 coord;
                 varying vec2 texcoord;
@@ -56,7 +56,7 @@ COMPAT_OVERTEX_SHADER = '''#version 110
                     gl_Position = vec4(coord.x, coord.y, 0.0, 1.0);
                 }'''
 
-COMPAT_OFRAG_SHADER = """#version 110
+COMPAT_OFRAG_SHADER = """#version 330
         uniform sampler2D texture1;
         varying vec2 texcoord;
 
