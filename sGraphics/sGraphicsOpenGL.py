@@ -1617,13 +1617,19 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
             self.layers_sorted = True
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for uniform_name, uniform_type in self.uniforms.items():
-            loc = self.shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
-            UNIFORM_FUNC[uniform_type](loc, *_getUniformArgs(self, uniform_name, uniform_type))
+            try:
+                loc = self.shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
+                UNIFORM_FUNC[uniform_type](loc, *_getUniformArgs(self, uniform_name, uniform_type))
+            except:
+                pass
         glBindVertexArray(self.vao)
         _layer = self.shader.get("layer", TEMP_SHADER_FALLBACK).location
         _img = None
         for layer in self.sorted_layer_keys:
-            _glUniform1f(_layer, layer)
+            try:
+                _glUniform1f(_layer, layer)
+            except:
+                pass
             for image in self.images[layer].values():
                 if _img != (_img := image[IMAGE_TEXTURE]):
                     _glBindTexture(GL_TEXTURE_2D, _img)
@@ -1637,17 +1643,26 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
             loc = self.post_shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
             UNIFORM_FUNC[uniform_type](loc, *self.getScreenUniformArgs(uniform_name, uniform_type))
         loc = self.post_shader.get("scaling", TEMP_SHADER_FALLBACK).location
-        glUniform2f(loc, self.global_scaling, self.global_scaling)
+        try:
+            glUniform2f(loc, self.global_scaling, self.global_scaling)
+        except:
+            pass
         loc = self.post_shader.get("step", TEMP_SHADER_FALLBACK).location
-        glUniform2f(loc, *self.step)
+        try:
+            glUniform2f(loc, *self.step)
+        except:
+            pass
         loc = self.post_shader.get("time", TEMP_SHADER_FALLBACK).location
-        glUniform1f(loc, self.uniform_values["time"])
+        try:
+            glUniform1f(loc, self.uniform_values["time"])
+        except:
+            pass
         glBindVertexArray(self.fbo_vao)
         glBindTexture(GL_TEXTURE_2D, self.fbo_texture)
         glDrawArrays(GL_TRIANGLES, 0, 6)
 
     def _drawOverlay(self):
-        glUseProgram(OVERLAY_SHADER)
+        #glUseProgram(OVERLAY_SHADER)
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         #glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glBindVertexArray(self.overlay_vao)
@@ -1663,7 +1678,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         self._drawFBOtoScreen()
         if self._draw_overlay:
             self._drawOverlay()
-        super(sWindow, self).flip()
+        super().swap_buffers()
 
     def set_global_scaling(self, value):
         self.global_scaling = value
