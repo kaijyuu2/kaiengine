@@ -1656,18 +1656,14 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
 
     def _main_draw_function(self):
         #main draw function
-        try:
-            windowsize = self.size
-            if windowsize[Xi] <= 0 or windowsize[Yi] <= 0: #crash prevention on minimize
-                return
-            self._drawToFBO()
-            self._drawFBOtoScreen()
-            if self._draw_overlay:
-                self._drawOverlay()
-            super(sWindow, self).flip()
-        except GLError:
-            #TODO: possibly only suppress during close?
-            pass
+        windowsize = self.size
+        if windowsize[Xi] <= 0 or windowsize[Yi] <= 0: #crash prevention on minimize
+            return
+        self._drawToFBO()
+        self._drawFBOtoScreen()
+        if self._draw_overlay:
+            self._drawOverlay()
+        super(sWindow, self).flip()
 
     def set_global_scaling(self, value):
         self.global_scaling = value
