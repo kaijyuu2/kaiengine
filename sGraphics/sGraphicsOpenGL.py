@@ -45,12 +45,6 @@ MODERNGL_WINDOW_CLASS = moderngl_window.utils.module_loading.import_string('mode
 
 UNIFORM_FUNC = {"float": glUniform1f, "matrix4": glUniformMatrix4fv}
 
-class TEMP_SHADER_FALLBACK_OBJ():
-
-    location = 0
-
-TEMP_SHADER_FALLBACK = TEMP_SHADER_FALLBACK_OBJ()
-
 def graphicsInit(window_x, window_y):
     graphicsInitWindow(CreateWindow(window_x, window_y))
 
@@ -1026,8 +1020,8 @@ class windowVBOInterface(object):
         self.overlay_vbo = glvbo.VBO(frame_data)
         self.overlay_vbo.bind()
 
-        index_tex = self.post_shader.get("tex", TEMP_SHADER_FALLBACK).location
-        index_coord = self.post_shader.get("coord", TEMP_SHADER_FALLBACK).location
+        index_tex = self.post_shader.get("tex", None).location
+        index_coord = self.post_shader.get("coord", None).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, 16, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1054,8 +1048,8 @@ class windowVBOInterface(object):
         self.frame_vbo = glvbo.VBO(frame_data)
         self.frame_vbo.bind()
 
-        index_tex = self.post_shader.get("tex", TEMP_SHADER_FALLBACK).location
-        index_coord = self.post_shader.get("coord", TEMP_SHADER_FALLBACK).location
+        index_tex = self.post_shader.get("tex", None).location
+        index_coord = self.post_shader.get("coord", None).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, 16, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1075,8 +1069,8 @@ class windowVBOInterface(object):
         glBindVertexArray(self.fbo_vao)
         self.frame_vbo.bind()
 
-        index_tex = self.post_shader.get("tex", TEMP_SHADER_FALLBACK).location
-        index_coord = self.post_shader.get("coord", TEMP_SHADER_FALLBACK).location
+        index_tex = self.post_shader.get("tex", None).location
+        index_coord = self.post_shader.get("coord", None).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, 16, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1159,8 +1153,8 @@ class windowVBOInterface(object):
         glBindVertexArray(self.vao)
         self.vbo.bind()
 
-        index_tex = self.shader.get("tex", TEMP_SHADER_FALLBACK).location
-        index_coord = self.shader.get("coord", TEMP_SHADER_FALLBACK).location
+        index_tex = self.shader.get("tex", None).location
+        index_coord = self.shader.get("coord", None).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1177,8 +1171,8 @@ class windowVBOInterface(object):
         glBindVertexArray(self.vao)
         self.vbo.bind()
 
-        index_tex = self.shader.get("tex", TEMP_SHADER_FALLBACK).location
-        index_coord = self.shader.get("coord", TEMP_SHADER_FALLBACK).location
+        index_tex = self.shader.get("tex", None).location
+        index_coord = self.shader.get("coord", None).location
         glEnableVertexAttribArray(index_tex)
         glVertexAttribPointer(index_tex, TEX_COORD_AMOUNT, VALUE_TYPE, GL_FALSE, STRIDE, TEX_COORD_STRIDE_OFFSET)
         glEnableVertexAttribArray(index_coord)
@@ -1618,12 +1612,12 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for uniform_name, uniform_type in self.uniforms.items():
             try:
-                loc = self.shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
+                loc = self.shader.get(uniform_name, None).location
                 UNIFORM_FUNC[uniform_type](loc, *_getUniformArgs(self, uniform_name, uniform_type))
             except:
                 pass
         glBindVertexArray(self.vao)
-        _layer = self.shader.get("layer", TEMP_SHADER_FALLBACK).location
+        _layer = self.shader.get("layer", None).location
         _img = None
         for layer in self.sorted_layer_keys:
             try:
@@ -1640,19 +1634,19 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         for uniform_name, uniform_type in self.screen_uniforms.items():
-            loc = self.post_shader.get(uniform_name, TEMP_SHADER_FALLBACK).location
+            loc = self.post_shader.get(uniform_name, None).location
             UNIFORM_FUNC[uniform_type](loc, *self.getScreenUniformArgs(uniform_name, uniform_type))
-        loc = self.post_shader.get("scaling", TEMP_SHADER_FALLBACK).location
+        loc = self.post_shader.get("scaling", None).location
         try:
             glUniform2f(loc, self.global_scaling, self.global_scaling)
         except:
             pass
-        loc = self.post_shader.get("step", TEMP_SHADER_FALLBACK).location
+        loc = self.post_shader.get("step", None).location
         try:
             glUniform2f(loc, *self.step)
         except:
             pass
-        loc = self.post_shader.get("time", TEMP_SHADER_FALLBACK).location
+        loc = self.post_shader.get("time", None).location
         try:
             glUniform1f(loc, self.uniform_values["time"])
         except:
