@@ -41,7 +41,14 @@ import moderngl_window
 
 gameWindow = None
 
-MODERNGL_WINDOW_CLASS = moderngl_window.utils.module_loading.import_string('moderngl_window.context.glfw.Window')
+_WINDOW_GLFW = 'moderngl_window.context.glfw.Window'
+_WINDOW_PYGAME2 = 'moderngl_window.context.pygame2.Window'
+_WINDOW_PYGLET = 'moderngl_window.context.pyglet.Window'
+_WINDOW_PYQT5 = 'moderngl_window.context.pyqt5.Window'
+_WINDOW_PYSIDE2 = 'moderngl_window.context.pyside2.Window'
+_WINDOW_SDL2 = 'moderngl_window.context.sdl2.Window'
+_WINDOW_TK = 'moderngl_window.context.tk.Window'
+MODERNGL_WINDOW_CLASS = moderngl_window.utils.module_loading.import_string(_WINDOW_GLFW)
 
 UNIFORM_FUNC = {"float": glUniform1f, "matrix4": glUniformMatrix4fv}
 
@@ -1665,6 +1672,8 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
 
     def _main_draw_function(self):
         #main draw function
+        self.clear()
+        self.render(0, 1)
         windowsize = self.size
         if windowsize[Xi] <= 0 or windowsize[Yi] <= 0: #crash prevention on minimize
             return
@@ -1672,7 +1681,7 @@ class sWindow(MODERNGL_WINDOW_CLASS, windowVBOInterface):
         self._drawFBOtoScreen()
         if self._draw_overlay:
             self._drawOverlay()
-        super().swap_buffers()
+        self.swap_buffers()
 
     def set_global_scaling(self, value):
         self.global_scaling = value

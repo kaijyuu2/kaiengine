@@ -82,7 +82,8 @@ def setWindowDimensionsScaled(x = None, y = None, *args, **kwargs):
     setWindowDimensions(x * scaling, y * scaling, *args, **kwargs)
 
 def setWindowLogo(*logos):
-    getWindow().set_icon(*logos)
+    pass
+    #getWindow().set_icon(*logos)
 
 def hideWindowCursor():
     """Wrapper for whatever we need to do to hide the hardware cursor."""

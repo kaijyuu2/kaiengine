@@ -21,16 +21,23 @@ class main_window(sWindow):
         super(main_window, self).__init__(width=width, height=height, vsync=settings.getValue(DYNAMIC_SETTINGS_VSYNC), fullscreen=fullscreen or settings.getValue(DYNAMIC_SETTINGS_FULLSCREEN), fake_fullscreen=fake_fullscreen or settings.getValue(DYNAMIC_SETTINGS_FAKE_FULLSCREEN))
         self._fake_fullscreen = fake_fullscreen
         #self.set_caption(settings.getValue(DYNAMIC_SETTINGS_GAME_CAPTION))
-        self.test_timer = timer.Timer()
+        self.resize_func = self.test_resize_func
+        self.iconify_func = self.test_iconify_func
+        self.key_event_func = self.test_key_event_func
+        self.mouse_position_event_func = self.test_mouse_position_event_func
+        self.mouse_drag_event_func = self.test_mouse_drag_event_func
+        self.mouse_scroll_event_func = self.test_mouse_scroll_event_func
+        self.mouse_press_event_func = self.test_mouse_press_event_func
+        self.mouse_release_event_func = self.test_mouse_release_event_func
+        self.unicode_char_entered_func = self.test_unicode_char_entered_func
 
-    def dispatch_events(*args, **kwargs):
+    def dispatch_events(self, *args, **kwargs):
         #TODO: do we need this?
         pass
 
-    def on_close(self):
+    def close(self):
         #do something on window close here
         event.gameCloseEvent()
-        self.close()
 
     def set_icon(self, *images):
         #TODO: replace pyglet call (load)
@@ -49,59 +56,50 @@ class main_window(sWindow):
             return False
         super().set_icon(*icons)
 
-    def on_key_press(self, symbol, modifiers):
-        event.keyPressEvent(symbol)
+    def test_key_event_func(self, key, action, modifiers):
+        if action == self.keys.ACTION_PRESS:
+            event.keyPressEvent(key)
+        else:
+            event.keyReleaseEvent(key)
 
-    def on_key_release(self, symbol, modifiers):
-        event.keyReleaseEvent(symbol)
+    def test_resize_func(self, width, height):
+        print("window resize: ", width, height)
 
-    def on_mouse_press(self, x, y, button, modifiers):
+    def test_iconify_func(self, iconified):
+        print("minimize/restore: ", iconified)
+
+    def test_mouse_position_event_func(self, x, y, dx, dy):
         scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
-        x = x / scaling
-        y = y / scaling
-        event.mousePressEvent(x, y, button)
-
-    def on_mouse_release(self, x, y, button, modifiers):
-        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
-        x = x / scaling
-        y = y / scaling
-        event.mouseReleaseEvent(x, y, button)
-
-    def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
-        x = x / scaling
-        y = y / scaling
-        dx = dx / scaling
-        dy = dy / scaling
-        event.mouseDragEvent(x, y, dx, dy, buttons)
-
-    def on_mouse_motion(self, x, y, dx, dy):
-        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
-        x = x / scaling
-        y = y / scaling
-        dx = dx / scaling
-        dy = dy / scaling
+        x = int(x / scaling)
+        y = int(y / scaling)
+        dx = int(dx / scaling)
+        dy = int(dy / scaling)
         event.mouseMoveEvent(x, y, dx, dy)
 
-    def on_mouse_enter(self, x, y):
+    def test_mouse_drag_event_func(self, x, y, dx, dy):
         scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
-        x = x / scaling
-        y = y / scaling
-        event.mouseEnterEvent(x, y)
+        x = int(x / scaling)
+        y = int(y / scaling)
+        dx = int(dx / scaling)
+        dy = int(dy / scaling)
+        event.mouseMoveEvent(x, y, dx, dy)
+        #event.mouseDragEvent(x, y, dx, dy, BUTTON) #TODO: buttons
 
-    def on_mouse_leave(self, x, y):
+    def test_mouse_scroll_event_func(self, x_offset, y_offset):
+        print("mouse scroll: ", x_offset, y_offset)
+
+    def test_mouse_press_event_func(self, x, y, button):
         scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
-        x = x / scaling
-        y = y / scaling
-        event.mouseExitEvent(x, y)
+        x = int(x / scaling)
+        y = int(y / scaling)
+        print("Mouse press: ", x, y, button)
+        event.mousePressEvent(x, y, button)
 
-    def on_activate(self, *args, **kwargs):
-        if self._fake_fullscreen:
-           self.maximize()
+    def test_mouse_release_event_func(self, x, y, button):
+        scaling = settings.getValue(DYNAMIC_SETTINGS_GLOBAL_SCALING)
+        x = int(x / scaling)
+        y = int(y / scaling)
+        event.mouseReleaseEvent(x, y, button)
 
-    def on_deactivate(self, *args, **kwargs):
-        if self._fake_fullscreen:
-            self.minimize()
-
-    def on_joybutton_release(self, joystick, button):
-        pass
+    def test_unicode_char_entered_func(self, character):
+        print("unicode character entered: ", character)
